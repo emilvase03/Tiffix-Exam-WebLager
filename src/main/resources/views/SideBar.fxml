@@ -11,7 +11,7 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="dk.easv.tiffixexamweblager.SideBarController"
+      fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.SideBarController"
       styleClass="sidebar"
       prefWidth="260"
       maxWidth="260"
