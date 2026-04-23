@@ -8,25 +8,38 @@
 <?import javafx.geometry.Insets?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<?import org.kordamp.ikonli.javafx.FontIcon?>
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.SideBarController"
       styleClass="sidebar"
       prefWidth="260"
       maxWidth="260"
-      >
-    <Button text="☰"
-            styleClass="hamburger-btn"
-            onAction="#onBtnCloseSideBar"
-            mnemonicParsing="false"/>
+      maxHeight="Infinity"
+      stylesheets="@../css/style.css">
 
-    <HBox styleClass="sidebar-header"
-          alignment="CENTER_LEFT"
-          spacing="10">
-        <FontIcon iconLiteral="bi-gear-fill" styleClass="sidebar-logo"/>
-        <Label text="TifFix Admin" styleClass="sidebar-app-name"/>
+
+    <HBox alignment="TOP_LEFT"
+          spacing="10"
+          styleClass="sidebar-topbar">
+
+        <Button styleClass="close-btn"
+                onAction="#onBtnCloseSideBar"
+                mnemonicParsing="false">
+            <graphic>
+                <FontIcon iconLiteral="bi-x-square-fill" styleClass="close-icon"/>
+            </graphic>
+        </Button>
+
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <FontIcon iconLiteral="bi-gear-fill"
+                      styleClass="sidebar-logo"/>
+            <Label text="TifFix"
+                   styleClass="sidebar-app-name"/>
+        </HBox>
+
+
     </HBox>
+
     <VBox styleClass="sidebar-nav"
           spacing="4"
           VBox.vgrow="ALWAYS">
@@ -34,16 +47,20 @@
             <Insets top="12" left="12" right="12" bottom="12"/>
         </padding>
 
-        <Label text="NAVIGATION" styleClass="sidebar-section-label"/>
 
-        <Button fx:id="btnUsers"
-                text="  Users"
+
+        <Button fx:id="btnEmployees"
+                text="  Employees"
                 styleClass="sidebar-btn, sidebar-btn-active"
                 maxWidth="Infinity"
                 mnemonicParsing="false"
-                onAction="#onUsers"
+                onAction="#onEmployees"> <graphic>
+            <HBox spacing="6" alignment="CENTER">
+                <FontIcon iconLiteral="bi-people"/>
 
-        />
+            </HBox>
+        </graphic>
+        </Button>
 
         <Button fx:id="btnProfiles"
                 text=" Profiles"
@@ -51,9 +68,10 @@
                 maxWidth="Infinity"
                 mnemonicParsing="false"
                 onAction="#onProfiles"/>
-        <Region VBox.vgrow="ALWAYS"/>
 
+        <Region VBox.vgrow="ALWAYS"/>
     </VBox>
+
     <HBox styleClass="sidebar-footer" alignment="CENTER_LEFT">
         <Label text="v1.0.0" styleClass="sidebar-version"/>
     </HBox>

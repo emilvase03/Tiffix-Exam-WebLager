@@ -1,0 +1,83 @@
+/*
+ Sidebar
+*/
+.sidebar {
+    -fx-background-color: #24C79F;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(0, 0, 0, 0.10),
+            12,
+            0,
+            0,
+            2
+    );
+}
+
+.sidebar-header {
+    -fx-padding: 12px 16px;
+}
+.sidebar-topbar {
+    -fx-padding: 2px 2px;
+}
+.sidebar-app-name {
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+}
+
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2D3D4F;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 6;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+}
+.sidebar-btn-active {
+    -fx-background-color: rgba(255, 255, 255, 0.25);
+    -fx-font-weight: 600;
+}
+
+
+.sidebar .ikonli-font-icon {
+    -fx-icon-color: #2D3D4F;
+}
+
+
+.sidebar-footer {
+    -fx-padding: 12px 16px;
+}
+
+.sidebar-version {
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+}
+.top-bar {
+    -fx-padding: 0 16px 0 0;
+}
+.close-btn {
+    -fx-background-color: transparent;
+    -fx-padding: 4px;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+}
+
+.close-btn .ikonli-font-icon {
+    -fx-icon-size: 16px;
+}
+.close-btn {
+    -fx-background-color: transparent;
+    -fx-padding: 0;           /* no gap between button edge and icon */
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+}
+/* icon fills the button */
+.close-btn .ikonli-font-icon {
+    -fx-icon-size: 32px;
+    -fx-icon-color: white;
+}
+
