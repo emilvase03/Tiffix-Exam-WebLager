@@ -17,7 +17,7 @@ public class Launcher extends Application {
     public void start(Stage stage) throws IOException {
         Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
 
-        ViewHandler.LOGIN.show(false);
+        ViewHandler.ADMIN_DASHBOARD.show(false);
 
     }
 
