@@ -1,16 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.UsersTabController"
-            prefHeight="400.0" prefWidth="600.0">
-
-
-        <Label text="Employees View"
-               style="-fx-font-size: 24px;"/>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
 
-</AnchorPane>
+<BorderPane prefHeight="322.0" prefWidth="390.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EmployeesTabController">
+   <center>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="38.0" prefWidth="390.0" spacing="5.0">
+               <children>
+                  <Label text="Employees" />
+                  <Button alignment="CENTER_RIGHT" mnemonicParsing="false" text="Create Employee">
+                     <HBox.margin>
+                        <Insets left="20.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets left="5.0" top="5.0" />
+               </padding>
+            </HBox>
+            <TableView fx:id="tblEmployeeContainer" prefHeight="159.0" prefWidth="390.0">
+              <columns>
+                <TableColumn fx:id="colFirstName" prefWidth="114.33331298828125" text="First name" />
+                <TableColumn fx:id="colLastName" prefWidth="72.0" text="Last Name" />
+                  <TableColumn fx:id="colUsername" prefWidth="90.3333740234375" text="Username" />
+                  <TableColumn fx:id="colManage" prefWidth="108.33331298828125" text="Manage" />
+              </columns>
+            </TableView>
+         </children>
+      </VBox>
+   </center>
+   <top>
+      <VBox prefHeight="94.0" prefWidth="390.0" BorderPane.alignment="CENTER" />
+   </top>
+</BorderPane>
