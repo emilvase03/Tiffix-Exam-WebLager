@@ -3,6 +3,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
+import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // Java imports
 import javafx.beans.property.SimpleStringProperty;
@@ -23,8 +24,7 @@ public class ProfilesTabController implements Initializable {
         try {
             profileModel = new ProfileModel();
         } catch (Exception e) {
-            // Show Alert to user
-            throw new RuntimeException(e);
+            AlertHelper.showError("Error", "Failed to instantiate ProfileModel.");
         }
     }
 
@@ -39,8 +39,7 @@ public class ProfilesTabController implements Initializable {
         try {
             tblProfiles.setItems(profileModel.getAllProfiles());
         } catch (Exception e) {
-            // Show error to user
-            throw new RuntimeException(e);
+            AlertHelper.showError("Error", "Failed to retrieve profiles from database.");
         }
     }
 
