@@ -7,20 +7,21 @@ import javafx.scene.control.Button;
 public class SideBarController {
 
     @FXML
-    private Button btnUsers;
+    private Button btnEmployees;
     @FXML
     private Button btnProfiles;
 
     private AdminDashboard dashboard;
 
     public void setDashboard(AdminDashboard dashboard) {
+
         this.dashboard = dashboard;
     }
 
     @FXML
-    private void onUsers() {
-        setActiveButton(btnUsers);
-        dashboard.loadView("views/UsersTab.fxml");
+    private void onEmployees() {
+        setActiveButton(btnEmployees);
+        dashboard.loadView("views/EmployeesTab.fxml");
     }
 
     @FXML
@@ -31,7 +32,7 @@ public class SideBarController {
 
     // Visually highlights the selected nav button
     private void setActiveButton(Button active) {
-        btnUsers.getStyleClass().remove("sidebar-btn-active");
+        btnEmployees.getStyleClass().remove("sidebar-btn-active");
         btnProfiles.getStyleClass().remove("sidebar-btn-active");
         active.getStyleClass().add("sidebar-btn-active");
     }

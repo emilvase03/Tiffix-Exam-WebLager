@@ -43,14 +43,15 @@
             <artifactId>atlantafx-base</artifactId>
             <version>2.0.0</version>
         </dependency>
+        <!-- Ikonli core -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
-            <artifactId>ikonli-javafx</artifactId>
+            <artifactId>ikonli-core</artifactId>
             <version>12.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
-            <artifactId>ikonli-feather-pack</artifactId>
+            <artifactId>ikonli-javafx</artifactId>
             <version>12.3.1</version>
         </dependency>
         <dependency>
@@ -77,7 +78,6 @@
                 <version>0.0.8</version>
                 <executions>
                     <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>dk.easv.tiffixexamweblager/dk.easv.tiffixexamweblager.HelloApplication

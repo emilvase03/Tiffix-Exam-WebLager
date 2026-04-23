@@ -12,8 +12,8 @@
            xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="dk.easv.tiffixexamweblager.AdminDashboard"
+           stylesheets="@../css/style.css"
           >
-
     <VBox>
         <HBox styleClass="top-bar"
               alignment="CENTER_LEFT"

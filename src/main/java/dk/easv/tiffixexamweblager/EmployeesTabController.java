@@ -1,4 +1,4 @@
 package dk.easv.tiffixexamweblager;
 
-public class UsersTabController {
+public class EmployeesTabController {
 }

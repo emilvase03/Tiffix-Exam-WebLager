@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager;
 
+import atlantafx.base.theme.NordLight;
 import atlantafx.base.theme.PrimerDark;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +12,7 @@ import java.io.IOException;
 public class Launcher extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/views/AdminDashboard.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
