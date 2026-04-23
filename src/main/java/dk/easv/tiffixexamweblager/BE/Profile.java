@@ -4,8 +4,7 @@ public class Profile {
     private int id;
     private String title;
 
-    public Profile(int id, String title) {
-        setId(id);
+    public Profile(String title) {
         setTitle(title);
     }
 
@@ -13,7 +12,7 @@ public class Profile {
         return id;
     }
 
-    private void setId(int id) {
+    public void setId(int id) {
         if (id != -1)
             this.id = id;
     }

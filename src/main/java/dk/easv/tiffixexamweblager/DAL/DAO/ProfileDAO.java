@@ -32,7 +32,8 @@ public class ProfileDAO implements IProfileDataAccess {
                 while (rs.next()) {
                     int id = rs.getInt("Id");
                     String title = rs.getString("Title");
-                    Profile p = new Profile(id, title);
+                    Profile p = new Profile(title);
+                    p.setId(id);
                     profiles.add(p);
                 }
             }
@@ -48,7 +49,7 @@ public class ProfileDAO implements IProfileDataAccess {
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setInt(1, newProfile.getId());
+            stmt.setString(1, newProfile.getTitle());
 
             stmt.executeUpdate();
 
@@ -58,7 +59,9 @@ public class ProfileDAO implements IProfileDataAccess {
             if (rs.next())
                 id = rs.getInt(1);
 
-            return new Profile(id, rs.getString("Title"));
+            Profile p = new Profile(newProfile.getTitle());
+            p.setId(id);
+            return p;
         }
     }
 
