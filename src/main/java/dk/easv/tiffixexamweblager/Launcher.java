@@ -13,7 +13,7 @@ public class Launcher extends Application {
     public void start(Stage stage) throws IOException {
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/AdminDashboard.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/views/AdminDashboard.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Hello!");
         stage.setScene(scene);

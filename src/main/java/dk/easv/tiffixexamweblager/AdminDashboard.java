@@ -31,7 +31,7 @@ public class AdminDashboard {
     public void initialize() {
         try {
             //  Load sidebar
-            URL sidebarUrl = getClass().getResource("/SideBar.fxml");
+            URL sidebarUrl = getClass().getResource("/views/SideBar.fxml");
             if (sidebarUrl == null) {
                 throw new IllegalStateException("SideBar.fxml not found in resources root");
             }
@@ -56,8 +56,8 @@ public class AdminDashboard {
             modalPane.hide(); // Sidebar hidden by default
 
             // tabs
-            loadView("UsersTab.fxml");
-            loadView("ProfilesTab.fxml");
+            loadView("views/UsersTab.fxml");
+            loadView("views/ProfilesTab.fxml");
 
         } catch (IOException e) {
             e.printStackTrace();

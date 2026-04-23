@@ -20,13 +20,13 @@ public class SideBarController {
     @FXML
     private void onUsers() {
         setActiveButton(btnUsers);
-        dashboard.loadView("UsersTab.fxml");
+        dashboard.loadView("views/UsersTab.fxml");
     }
 
     @FXML
     private void onProfiles() {
         setActiveButton(btnProfiles);
-        dashboard.loadView("ProfilesTab.fxml");
+        dashboard.loadView("views/ProfilesTab.fxml");
     }
 
     // Visually highlights the selected nav button
