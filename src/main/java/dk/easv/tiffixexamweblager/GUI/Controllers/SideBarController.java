@@ -1,4 +1,4 @@
-package dk.easv.tiffixexamweblager;
+package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

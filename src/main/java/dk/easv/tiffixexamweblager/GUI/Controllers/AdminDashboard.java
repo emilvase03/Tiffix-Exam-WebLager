@@ -1,4 +1,4 @@
-package dk.easv.tiffixexamweblager;
+package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import atlantafx.base.controls.ModalPane;
 import javafx.animation.FadeTransition;

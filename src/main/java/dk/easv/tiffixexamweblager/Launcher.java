@@ -1,12 +1,15 @@
 package dk.easv.tiffixexamweblager;
 
-import atlantafx.base.theme.NordLight;
-import atlantafx.base.theme.PrimerDark;
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+// Project imports
+import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
+// AtlantaFX imports
+import atlantafx.base.theme.NordDark;
+import atlantafx.base.theme.NordLight;
+
+// Java imports
+import javafx.application.Application;
+import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Launcher extends Application {
@@ -14,11 +17,8 @@ public class Launcher extends Application {
     public void start(Stage stage) throws IOException {
         Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/views/AdminDashboard.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Hello!");
-        stage.setScene(scene);
-        stage.show();
+        ViewHandler.LOGIN.show(false);
+
     }
 
     public static void main(String[] args) {
