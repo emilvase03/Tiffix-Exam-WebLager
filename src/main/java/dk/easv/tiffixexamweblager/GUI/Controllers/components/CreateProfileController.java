@@ -36,16 +36,17 @@ public class CreateProfileController {
         Profile newProfile = new Profile(txtTitle.getText().trim());
         try {
             profileModel.createProfile(newProfile);
+            txtTitle.clear();
             handleClose();
             profilesTabController.getTable().getItems().add(newProfile);
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to create new profile.");
-            e.printStackTrace();
         }
     }
 
     @FXML
     private void handleCancel(ActionEvent event) {
+        txtTitle.clear();
         handleClose();
     }
 
