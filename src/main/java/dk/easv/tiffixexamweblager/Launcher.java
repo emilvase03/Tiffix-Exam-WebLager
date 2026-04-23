@@ -1,11 +1,15 @@
 package dk.easv.tiffixexamweblager;
 
+// Project imports
+import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
+
+// AtlantaFX imports
 import atlantafx.base.theme.NordDark;
 import atlantafx.base.theme.NordLight;
-import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
+
+// Java imports
 import javafx.application.Application;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 public class Launcher extends Application {
