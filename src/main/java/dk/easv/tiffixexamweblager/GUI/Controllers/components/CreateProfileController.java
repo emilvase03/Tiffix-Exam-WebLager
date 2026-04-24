@@ -9,11 +9,13 @@ import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 // Java imports
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class CreateProfileController {
     @FXML private TextField txtTitle;
+    @FXML private Label lblHeader;
     private VBox overlay;
     private ProfileModel profileModel;
     private ProfilesTabController profilesTabController;
@@ -42,6 +44,7 @@ public class CreateProfileController {
                     profileModel.updateProfile(profileToBeUpdated);
                     profilesTabController.getTable().refresh();
                     txtTitle.clear();
+                    lblHeader.setText("Create a new profile.");
                     handleClose();
                     updateProfile = false;
                 }
@@ -65,6 +68,7 @@ public class CreateProfileController {
     private void handleCancel(ActionEvent event) {
         txtTitle.clear();
         updateProfile = false;
+        lblHeader.setText("Create a new profile.");
         handleClose();
     }
 
@@ -78,6 +82,7 @@ public class CreateProfileController {
 
     public void preloadWindow(Profile profile) {
         txtTitle.setText(profile.getTitle());
+        lblHeader.setText("Edit profile.");
         updateProfile = true;
         profileToBeUpdated = profile;
     }
