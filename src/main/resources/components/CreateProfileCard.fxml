@@ -10,7 +10,7 @@
 
 <VBox fx:id="createProfileCard" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="141.0" prefWidth="327.0" spacing="10.0" styleClass="overlay" stylesheets="@../css/profilesTab.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.CreateProfileController">
    <children>
-      <Label text="Create a new profile.">
+      <Label fx:id="lblHeader" text="Create a new profile.">
          <font>
             <Font name="Roboto Regular" size="12.0" />
          </font>
