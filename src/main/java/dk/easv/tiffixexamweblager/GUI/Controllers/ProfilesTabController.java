@@ -60,4 +60,20 @@ public class ProfilesTabController implements Initializable {
     public TableView<Profile> getTable() {
         return tblProfiles;
     }
+
+    @FXML
+    private void handleDeleteProfile(ActionEvent event) {
+        Profile profile = getTable().getSelectionModel().getSelectedItem();
+        if (profile == null) {
+            AlertHelper.showError("Error", "Please select a profile to delete.");
+            return;
+        }
+
+        try {
+            profileModel.deleteProfile(profile);
+            getTable().getItems().remove(profile);
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to delete the selected profile.");
+        }
+    }
 }
