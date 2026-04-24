@@ -1,11 +1,13 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 // Project imports
-import atlantafx.base.theme.Tweaks;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.CreateProfileController;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// AtlantaFX imports
+import atlantafx.base.theme.Tweaks;
 
 // Java imports
 import javafx.beans.property.SimpleStringProperty;
@@ -13,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import java.net.URL;
@@ -49,12 +52,23 @@ public class ProfilesTabController implements Initializable {
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve profiles from database.");
         }
+
+        tblProfiles.setRowFactory(tv -> {
+            TableRow<Profile> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    Profile selectedProfile = row.getItem();
+                    showOverlay();
+                    createProfileController.preloadWindow(selectedProfile);
+                }
+            });
+            return row;
+        });
     }
 
     @FXML
     private void handleCreateProfile(ActionEvent event) {
-        createProfileOverlay.setVisible(true);
-        createProfileOverlay.setManaged(true);
+        showOverlay();
     }
 
     public TableView<Profile> getTable() {
@@ -75,5 +89,10 @@ public class ProfilesTabController implements Initializable {
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to delete the selected profile.");
         }
+    }
+
+    private void showOverlay() {
+        createProfileOverlay.setVisible(true);
+        createProfileOverlay.setManaged(true);
     }
 }

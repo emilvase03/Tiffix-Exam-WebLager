@@ -36,6 +36,9 @@
                         <Cursor fx:constant="DEFAULT" />
                      </cursor></Button>
                </children>
+               <VBox.margin>
+                  <Insets top="30.0" />
+               </VBox.margin>
             </HBox>
             <TableView fx:id="tblProfiles" prefHeight="505.0" prefWidth="752.0" VBox.vgrow="ALWAYS">
               <columns>
