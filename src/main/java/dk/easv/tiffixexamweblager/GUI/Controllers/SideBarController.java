@@ -1,8 +1,15 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
+import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
+import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+
+import javax.swing.text.View;
+import java.util.Optional;
 
 public class SideBarController {
 
@@ -41,6 +48,21 @@ public class SideBarController {
     @FXML
     private void onBtnCloseSideBar(ActionEvent event) {
         dashboard.closeSideBar();
+    }
+
+    @FXML
+    public void onLogout(ActionEvent actionEvent) {
+        boolean confirmed = AlertHelper.showConfirmation(
+                "Log out",
+                "Are you sure you want to log out?"
+        );
+
+        if (confirmed) {
+            UserSession.getInstance().clear();
+            ViewHandler.ADMIN_DASHBOARD.close();
+            ViewHandler.ADMIN_DASHBOARD.reset();
+            ViewHandler.LOGIN.show(false);
+        }
     }
 }
 

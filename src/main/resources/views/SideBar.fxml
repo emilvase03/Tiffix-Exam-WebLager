@@ -17,7 +17,6 @@
       maxHeight="Infinity"
       stylesheets="@../css/style.css">
 
-
     <HBox alignment="TOP_LEFT"
           spacing="10"
           styleClass="sidebar-topbar">
@@ -31,12 +30,9 @@
         </Button>
 
         <HBox spacing="6" alignment="CENTER_LEFT">
-            <FontIcon iconLiteral="bi-gear-fill"
-                      styleClass="sidebar-logo"/>
-            <Label text="TifFix"
-                   styleClass="sidebar-app-name"/>
+            <FontIcon iconLiteral="bi-gear-fill" styleClass="sidebar-logo"/>
+            <Label text="TifFix" styleClass="sidebar-app-name"/>
         </HBox>
-
 
     </HBox>
 
@@ -47,19 +43,17 @@
             <Insets top="12" left="12" right="12" bottom="12"/>
         </padding>
 
-
-
         <Button fx:id="btnEmployees"
                 text="  Employees"
                 styleClass="sidebar-btn, sidebar-btn-active"
                 maxWidth="Infinity"
                 mnemonicParsing="false"
-                onAction="#onEmployees"> <graphic>
-            <HBox spacing="6" alignment="CENTER">
-                <FontIcon iconLiteral="bi-people"/>
-
-            </HBox>
-        </graphic>
+                onAction="#onEmployees">
+            <graphic>
+                <HBox spacing="6" alignment="CENTER">
+                    <FontIcon iconLiteral="bi-people"/>
+                </HBox>
+            </graphic>
         </Button>
 
         <Button fx:id="btnProfiles"
@@ -72,8 +66,24 @@
         <Region VBox.vgrow="ALWAYS"/>
     </VBox>
 
-    <HBox styleClass="sidebar-footer" alignment="CENTER_LEFT">
+    <!-- ── Footer: version left, logout right ── -->
+    <HBox styleClass="sidebar-footer"
+          alignment="CENTER_LEFT"
+          spacing="8">
+
         <Label text="v1.0.0" styleClass="sidebar-version"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="btnLogout"
+                styleClass="sidebar-btn-logout"
+                mnemonicParsing="false"
+                onAction="#onLogout">
+            <graphic>
+                <FontIcon iconLiteral="bi-box-arrow-right"/>
+            </graphic>
+        </Button>
+
     </HBox>
 
 </VBox>

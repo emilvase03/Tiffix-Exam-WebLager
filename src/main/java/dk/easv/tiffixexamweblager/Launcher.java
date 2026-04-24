@@ -15,9 +15,9 @@ import java.io.IOException;
 public class Launcher extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
 
-        ViewHandler.ADMIN_DASHBOARD.show(false);
+        ViewHandler.LOGIN.show(false);
 
     }
 
