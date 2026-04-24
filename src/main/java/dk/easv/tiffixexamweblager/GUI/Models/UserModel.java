@@ -1,4 +1,4 @@
-package dk.easv.tiffixexamweblager.Models;
+package dk.easv.tiffixexamweblager.GUI.Models;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.User;
@@ -22,7 +22,7 @@ public class UserModel {
     private final BooleanProperty loading = new SimpleBooleanProperty(false);
     private final BooleanProperty loginFailed = new SimpleBooleanProperty(false);
     private final ObservableList<User> users = FXCollections.observableArrayList();
-    private final ObservableList<User> coordinators = FXCollections.observableArrayList();
+    private final ObservableList<User> employees = FXCollections.observableArrayList();
 
 
     public UserModel() {
@@ -65,7 +65,7 @@ public class UserModel {
                 () -> userManager.getEmployees(),
                 result -> {
 
-                    coordinators.setAll(result);
+                    employees.setAll(result);
                 },
                 e -> { throw new RuntimeException("Failed to load coordinators", e); },
                 loading::set
@@ -84,12 +84,12 @@ public class UserModel {
                     if (created != null) {
                         users.add(created);
                         if (created.getRole() == Role.EMPLOYEE) {
-                            coordinators.add(created);
+                            employees.add(created);
                         }
                     }
                 },
 
-                e -> { throw new RuntimeException("Failed to create user", e); },
+                e -> { throw new RuntimeException("Failed to create an employee", e); },
                 loading::set
         );
     }
@@ -101,8 +101,8 @@ public class UserModel {
                     int index = users.indexOf(user);
                     if (index >= 0) users.set(index, user);
 
-                    coordinators.removeIf(u -> u.getId() == user.getId());
-                    if (user.getRole() == Role.EMPLOYEE) coordinators.add(user);
+                    employees.removeIf(u -> u.getId() == user.getId());
+                    if (user.getRole() == Role.EMPLOYEE)employees.add(user);
                 },
                 e -> { throw new RuntimeException("Failed to update user", e); },
                 loading::set
@@ -115,14 +115,14 @@ public class UserModel {
                 () -> { userManager.deleteUser(user); return null; },
                 result -> {
                     users.remove(user);
-                    coordinators.remove(user);
+                    employees.remove(user);
                 },
                 e -> { throw new RuntimeException("Failed to delete user", e); },
                 loading::set
         );
     }
 
-    public ObservableList<User> getCoordinators ()          { return coordinators; }
+    public ObservableList<User> getEmployees ()          { return employees; }
     public ObservableList<User> getUsers()                  { return users; }
     public ObjectProperty<User> loggedInUserProperty()      { return loggedInUser; }
     public BooleanProperty loadingProperty()                { return loading; }

@@ -2,12 +2,11 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import dk.easv.tiffixexamweblager.BE.Role;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
-import dk.easv.tiffixexamweblager.Models.UserModel;
+import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.text.Text;
 
 public class LoginController {
 
