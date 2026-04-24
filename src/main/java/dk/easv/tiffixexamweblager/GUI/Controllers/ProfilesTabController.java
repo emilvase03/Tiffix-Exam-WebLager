@@ -36,8 +36,6 @@ public class ProfilesTabController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println(createProfileOverlay);
-        System.out.println(createProfileController);
         setupTable();
         createProfileController.setOverlay(createProfileOverlay);
         createProfileController.setProfilesTabController(this);

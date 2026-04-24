@@ -3,7 +3,7 @@
 **/
 
 .overlay {
-    -fx-background-color: #354556;
+    -fx-background-color: -color-bg-subtle;
     -fx-background-radius: 15;
 }
 
