@@ -17,6 +17,8 @@ public class CreateProfileController {
     private VBox overlay;
     private ProfileModel profileModel;
     private ProfilesTabController profilesTabController;
+    private boolean updateProfile = false;
+    private Profile profileToBeUpdated;
 
     public CreateProfileController() {
         try {
@@ -33,20 +35,36 @@ public class CreateProfileController {
             return;
         }
 
-        Profile newProfile = new Profile(txtTitle.getText().trim());
-        try {
-            profileModel.createProfile(newProfile);
-            txtTitle.clear();
-            handleClose();
-            profilesTabController.getTable().getItems().add(newProfile);
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to create new profile.");
+        if (updateProfile) {
+            try {
+                if (profileToBeUpdated != null) {
+                    profileToBeUpdated.setTitle(txtTitle.getText().trim());
+                    profileModel.updateProfile(profileToBeUpdated);
+                    profilesTabController.getTable().refresh();
+                    txtTitle.clear();
+                    handleClose();
+                    updateProfile = false;
+                }
+            } catch (Exception e) {
+                AlertHelper.showError("Error", "Failed to update profile.");
+            }
+        } else {
+            try {
+                Profile profile = new Profile(txtTitle.getText().trim());
+                profileModel.createProfile(profile);
+                profilesTabController.getTable().getItems().add(profile);
+                txtTitle.clear();
+                handleClose();
+            } catch (Exception e) {
+                AlertHelper.showError("Error", "Failed to create new profile.");
+            }
         }
     }
 
     @FXML
     private void handleCancel(ActionEvent event) {
         txtTitle.clear();
+        updateProfile = false;
         handleClose();
     }
 
@@ -56,6 +74,12 @@ public class CreateProfileController {
 
     public void setProfilesTabController(ProfilesTabController profilesTabController) {
         this.profilesTabController = profilesTabController;
+    }
+
+    public void preloadWindow(Profile profile) {
+        txtTitle.setText(profile.getTitle());
+        updateProfile = true;
+        profileToBeUpdated = profile;
     }
 
     private void handleClose() {

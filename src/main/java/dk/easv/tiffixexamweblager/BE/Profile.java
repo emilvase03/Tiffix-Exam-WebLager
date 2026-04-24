@@ -21,7 +21,7 @@ public class Profile {
         return title;
     }
 
-    private void setTitle(String title) {
+    public void setTitle(String title) {
         if (!title.isBlank())
             this.title = title;
     }

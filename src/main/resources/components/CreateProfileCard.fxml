@@ -19,7 +19,7 @@
       <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
             <Button mnemonicParsing="false" onAction="#handleSave" prefWidth="73.0" text="Save" />
-            <Button mnemonicParsing="false" onAction="#handleCancel" prefHeight="26.0" prefWidth="73.0" text="Cancel" styleClass="dangerBtn"/>
+            <Button mnemonicParsing="false" onAction="#handleCancel" prefHeight="26.0" prefWidth="73.0" styleClass="dangerBtn" text="Cancel" />
          </children>
          <VBox.margin>
             <Insets bottom="10.0" />

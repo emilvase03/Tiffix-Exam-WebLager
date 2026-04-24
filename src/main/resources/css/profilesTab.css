@@ -3,7 +3,7 @@
 **/
 
 .overlay {
-    -fx-background-color: #354556;
+    -fx-background-color: -color-bg-subtle;
     -fx-background-radius: 15;
 }
 
@@ -13,13 +13,9 @@
 }
 
 .button:hover {
-    -fx-background-color: #2B3B4C;
+    -fx-background-color: -color-bg-subtle;
 }
 
 .dangerBtn {
     -fx-background-color: #EF4444;
-}
-
-.dangerBtn:hover {
-    -fx-background-color: #2B3B4C;
 }
