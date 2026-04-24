@@ -6,8 +6,6 @@ import dk.easv.tiffixexamweblager.GUI.Controllers.components.NewEmployeeControll
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,20 +25,19 @@ public class EmployeesTabController {
     @FXML private TableColumn<User, Void>   colManage;
 
     private final UserModel userModel = new UserModel();
-    private final ObservableList<User> employees = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         colFirstName.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getFirstName()));
         colLastName .setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getLastName()));
         colUsername .setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getUsername()));
-        tblEmployeeContainer.setItems(employees);
+        tblEmployeeContainer.setItems(userModel.getEmployees());
         loadEmployees();
     }
 
     private void loadEmployees() {
         try {
-            employees.setAll(userModel.getEmployees());
+            userModel.loadCoordinators();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to load employees.");
         }
@@ -50,11 +47,17 @@ public class EmployeesTabController {
     private void onBtnCreateEmployee() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/views/NewEmployeeView.fxml"));
+                    getClass().getResource("/views/NewEmployeeView.fxml")
+            );
+
             Parent content = loader.load();
 
             NewEmployeeController controller = loader.getController();
-            controller.init(userModel, modalPane, employees);
+            controller.init(
+                    userModel,
+                    modalPane,
+                    userModel.getEmployees()
+            );
 
             modalPane.show(content);
 
@@ -63,4 +66,5 @@ public class EmployeesTabController {
             e.printStackTrace();
         }
     }
+
 }
