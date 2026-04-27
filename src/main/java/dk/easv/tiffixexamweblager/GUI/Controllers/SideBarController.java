@@ -6,10 +6,6 @@ import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-
-import javax.swing.text.View;
-import java.util.Optional;
 
 public class SideBarController {
 
@@ -18,9 +14,9 @@ public class SideBarController {
     @FXML
     private Button btnProfiles;
 
-    private AdminDashboard dashboard;
+    private AdminDashboardController dashboard;
 
-    public void setDashboard(AdminDashboard dashboard) {
+    public void setDashboard(AdminDashboardController dashboard) {
 
         this.dashboard = dashboard;
     }

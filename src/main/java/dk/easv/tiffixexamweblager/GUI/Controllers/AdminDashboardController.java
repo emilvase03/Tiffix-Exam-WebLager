@@ -15,7 +15,7 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.net.URL;
 
-public class AdminDashboard {
+public class AdminDashboardController {
 
     @FXML
     private StackPane root;

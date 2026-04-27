@@ -38,7 +38,7 @@ public class LoginController {
                 if (newUser.getRole() == Role.ADMIN) {
                     ViewHandler.ADMIN_DASHBOARD.show(true);
                 } else {
-                    //ViewHandler.COORD_DASHBOARD.show(true);
+                    ViewHandler.EMPLOYEE_DASHBOARD.show(true);
                 }
 
                 ViewHandler.LOGIN.close();

@@ -12,6 +12,7 @@ public enum ViewHandler {
 
     LOGIN("/views/LoginView.fxml", "Login", Modality.NONE),
     ADMIN_DASHBOARD("/views/AdminDashboard.fxml", "Dashboard", Modality.NONE),
+    EMPLOYEE_DASHBOARD("/views/EmployeeDashboard.fxml", "Dashboard", Modality.NONE),
     NEW_EMPLOYEE("/views/NewEmployeeView.fxml","New Employee",Modality.APPLICATION_MODAL);
 
     private final String path;
