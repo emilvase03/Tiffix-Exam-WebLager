@@ -34,10 +34,10 @@
                     </HBox>
                     <TableView fx:id="tblEmployeeContainer" prefHeight="243.0" prefWidth="390.0" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="colFirstName" prefWidth="114.0" text="First name" />
-                            <TableColumn fx:id="colLastName" prefWidth="72.0" text="Last Name" />
-                            <TableColumn fx:id="colUsername" prefWidth="90.0" text="Username" />
-                            <TableColumn fx:id="colManage" prefWidth="108.0" text="Manage" />
+                            <TableColumn fx:id="colFirstName" prefWidth="97.33334112167358" text="First name" />
+                            <TableColumn fx:id="colLastName" prefWidth="110.00000762939453" text="Last Name" />
+                            <TableColumn fx:id="colUsername" prefWidth="100.99998474121094" text="Username" />
+                            <TableColumn fx:id="colManage" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" resizable="false" text="Manage" />
                         </columns>
                   <VBox.margin>
                      <Insets left="5.0" right="5.0" />

@@ -1,11 +1,25 @@
 /*
+   WEBLAGER  COLORS
+    */
 
+.root {
+    /* Text */
+    -color-fg-primary: #2D3D4F;
+    -color-fg-on-emphasis: white;
+
+    /* Sidebar */
+    -color-sidebar-bg-light: #24C79F;
+    -color-sidebar-bg-dark: #2D3D4F;
+
+    /* Actions */
+    -color-danger: #EF4444;
+}
+/*
    Sidebar
-
     */
 
 .sidebar {
-    -fx-background-color: -color-accent-emphasis; /* secondary nav bg */
+    -fx-background-color: -color-sidebar-bg-light; /* secondary nav bg */
     -fx-effect: dropshadow(
             gaussian,
             rgba(0, 0, 0, 0.10),
@@ -95,12 +109,86 @@
     -fx-icon-color: -color-danger-fg;
 }
 
+
+.action-btn{
+    -fx-padding: 6;
+    -fx-background-radius: 6;
+    -fx-border-color: transparent;
+}
+.action-btn {
+    -fx-background-color: #33A9EE;
+    -fx-text-fill: black;
+}
+
+.action-btn:hover {
+    -fx-background-color: #0094EA; ;
+    -fx-text-fill: white;
+}
+
+
+
 /*
   NewEmployee Card
    */
 
 .card {
     -fx-background-color: -color-bg-default;
-    -fx-background-radius: 10px; /* large container per guide */
+    -fx-background-radius: 10px;
     -fx-padding: 20px;
+}
+
+.icon-button {
+    -fx-padding: 6;
+    -fx-background-radius: 6;
+    -fx-border-color: transparent;
+}
+
+
+.icon-button .ikonli-font-icon {
+    -fx-icon-size: 16px;
+}
+
+/*
+   EDIT BUTTON
+ */
+
+.icon-button {
+    -fx-background-color: #EFF6FF;
+}
+
+.icon-button .ikonli-font-icon {
+    -fx-icon-color: #2D3D4F;
+}
+
+.icon-button:hover {
+    -fx-background-color: #2563EB;
+}
+
+.icon-button:hover .ikonli-font-icon {
+    -fx-icon-color: white;
+}
+
+/*
+   DELETE BUTTON
+   */
+
+.icon-button.danger {
+    -fx-background-color: #FEF2F2;
+}
+
+.icon-button.danger .ikonli-font-icon {
+    -fx-icon-color: #EF4444;
+}
+
+.icon-button.danger:hover {
+    -fx-background-color: #EF4444;
+}
+
+.icon-button.danger:hover .ikonli-font-icon {
+    -fx-icon-color: white;
+}
+
+.icon-button:disabled {
+    -fx-opacity: 0.6;
+    -fx-cursor: default;
 }

@@ -1,6 +1,7 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import atlantafx.base.controls.ModalPane;
+import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
@@ -114,7 +115,8 @@ public class AdminDashboardController {
                 closeSideBar();
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to load view.");
             e.printStackTrace();
         }
     }
