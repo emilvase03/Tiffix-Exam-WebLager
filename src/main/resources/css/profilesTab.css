@@ -7,13 +7,19 @@
     -fx-background-radius: 15;
 }
 
-.button {
-    -fx-background-color: #0094EA;
-    -fx-background-radius: 10;
+.action-btn{
+    -fx-padding: 6;
+    -fx-background-radius: 6;
+    -fx-border-color: transparent;
+}
+.action-btn {
+    -fx-background-color: #33A9EE;
+    -fx-text-fill: black;
 }
 
-.button:hover {
-    -fx-background-color: -color-bg-subtle;
+.action-btn:hover {
+    -fx-background-color: #0094EA; ;
+    -fx-text-fill: white;
 }
 
 .dangerBtn {

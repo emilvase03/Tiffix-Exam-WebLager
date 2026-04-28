@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <StackPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EmployeesTabController">
 
@@ -20,7 +21,10 @@
                 <children>
                     <HBox prefHeight="38.0" prefWidth="390.0" spacing="5.0">
                         <children>
-                            <Label text="Employees" />
+                            <Label text="Employees">
+                        <font>
+                           <Font size="18.0" />
+                        </font></Label>
                             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                             <Button fx:id="btnCreate" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#onBtnCreateEmployee" styleClass="action-btn" text="Create Employee">
                                 <HBox.margin>
@@ -34,10 +38,10 @@
                     </HBox>
                     <TableView fx:id="tblEmployeeContainer" prefHeight="243.0" prefWidth="390.0" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="colFirstName" prefWidth="97.33334112167358" text="First name" />
-                            <TableColumn fx:id="colLastName" prefWidth="110.00000762939453" text="Last Name" />
-                            <TableColumn fx:id="colUsername" prefWidth="100.99998474121094" text="Username" />
-                            <TableColumn fx:id="colManage" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" resizable="false" text="Manage" />
+                            <TableColumn fx:id="colFirstName" prefWidth="114.0" text="First name" />
+                            <TableColumn fx:id="colLastName" prefWidth="72.0" text="Last Name" />
+                            <TableColumn fx:id="colUsername" prefWidth="90.0" text="Username" />
+                            <TableColumn fx:id="colManage" prefWidth="140.0" resizable="false" text="Manage" />
                         </columns>
                   <VBox.margin>
                      <Insets left="5.0" right="5.0" />
@@ -47,6 +51,9 @@
                   </columnResizePolicy>
                     </TableView>
                 </children>
+            <BorderPane.margin>
+               <Insets bottom="10.0" left="10.0" right="10.0" />
+            </BorderPane.margin>
             </VBox>
         </center>
         <top>

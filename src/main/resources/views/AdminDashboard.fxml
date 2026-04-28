@@ -13,7 +13,13 @@
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.AdminDashboardController"
            stylesheets="@../css/style.css"
-          >
+
+           prefWidth="900"
+           prefHeight="600"
+
+
+
+>
 
     <VBox>
         <HBox styleClass="top-bar"
