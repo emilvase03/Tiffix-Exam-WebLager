@@ -50,7 +50,6 @@ public class ProfilesTabController implements Initializable {
 
     private void setupTable() {
         colTitle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTitle()));
-        tblProfiles.getStyleClass().add(Tweaks.EDGE_TO_EDGE);
 
         try {
             tblProfiles.setItems(profileModel.getAllProfiles());
