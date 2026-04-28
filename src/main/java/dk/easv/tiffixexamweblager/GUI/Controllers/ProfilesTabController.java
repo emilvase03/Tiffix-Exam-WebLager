@@ -1,15 +1,12 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-// Project imports
+import atlantafx.base.theme.Tweaks;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.CreateProfileController;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
+import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
-
-// AtlantaFX imports
-import atlantafx.base.theme.Tweaks;
-
-// Java imports
+import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,20 +21,22 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ProfilesTabController implements Initializable {
+
     @FXML private TableView<Profile> tblProfiles;
     @FXML private TableColumn<Profile, String> colTitle;
-    @FXML
-    private TableColumn<Profile, Void> colManage;
+    @FXML private TableColumn<Profile, Void> colManage;
     @FXML private VBox createProfileOverlay;
     @FXML private CreateProfileController createProfileController;
-    private ProfileModel profileModel;
 
+    private ProfileModel profileModel;
+    private UserModel userModel;
 
     public ProfilesTabController() {
         try {
             profileModel = new ProfileModel();
+            userModel    = new UserModel();
         } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to instantiate ProfileModel.");
+            AlertHelper.showError("Error", "Failed to initialize models.");
         }
     }
 
@@ -52,6 +51,7 @@ public class ProfilesTabController implements Initializable {
     private void setupTable() {
         colTitle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTitle()));
         tblProfiles.getStyleClass().add(Tweaks.EDGE_TO_EDGE);
+
         try {
             tblProfiles.setItems(profileModel.getAllProfiles());
         } catch (Exception e) {
@@ -62,33 +62,47 @@ public class ProfilesTabController implements Initializable {
             TableRow<Profile> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
-                    Profile selectedProfile = row.getItem();
                     showOverlay();
-                    createProfileController.preloadWindow(selectedProfile);
+                    createProfileController.preloadWindow(row.getItem());
                 }
             });
             return row;
         });
     }
+
     private void setupManageColumn() {
         colManage.setCellFactory(col -> new TableCell<>() {
 
+            private final Button btnAssign = new Button();
             private final Button btnDelete = new Button();
-            private final HBox container = new HBox(btnDelete);
+            private final HBox container  = new HBox(8, btnAssign, btnDelete);
 
             {
-                FontIcon deleteIcon = new FontIcon("bi-trash");
+                btnAssign.setGraphic(new FontIcon("bi-person-plus"));
+                btnAssign.getStyleClass().add("icon-button");
+                btnAssign.setOnAction(e ->
+                        handleAssignEmployee(getTableView().getItems().get(getIndex()))
+                );
 
-                btnDelete.setGraphic(deleteIcon);
-                btnDelete.getStyleClass().add("icon-button");
-                btnDelete.getStyleClass().add("danger");
-
+                btnDelete.setGraphic(new FontIcon("bi-trash"));
+                btnDelete.getStyleClass().addAll("icon-button", "danger");
                 btnDelete.setOnAction(e ->
                         handleDeleteProfile(getTableView().getItems().get(getIndex()))
                 );
 
                 container.setAlignment(Pos.CENTER);
             }
+
+            private void handleAssignEmployee(Profile profile) {
+                if (profile == null) return;
+
+                ViewHandler.ASSIGN_EMPLOYEE_PROFILE.reset();
+                ViewHandler.ASSIGN_EMPLOYEE_PROFILE.show(false);
+
+                AssignEmployeeProfileController controller = ViewHandler.ASSIGN_EMPLOYEE_PROFILE.getController();
+                controller.init(userModel, profile.getId());
+            }
+
             private void handleDeleteProfile(Profile profile) {
                 if (profile == null) return;
 
@@ -96,7 +110,6 @@ public class ProfilesTabController implements Initializable {
                         "Delete Profile",
                         "Are you sure you want to delete \"" + profile.getTitle() + "\"?"
                 );
-
                 if (!confirmed) return;
 
                 try {
@@ -106,6 +119,7 @@ public class ProfilesTabController implements Initializable {
                     AlertHelper.showError("Error", "Failed to delete profile.");
                 }
             }
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
@@ -113,6 +127,7 @@ public class ProfilesTabController implements Initializable {
             }
         });
     }
+
     @FXML
     private void handleCreateProfile(ActionEvent event) {
         showOverlay();

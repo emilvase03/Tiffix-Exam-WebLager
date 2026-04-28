@@ -24,7 +24,7 @@ public class UserDAO implements IUserDataAccess {
 
         List<User> users = new ArrayList<>();
 
-        String sql = "SELECT id, firstName, lastName, username, password, role FROM [User]";
+        String sql = "SELECT Id, FirstName, LastName, Username, Password, Role FROM [User]";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -44,7 +44,7 @@ public class UserDAO implements IUserDataAccess {
     public User createUser(User newUser) throws Exception {
 
         String sql = """
-                INSERT INTO [User] (firstName, lastName, username, password, role)
+                INSERT INTO [User] (FirstName, LastName, Username, Password, Role)
                 VALUES (?, ?, ?, ?, ?)
                 """;
 
@@ -81,8 +81,8 @@ public class UserDAO implements IUserDataAccess {
 
         String sql = """
                 UPDATE [User]
-                SET firstName = ?, lastName = ?, username = ?, password = ?, role = ?
-                WHERE id = ?
+                SET FirstName = ?, LastName = ?, Username = ?, Password = ?, Role = ?
+                WHERE Id = ?
                 """;
 
         try (Connection conn = databaseConnector.getConnection();
@@ -102,7 +102,7 @@ public class UserDAO implements IUserDataAccess {
     @Override
     public void deleteUser(User user) throws Exception {
 
-        String sql = "DELETE FROM [User] WHERE id = ?";
+        String sql = "DELETE FROM [User] WHERE Id = ?";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -115,7 +115,7 @@ public class UserDAO implements IUserDataAccess {
     @Override
     public boolean usernameExists(String username) throws Exception {
 
-        String sql = "SELECT COUNT(*) FROM [User] WHERE LOWER(username) = LOWER(?)";
+        String sql = "SELECT COUNT(*) FROM [User] WHERE LOWER(Username) = LOWER(?)";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -130,7 +130,7 @@ public class UserDAO implements IUserDataAccess {
 
     public User getUserByUsername(String username) throws Exception {
 
-        String sql = "SELECT id, firstName, lastName, username, password, role FROM [User] WHERE username = ?";
+        String sql = "SELECT Id, FirstName, LastName, Username, Password, Role FROM [User] WHERE username = ?";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -147,7 +147,7 @@ public class UserDAO implements IUserDataAccess {
     }
     @Override
     public List<User> getUsersByRole(Role role) throws Exception {
-        String sql = "SELECT id, firstName, lastName, username, password, role FROM [User] WHERE UPPER(role) = UPPER(?)";
+        String sql = "SELECT Id, FirstName, LastName, Username, Password, Role FROM [User] WHERE UPPER(role) = UPPER(?)";
         List<User> coordinators = new ArrayList<>();
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -155,7 +155,6 @@ public class UserDAO implements IUserDataAccess {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     coordinators.add(mapUser(rs));
-
                 }
             }
         }
@@ -165,12 +164,12 @@ public class UserDAO implements IUserDataAccess {
     private User mapUser(ResultSet rs) throws SQLException {
 
         return new User(
-                rs.getInt("id"),
-                rs.getString("firstName"),
-                rs.getString("lastName"),
-                rs.getString("username"),
-                rs.getString("password"),
-                Role.valueOf(rs.getString("role").toUpperCase()) // String → ENUM
+                rs.getInt("Id"),
+                rs.getString("FirstName"),
+                rs.getString("LastName"),
+                rs.getString("Username"),
+                rs.getString("Password"),
+                Role.valueOf(rs.getString("Role").toUpperCase()) // String → ENUM
         );
     }
 }

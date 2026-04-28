@@ -61,11 +61,15 @@ public class UserModel {
     }
 
     public void loadEmployees() {
+        loadEmployees(null);
+    }
+
+    public void loadEmployees(Runnable onLoaded) {
         BackgroundExecutor.execute(
                 () -> userManager.getEmployees(),
                 result -> {
-
                     employees.setAll(result);
+                    if (onLoaded != null) onLoaded.run();
                 },
                 e -> { throw new RuntimeException("Failed to load coordinators", e); },
                 loading::set
