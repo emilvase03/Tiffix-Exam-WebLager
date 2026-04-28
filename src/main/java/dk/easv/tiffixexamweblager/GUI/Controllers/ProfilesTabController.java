@@ -14,20 +14,24 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.javafx.FontIcon;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ProfilesTabController implements Initializable {
     @FXML private TableView<Profile> tblProfiles;
     @FXML private TableColumn<Profile, String> colTitle;
+    @FXML
+    private TableColumn<Profile, Void> colManage;
     @FXML private VBox createProfileOverlay;
     @FXML private CreateProfileController createProfileController;
-
     private ProfileModel profileModel;
+
 
     public ProfilesTabController() {
         try {
@@ -40,6 +44,7 @@ public class ProfilesTabController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
+        setupManageColumn();
         createProfileController.setOverlay(createProfileOverlay);
         createProfileController.setProfilesTabController(this);
     }
@@ -65,7 +70,49 @@ public class ProfilesTabController implements Initializable {
             return row;
         });
     }
+    private void setupManageColumn() {
+        colManage.setCellFactory(col -> new TableCell<>() {
 
+            private final Button btnDelete = new Button();
+            private final HBox container = new HBox(btnDelete);
+
+            {
+                FontIcon deleteIcon = new FontIcon("bi-trash");
+
+                btnDelete.setGraphic(deleteIcon);
+                btnDelete.getStyleClass().add("icon-button");
+                btnDelete.getStyleClass().add("danger");
+
+                btnDelete.setOnAction(e ->
+                        handleDeleteProfile(getTableView().getItems().get(getIndex()))
+                );
+
+                container.setAlignment(Pos.CENTER);
+            }
+            private void handleDeleteProfile(Profile profile) {
+                if (profile == null) return;
+
+                boolean confirmed = AlertHelper.showConfirmation(
+                        "Delete Profile",
+                        "Are you sure you want to delete \"" + profile.getTitle() + "\"?"
+                );
+
+                if (!confirmed) return;
+
+                try {
+                    profileModel.deleteProfile(profile);
+                    tblProfiles.getItems().remove(profile);
+                } catch (Exception e) {
+                    AlertHelper.showError("Error", "Failed to delete profile.");
+                }
+            }
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : container);
+            }
+        });
+    }
     @FXML
     private void handleCreateProfile(ActionEvent event) {
         showOverlay();
@@ -73,22 +120,6 @@ public class ProfilesTabController implements Initializable {
 
     public TableView<Profile> getTable() {
         return tblProfiles;
-    }
-
-    @FXML
-    private void handleDeleteProfile(ActionEvent event) {
-        Profile profile = getTable().getSelectionModel().getSelectedItem();
-        if (profile == null) {
-            AlertHelper.showError("Error", "Please select a profile to delete.");
-            return;
-        }
-
-        try {
-            profileModel.deleteProfile(profile);
-            getTable().getItems().remove(profile);
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to delete the selected profile.");
-        }
     }
 
     private void showOverlay() {
