@@ -60,7 +60,7 @@ public class UserModel {
         );
     }
 
-    public void loadCoordinators() {
+    public void loadEmployees() {
         BackgroundExecutor.execute(
                 () -> userManager.getEmployees(),
                 result -> {
@@ -94,19 +94,36 @@ public class UserModel {
         );
     }
 
-    public void updateUser(User user) {
+    public void updateUser(User user, String rawPassword) {
         BackgroundExecutor.execute(
-                () -> { userManager.updateUser(user); return null; },
-                result -> {
-                    int index = users.indexOf(user);
-                    if (index >= 0) users.set(index, user);
-
-                    employees.removeIf(u -> u.getId() == user.getId());
-                    if (user.getRole() == Role.EMPLOYEE)employees.add(user);
+                () -> {
+                    userManager.updateUser(user, rawPassword);
+                    return null;
                 },
+
+                result -> {
+                    int userIndex = findUserIndex(users, user.getId());
+                    if (userIndex >= 0) users.set(userIndex, user);
+
+                    int empIndex = findUserIndex(employees, user.getId());
+                    if (user.getRole() == Role.EMPLOYEE) {
+                        if (empIndex >= 0) employees.set(empIndex, user);
+                        else employees.add(user);
+                    } else {
+                        if (empIndex >= 0) employees.remove(empIndex);
+                    }
+                },
+
                 e -> { throw new RuntimeException("Failed to update user", e); },
                 loading::set
         );
+    }
+
+    private int findUserIndex(ObservableList<User> list, int id) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId() == id) return i;
+        }
+        return -1;
     }
 
 

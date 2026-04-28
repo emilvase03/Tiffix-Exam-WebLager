@@ -49,7 +49,7 @@ public class  EmployeesTabController {
 
     private void loadEmployees() {
         try {
-            userModel.loadCoordinators();
+            userModel.loadEmployees();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to load employees.");
         }
@@ -115,6 +115,26 @@ public class  EmployeesTabController {
     }
 
     private void onBtnEditUser(User user) {
+        if (user == null) return;
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/views/EditEmployeeView.fxml")
+            );
+
+            Parent content = loader.load();
+
+            EditEmployeeController controller = loader.getController();
+            controller.init(
+                    userModel,user,
+                    modalPane
+            );
+
+            modalPane.show(content);
+
+        } catch (IOException e) {
+            AlertHelper.showError("Error", "Failed to open New Employee form.");
+            e.printStackTrace();
+        }
     }
 
     @FXML
