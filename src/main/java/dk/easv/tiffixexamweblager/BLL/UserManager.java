@@ -62,9 +62,13 @@ public class UserManager {
         return userDAO.createUser(newUser);
     }
 
-    public void updateUser(User user) throws Exception {
+    public void updateUser(User user, String rawPassword) throws Exception {
+        if (rawPassword != null && !rawPassword.isBlank()) {
+            user.setPassword(Encrypter.hashPassword(rawPassword));
+        }
         userDAO.updateUser(user);
     }
+
 
     public void deleteUser(User user) throws Exception {
         userDAO.deleteUser(user);

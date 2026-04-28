@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+        <?import javafx.scene.layout.StackPane?>
+<?import javafx.geometry.Insets?>
+<StackPane xmlns="http://javafx.com/javafx/24.0.1"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EditEmployeeController"
+           style="-fx-background-color: transparent;"
+           alignment="CENTER">
+<VBox
+        alignment="CENTER"
+        minWidth="320"
+        prefWidth="320"
+        maxWidth="320"
+
+        minHeight="420"
+        prefHeight="420"
+        maxHeight="420"
+
+        spacing="4.0"
+        styleClass="card"
+>
+
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <HBox alignment="CENTER">
+        <Label styleClass="brand-title" text="Tiffix" />
+    </HBox>
+    <HBox alignment="CENTER">
+        <Label fx:id="lblEditingEmployee" styleClass="lbl-title" text="Edit Employee" />
+        <VBox.margin><Insets bottom="10.0" /></VBox.margin>
+    </HBox>
+    <VBox spacing="5.0">
+        <padding><Insets top="5.0" /></padding>
+
+        <TextField fx:id="txtFirstName" maxWidth="Infinity" promptText="First Name" />
+        <Label fx:id="lblFirstNameError"
+               prefHeight="16.0" maxWidth="Infinity" visible="false"
+               style="-fx-text-fill: -color-danger-fg; -fx-font-size: 11px;" />
+
+        <TextField fx:id="txtLastName" maxWidth="Infinity" promptText="Last Name" />
+        <Label fx:id="lblLastNameError"
+               prefHeight="16.0" maxWidth="Infinity" visible="false"
+               style="-fx-text-fill: -color-danger-fg; -fx-font-size: 11px;" />
+
+        <TextField fx:id="txtUserName" maxWidth="Infinity" promptText="Username" />
+        <Label fx:id="lblUsernameError"
+               prefHeight="16.0" maxWidth="Infinity" visible="false"
+               style="-fx-text-fill: -color-danger-fg; -fx-font-size: 11px;" />
+
+        <TextField fx:id="txtPassword" maxWidth="Infinity" promptText="Leave blank to keep current password" />
+        <Label fx:id="lblPasswordError"
+               prefHeight="16.0" maxWidth="Infinity" visible="false"
+               style="-fx-text-fill: -color-danger-fg; -fx-font-size: 11px;" />
+    </VBox>
+    <HBox alignment="CENTER_RIGHT" spacing="5.0">
+        <VBox.margin><Insets top="10.0" /></VBox.margin>
+        <Button fx:id="btnSave"
+                mnemonicParsing="false"
+                onAction="#onBtnSave"
+                styleClass="accent"
+                text="Save" />
+        <Button fx:id="btnCancel"
+                mnemonicParsing="false"
+                onAction="#onBtnCancel"
+                text="Cancel" />
+    </HBox>
+
+</VBox>
+
+</StackPane>
