@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.DAL.DAO;
 
+import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.UserProfile;
 import dk.easv.tiffixexamweblager.DAL.IUserProfileDataAccess;
 import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
@@ -36,6 +37,28 @@ public class UserProfileDAO implements IUserProfileDataAccess {
         return list;
     }
 
+    @Override
+    public List<Profile> getProfilesForEmployee(int userId) throws Exception {
+        List<Profile> profiles = new ArrayList<>();
+        String sql = """
+        SELECT p.Id, p.Title
+        FROM Profile p
+        JOIN UserProfile up ON p.Id = up.ProfileId
+        WHERE up.UserId = ?
+    """;
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Profile profile = new Profile(rs.getString("Title"));
+                profile.setId(rs.getInt("Id"));
+                profiles.add(profile);
+            }
+        }
+        return profiles;
+    }
     @Override
     public void assignEmployees(int userId, int profileId) throws Exception {
         String sql = "INSERT INTO UserProfile (UserId, ProfileId) VALUES (?, ?)";

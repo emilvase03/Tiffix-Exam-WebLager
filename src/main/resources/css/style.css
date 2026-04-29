@@ -192,3 +192,64 @@
     -fx-opacity: 0.6;
     -fx-cursor: default;
 }
+/*Choose profile card*/
+
+.modal-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(0, 0, 0, 0.35),
+        24,
+        0.25,
+        0,
+        10
+    );
+}
+
+/* Header */
+.modal-header {
+    -fx-background-color: white;
+    -fx-background-radius: 12 12 0 0;
+}
+
+/* Title */
+.modal-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #2D3D4F;
+}
+
+/* Subtitle */
+.modal-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748B;
+}
+
+/* ScrollPane cleanup */
+.profile-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.profile-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.profile-list {
+    -fx-background-color: transparent;
+}
+
+/* Profile rows */
+.profile-item {
+    -fx-padding: 8 12;
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.profile-item:hover {
+    -fx-background-color: #EFF6FF;
+}
+
