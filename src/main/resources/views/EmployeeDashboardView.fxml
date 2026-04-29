@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+        <?import atlantafx.base.controls.ModalPane?>
+        <?import javafx.scene.layout.AnchorPane?>
+        <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Button?>
+<StackPane fx:id="root"
+           xmlns="http://javafx.com/javafx/24.0.1"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EmployeeDashboardController">
+<AnchorPane fx:id="dashboardContent"
+            prefWidth="900"
+            prefHeight="600">
+    <Button
+            fx:id="btnLogout"
+            onAction="#onLogout"
+            text="Logout"
+            AnchorPane.topAnchor="10"
+            AnchorPane.leftAnchor="10">
+    </Button>
+</AnchorPane>
+
+<ModalPane fx:id="modalPane"/>
+</StackPane>

@@ -15,12 +15,7 @@
            stylesheets="@../css/style.css"
 
            prefWidth="900"
-           prefHeight="600"
-
-
-
->
-
+           prefHeight="600">
     <VBox>
         <HBox styleClass="top-bar"
               alignment="CENTER_LEFT"
@@ -43,7 +38,6 @@
         <StackPane fx:id="contentArea"
                    VBox.vgrow="ALWAYS"
                    styleClass="content-area"/>
-
     </VBox>
 
 </StackPane>

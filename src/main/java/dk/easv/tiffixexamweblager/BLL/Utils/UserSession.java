@@ -1,12 +1,17 @@
 package dk.easv.tiffixexamweblager.BLL.Utils;
 
 // Project imports
+import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
+
+import java.util.Collections;
+import java.util.List;
 
 public class UserSession {
 
     private static UserSession instance;
     private User currentUser;
+    private List<Profile> activeProfiles = Collections.emptyList();
 
     private UserSession() {}
 
@@ -35,7 +40,17 @@ public class UserSession {
         return currentUser != null;
     }
 
+    public void setActiveProfiles(List<Profile> profiles) {
+        this.activeProfiles = profiles != null ? List.copyOf(profiles) : Collections.emptyList();
+    }
+    public List<Profile> getActiveProfiles() {
+        return activeProfiles;
+    }
+    public boolean hasActiveProfiles() {
+        return !activeProfiles.isEmpty();
+    }
     public void clear() {
         currentUser = null;
+        activeProfiles = Collections.emptyList();
     }
 }
