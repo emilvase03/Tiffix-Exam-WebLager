@@ -51,10 +51,7 @@ public class UserDAO implements IUserDataAccess {
             stmt.setString(2, newUser.getLastName());
             stmt.setString(3, newUser.getUsername());
             stmt.setString(4, newUser.getPassword());
-            if (newUser.getRole().name().equals("ADMIN"))
-                stmt.setInt(5, 1);
-            else
-                stmt.setInt(5, 2);
+            stmt.setInt(5, newUser.getRole().getId());
 
             stmt.executeUpdate();
 
@@ -91,10 +88,7 @@ public class UserDAO implements IUserDataAccess {
             stmt.setString(2, user.getLastName());
             stmt.setString(3, user.getUsername());
             stmt.setString(4, user.getPassword());
-            if (user.getRole().name().equals("ADMIN"))
-                stmt.setInt(5, 1);
-            else
-                stmt.setInt(5,2);
+            stmt.setInt(5, user.getRole().getId());
             stmt.setInt(6, user.getId());
 
             stmt.executeUpdate();
@@ -148,10 +142,7 @@ public class UserDAO implements IUserDataAccess {
         List<User> users = new ArrayList<>();
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            if (role.name().equals("ADMIN"))
-                stmt.setInt(1, 1);
-            else
-                stmt.setInt(1, 2);
+            stmt.setInt(1, role.getId());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -163,20 +154,13 @@ public class UserDAO implements IUserDataAccess {
     }
 
     private User mapUser(ResultSet rs) throws SQLException {
-        Role role;
-        if (rs.getInt("RoleId") == 1) {
-            role = Role.ADMIN;
-        } else {
-            role = Role.EMPLOYEE;
-        }
-
         return new User(
                 rs.getInt("Id"),
                 rs.getString("FirstName"),
                 rs.getString("LastName"),
                 rs.getString("Username"),
                 rs.getString("Password"),
-                role
+                Role.fromId(rs.getInt("RoleId"))
         );
     }
 }
