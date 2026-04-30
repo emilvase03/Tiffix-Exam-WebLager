@@ -43,6 +43,7 @@ public class EmployeeDashboardController {
     //not nice
     @FXML
     public void onLogout(ActionEvent actionEvent) {
+            ViewHandler.EMPLOYEE_DASHBOARD.close();
             ViewHandler.EMPLOYEE_DASHBOARD.reset();
             ViewHandler.LOGIN.show(false);
         }
