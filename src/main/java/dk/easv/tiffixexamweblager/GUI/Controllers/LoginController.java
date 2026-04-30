@@ -42,6 +42,7 @@ public class LoginController {
                 }
 
                 ViewHandler.LOGIN.close();
+                ViewHandler.LOGIN.reset();
             }
         });
 
