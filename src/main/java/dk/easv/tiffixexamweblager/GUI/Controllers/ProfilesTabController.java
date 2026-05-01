@@ -65,7 +65,7 @@ public class ProfilesTabController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
                     showOverlay();
-                    createProfileController.preloadWindow(row.getItem());
+                    createProfileController.preloadUpdateWindow(row.getItem());
                 }
             });
             return row;
@@ -136,6 +136,7 @@ public class ProfilesTabController implements Initializable {
     @FXML
     private void handleCreateProfile(ActionEvent event) {
         showOverlay();
+        createProfileController.preloadCreateWindow();
     }
 
     public TableView<Profile> getTable() {

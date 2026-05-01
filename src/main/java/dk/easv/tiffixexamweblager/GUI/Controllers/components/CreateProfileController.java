@@ -5,10 +5,14 @@ import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.Rule;
 import dk.easv.tiffixexamweblager.GUI.Controllers.ProfilesTabController;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
+import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
+import dk.easv.tiffixexamweblager.GUI.Models.RuleModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // Java imports
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,6 +21,8 @@ import javafx.scene.layout.VBox;
 import org.controlsfx.control.CheckComboBox;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class CreateProfileController implements Initializable {
@@ -29,8 +35,11 @@ public class CreateProfileController implements Initializable {
     private ProfileModel profileModel;
     private ProfilesTabController profilesTabController;
     private boolean updateProfile = false;
-    private boolean rulesIsUpdating = false;
     private Profile profileToBeUpdated;
+    private RuleModel ruleModel;
+    private ProfileRuleModel profileRuleModel;
+    private ObservableList<Rule> allRules = FXCollections.observableArrayList();
+    private ObservableList<Rule> profileRules = FXCollections.observableArrayList();
 
     public CreateProfileController() {
         try {
@@ -38,34 +47,53 @@ public class CreateProfileController implements Initializable {
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to instantiate ProfileModel.");
         }
+        try {
+            ruleModel = new RuleModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate RuleModel");
+        }
+        try {
+            profileRuleModel = new ProfileRuleModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate ProfileRuleModel");
+        }
     }
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Rule r1 = new Rule(1,"Brightness", 5);
-        rulesDropdown.getItems().add(r1);
-        Rule r2 = new Rule(2, "Rotate 90", 90);
-        rulesDropdown.getItems().add(r2);
-        Rule r3 = new Rule(3, "Rotate 180", 180);
-        rulesDropdown.getItems().add(r3);
-
-        setupOverLay();
-
+        setupListeners();
     }
 
     private void setupOverLay() {
+        rulesDropdown.getItems().clear();
+        rulesList.getItems().clear();
+        profileRules.clear();
+        allRules.clear();
+
         rulesDropdown.setTitle("Select Rules");
-        rulesDropdown.getCheckModel().getCheckedItems().addListener((ListChangeListener<Rule>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    rulesList.getItems().addAll(change.getAddedSubList());
-                }
-                if (change.wasRemoved()) {
-                    rulesList.getItems().removeAll(change.getRemoved());
-                }
+
+        try {
+            allRules.addAll(ruleModel.getAllRules());
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to retrieve every profile rule from database");
+        }
+
+        // If update vs If create
+        if (updateProfile) {
+            try {
+                profileRules.addAll(ruleModel.getRulesForProfile(profileToBeUpdated));
+            } catch (Exception e) {
+                AlertHelper.showError("Error", "Failed to retrieve profile rules from database");
             }
-        } );
+            rulesDropdown.getItems().addAll(allRules);
+            for (Rule r : profileRules) {
+                rulesDropdown.getCheckModel().check(r);
+            }
+
+        } else {
+
+            rulesDropdown.getItems().addAll(allRules);
+        }
     }
 
     @FXML
@@ -79,11 +107,17 @@ public class CreateProfileController implements Initializable {
             return;
         }
 
+        // If update vs If create
         if (updateProfile) {
             try {
                 if (profileToBeUpdated != null) {
                     profileToBeUpdated.setTitle(txtTitle.getText().trim());
                     profileModel.updateProfile(profileToBeUpdated);
+
+                    profileRuleModel.deleteRulesForProfile(profileToBeUpdated);
+                    for (Rule r : rulesList.getItems())
+                        profileRuleModel.addRuleToProfile(profileToBeUpdated, r);
+
                     profilesTabController.getTable().refresh();
                     txtTitle.clear();
                     lblHeader.setText("Create a new profile.");
@@ -97,6 +131,9 @@ public class CreateProfileController implements Initializable {
             try {
                 Profile profile = profileModel.createProfile(new Profile(txtTitle.getText().trim()));
                 profilesTabController.getTable().getItems().add(profile);
+                for (Rule r : rulesList.getItems())
+                    profileRuleModel.addRuleToProfile(profile, r);
+
                 txtTitle.clear();
                 handleClose();
             } catch (Exception e) {
@@ -107,9 +144,6 @@ public class CreateProfileController implements Initializable {
 
     @FXML
     private void handleCancel(ActionEvent event) {
-        txtTitle.clear();
-        updateProfile = false;
-        lblHeader.setText("Create a new profile.");
         handleClose();
     }
 
@@ -121,17 +155,38 @@ public class CreateProfileController implements Initializable {
         this.profilesTabController = profilesTabController;
     }
 
-    public void preloadWindow(Profile profile) {
+    public void preloadUpdateWindow(Profile profile) {
         txtTitle.setText(profile.getTitle());
         lblHeader.setText("Edit profile.");
         updateProfile = true;
         profileToBeUpdated = profile;
+        setupOverLay();
+    }
+
+    public void preloadCreateWindow() {
+        lblHeader.setText("Create a new profile.");
+        updateProfile = false;
+        setupOverLay();
     }
 
     private void handleClose() {
         if (overlay != null) {
+            updateProfile = false;
             overlay.setVisible(false);
             overlay.setManaged(false);
         }
+    }
+
+    private void setupListeners() {
+        rulesDropdown.getCheckModel().getCheckedItems().addListener((ListChangeListener<Rule>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    rulesList.getItems().addAll(change.getAddedSubList());
+                }
+                if (change.wasRemoved()) {
+                    rulesList.getItems().removeAll(change.getRemoved());
+                }
+            }
+        } );
     }
 }
