@@ -8,6 +8,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 
 public class EmployeeDashboardController {
@@ -16,9 +19,20 @@ public class EmployeeDashboardController {
     private StackPane root;
     @FXML
     private ModalPane modalPane;
+    @FXML
+    private Label lblBoxID;
+    @FXML
+    private Label lblDocumentNr;
+    @FXML
+    private Label lblTotalDocInBox;
+    @FXML
+    private BorderPane topOverview;
+    @FXML
+    private ImageView previewImageView;
 
     @FXML
     private void initialize() {
+
         Platform.runLater(this::showChooseProfileModal);
     }
 
@@ -47,4 +61,24 @@ public class EmployeeDashboardController {
             ViewHandler.EMPLOYEE_DASHBOARD.reset();
             ViewHandler.LOGIN.show(false);
         }
+
+    @FXML
+    private void onBtnExport(ActionEvent actionEvent) {
     }
+
+    @FXML
+    private void onBtnCloseOverview(ActionEvent actionEvent) {
+    }
+
+    @FXML
+    private void onBtnPreviousPage(ActionEvent actionEvent) {
+    }
+
+    @FXML
+    private void onBtnRotate(ActionEvent actionEvent) {
+    }
+
+    @FXML
+    private void onBtnNext(ActionEvent actionEvent) {
+    }
+}

@@ -28,3 +28,8 @@
 .dangerBtn {
     -fx-background-color: #EF4444;
 }
+
+#rulesList .list-cell{
+    -fx-padding: 2px 2px;
+    -fx-font-size: 12px;
+}
