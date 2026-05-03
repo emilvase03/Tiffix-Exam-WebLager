@@ -1,6 +1,7 @@
 package dk.easv.tiffixexamweblager;
 
 // Project imports
+import dk.easv.tiffixexamweblager.BLL.Utils.ThemeManager;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
 // AtlantaFX imports
@@ -15,8 +16,8 @@ import java.io.IOException;
 public class Launcher extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
-
+        //Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
+        ThemeManager.getInstance();
         ViewHandler.LOGIN.show(false);
 
     }

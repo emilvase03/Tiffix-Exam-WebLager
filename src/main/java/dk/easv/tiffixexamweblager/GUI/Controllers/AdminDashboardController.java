@@ -2,10 +2,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import atlantafx.base.controls.ModalPane;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
-import javafx.animation.FadeTransition;
-import javafx.animation.Interpolator;
-import javafx.animation.ParallelTransition;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -20,7 +17,6 @@ public class AdminDashboardController {
 
     @FXML
     private StackPane root;
-
     @FXML
     private StackPane contentArea;
     @FXML
@@ -38,6 +34,7 @@ public class AdminDashboardController {
         setupModalPane();
         loadInitialView();
     }
+
     private void loadSidebar() {
         try {
             URL sidebarUrl = getClass().getResource("/views/SideBar.fxml");
@@ -55,6 +52,7 @@ public class AdminDashboardController {
             throw new RuntimeException("Failed to load sidebar", e);
         }
     }
+
     private void setupModalPane() {
         modalPane = new ModalPane();
         modalPane.setAlignment(Pos.CENTER_LEFT);
@@ -64,9 +62,11 @@ public class AdminDashboardController {
         root.getChildren().add(modalPane);
         modalPane.hide();
     }
+
     private void loadInitialView() {
         loadView("views/EmployeesTab.fxml");
     }
+
     @FXML
     private void onBtnOpenSideBar() {
         if (modalPane == null || drawer == null) return;

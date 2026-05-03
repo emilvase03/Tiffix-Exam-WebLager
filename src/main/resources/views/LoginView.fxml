@@ -65,6 +65,14 @@
             alignment="CENTER"
             HBox.hgrow="ALWAYS">
 
+        <!-- Top-right theme toggle -->
+        <HBox alignment="CENTER_RIGHT">
+            <padding>
+                <Insets top="12" right="12"/>
+            </padding>
+            <fx:include source="../components/ThemeToggleButton.fxml" />
+        </HBox>
+
         <Region VBox.vgrow="ALWAYS"/>
 
         <VBox spacing="20" maxWidth="300">
