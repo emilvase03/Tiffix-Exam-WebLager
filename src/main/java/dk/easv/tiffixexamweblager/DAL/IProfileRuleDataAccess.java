@@ -4,8 +4,13 @@ package dk.easv.tiffixexamweblager.DAL;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.Rule;
 
+// Java imports
+import java.util.List;
+
 public interface IProfileRuleDataAccess {
-    public void addRuleToProfile(Profile profile, Rule rule) throws Exception;
+    public void addRulesToProfile(Profile profile, List<Rule> rules) throws Exception;
 
     public void deleteRulesForProfile(Profile profile) throws Exception;
+
+    public void updateRulesForProfile(Profile profile, List<Rule> rules) throws Exception;
 }
