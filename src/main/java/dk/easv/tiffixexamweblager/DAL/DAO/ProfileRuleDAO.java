@@ -9,6 +9,7 @@ import dk.easv.tiffixexamweblager.DAL.IProfileRuleDataAccess;
 // Java imports
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.List;
 
 public class ProfileRuleDAO implements IProfileRuleDataAccess {
     private DBConnector databaseConnector;
@@ -18,16 +19,27 @@ public class ProfileRuleDAO implements IProfileRuleDataAccess {
     }
 
     @Override
-    public void addRuleToProfile(Profile profile, Rule rule) throws Exception {
-        String sql = "INSERT INTO ProfileRule (ProfileId, RuleID) VALUES (?,?)";
+    public void addRulesToProfile(Profile profile, List<Rule> rules) throws Exception {
+        Connection conn = databaseConnector.getConnection();
 
-        try(Connection connection = databaseConnector.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try {
+            conn.setAutoCommit(false);
 
-            stmt.setInt(1, profile.getId());
-            stmt.setInt(2, rule.getId());
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO ProfileRule (ProfileId, RuleID) VALUES (?,?)");
+            for (Rule r : rules) {
+                stmt.setInt(1, profile.getId());
+                stmt.setInt(2, r.getId());
+                stmt.addBatch();
+            }
 
-            stmt.executeUpdate();
+            stmt.executeBatch();
+            conn.commit();
+        } catch (Exception e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+            conn.close();
         }
     }
 
@@ -38,6 +50,34 @@ public class ProfileRuleDAO implements IProfileRuleDataAccess {
         try (Connection conn = databaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, profile.getId());
             stmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public void updateRulesForProfile(Profile profile, List<Rule> rules) throws Exception {
+        Connection conn = databaseConnector.getConnection();
+        try {
+         conn.setAutoCommit(false);
+
+         PreparedStatement deleteStmt = conn.prepareStatement("DELETE FROM ProfileRule WHERE ProfileId = ?");
+         deleteStmt.setInt(1, profile.getId());
+         deleteStmt.executeUpdate();
+
+         PreparedStatement insertStmt = conn.prepareStatement("INSERT INTO ProfileRule (ProfileId, RuleID) VALUES (?,?)");
+         for (Rule r : rules) {
+             insertStmt.setInt(1, profile.getId());
+             insertStmt.setInt(2, r.getId());
+             insertStmt.addBatch();
+         }
+
+         insertStmt.executeBatch();
+         conn.commit();
+        } catch (Exception e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+            conn.close();
         }
     }
 }

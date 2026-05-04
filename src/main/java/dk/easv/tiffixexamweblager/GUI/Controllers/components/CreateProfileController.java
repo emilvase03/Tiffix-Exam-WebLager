@@ -114,9 +114,7 @@ public class CreateProfileController implements Initializable {
                     profileToBeUpdated.setTitle(txtTitle.getText().trim());
                     profileModel.updateProfile(profileToBeUpdated);
 
-                    profileRuleModel.deleteRulesForProfile(profileToBeUpdated);
-                    for (Rule r : rulesList.getItems())
-                        profileRuleModel.addRuleToProfile(profileToBeUpdated, r);
+                    profileRuleModel.updateRulesForProfile(profileToBeUpdated, rulesList.getItems());
 
                     profilesTabController.getTable().refresh();
                     txtTitle.clear();
@@ -131,8 +129,8 @@ public class CreateProfileController implements Initializable {
             try {
                 Profile profile = profileModel.createProfile(new Profile(txtTitle.getText().trim()));
                 profilesTabController.getTable().getItems().add(profile);
-                for (Rule r : rulesList.getItems())
-                    profileRuleModel.addRuleToProfile(profile, r);
+
+                profileRuleModel.addRulesToProfile(profile, rulesList.getItems());
 
                 txtTitle.clear();
                 handleClose();

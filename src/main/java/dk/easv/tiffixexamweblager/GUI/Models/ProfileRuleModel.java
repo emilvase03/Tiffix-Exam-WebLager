@@ -5,6 +5,8 @@ import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.Rule;
 import dk.easv.tiffixexamweblager.BLL.ProfileRuleManager;
 
+import java.util.List;
+
 public class ProfileRuleModel {
     private ProfileRuleManager manager;
 
@@ -12,11 +14,15 @@ public class ProfileRuleModel {
         manager = new ProfileRuleManager();
     }
 
-    public void addRuleToProfile(Profile profile, Rule rule) throws Exception {
-        manager.addRuleToProfile(profile, rule);
+    public void addRulesToProfile(Profile profile, List<Rule> rules) throws Exception {
+        manager.addRulesToProfile(profile, rules);
     }
 
     public void deleteRulesForProfile(Profile profile) throws Exception {
         manager.deleteRulesForProfile(profile);
+    }
+
+    public void updateRulesForProfile(Profile profile, List<Rule> rules) throws Exception {
+        manager.updateRulesForProfile(profile, rules);
     }
 }
