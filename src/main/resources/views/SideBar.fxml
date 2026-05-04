@@ -20,7 +20,7 @@
 
         <HBox alignment="CENTER_LEFT" spacing="6">
             <FontIcon iconLiteral="bi-gear-fill" styleClass="sidebar-logo" />
-            <Label styleClass="sidebar-app-name" text="TifFix" />
+            <Label styleClass="sidebar-app-name" text="Tiffix" />
         </HBox>
 
     </HBox>
