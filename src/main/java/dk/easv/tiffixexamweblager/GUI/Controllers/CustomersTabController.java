@@ -7,8 +7,6 @@ import dk.easv.tiffixexamweblager.GUI.Models.CustomerModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // Ikonli imports
-import javafx.geometry.Pos;
-import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 // Java imports
@@ -18,6 +16,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.geometry.Pos;
+import javafx.scene.layout.HBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 
