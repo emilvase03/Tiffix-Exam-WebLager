@@ -9,6 +9,9 @@ import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Models.RuleModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
+// ControlsFX imports
+import org.controlsfx.control.CheckComboBox;
+
 // Java imports
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -18,11 +21,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import org.controlsfx.control.CheckComboBox;
-
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class CreateProfileController implements Initializable {
