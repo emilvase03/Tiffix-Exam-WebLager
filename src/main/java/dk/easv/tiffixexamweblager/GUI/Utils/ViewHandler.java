@@ -14,7 +14,7 @@ public enum ViewHandler {
     ADMIN_DASHBOARD("/views/AdminDashboard.fxml", "Dashboard", Modality.NONE),
     EMPLOYEE_DASHBOARD("/views/EmployeeDashboardView.fxml", "Dashboard", Modality.NONE),
     NEW_EMPLOYEE("/views/NewEmployeeView.fxml","New Employee",Modality.APPLICATION_MODAL),
-    ASSIGN_EMPLOYEE_PROFILE("/views/AssignEmployeeProfile.fxml", "Assign Employees", Modality.APPLICATION_MODAL);
+    ASSIGN_EMPLOYEE_PROFILE("/components/AssignEmployeeProfile.fxml", "Assign Employees", Modality.APPLICATION_MODAL);
 
     private final String path;
     private final String title;

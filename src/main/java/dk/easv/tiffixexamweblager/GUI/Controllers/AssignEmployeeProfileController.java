@@ -6,132 +6,122 @@ import dk.easv.tiffixexamweblager.BE.UserProfile;
 import dk.easv.tiffixexamweblager.BLL.UserProfileManager;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
-import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import org.controlsfx.control.CheckComboBox;
 
+import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class AssignEmployeeProfileController {
+public class AssignEmployeeProfileController implements Initializable {
 
-    @FXML private ComboBox<User> employeeDropdown;
+    @FXML private CheckComboBox<User> employeeDropdown;
     @FXML private ListView<User> assignedList;
 
+    private VBox overlay;
     private UserProfileManager userProfileManager;
     private UserModel userModel;
     private int currentProfileId;
-    private List<User> allEmployees;
+    private boolean isLoading = false;
 
-    public void init(UserModel userModel, int profileId) {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setupListener();
+    }
+
+    public void setOverlay(VBox overlay) {
+        this.overlay = overlay;
+    }
+
+    public void preload(UserModel userModel, int profileId) {
         this.userModel        = userModel;
         this.currentProfileId = profileId;
 
+        employeeDropdown.getItems().clear();
+        employeeDropdown.getCheckModel().clearChecks();
+        assignedList.getItems().clear();
+        employeeDropdown.setTitle("Select Employees");
+
         try {
             userProfileManager = new UserProfileManager();
-            allEmployees       = userModel.getEmployees();
         } catch (Exception e) {
             AlertHelper.showError("Failed to initialize", e.getMessage());
             return;
         }
 
-        setupAssignedListCellFactory();
-
-        if (!allEmployees.isEmpty()) {
-            loadAssignedEmployees();
+        List<User> employees = userModel.getEmployees();
+        if (!employees.isEmpty()) {
+            populateDropdown(employees);
         } else {
-            userModel.loadEmployees(this::loadAssignedEmployees);
+            userModel.loadEmployees(() -> populateDropdown(userModel.getEmployees()));
         }
     }
 
-    private void setupAssignedListCellFactory() {
-        assignedList.setCellFactory(listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(User item, boolean empty) {
-                super.updateItem(item, empty);
+    private void populateDropdown(List<User> allEmployees) {
+        try {
+            employeeDropdown.getItems().addAll(allEmployees);
 
-                if (empty || item == null) {
-                    setGraphic(null);
-                    setText(null);
-                } else {
-                    Button btnRemove = new Button("✕");
-                    btnRemove.getStyleClass().addAll(Styles.BUTTON_OUTLINED, Styles.DANGER, Styles.SMALL);
-                    btnRemove.setOnAction(e -> handleRemove(item));
+            List<UserProfile> assigned = userProfileManager.getCoordinatorsForEvent(currentProfileId);
 
-                    HBox row = new HBox(8, btnRemove, new Label(item.getFirstName() + " " + item.getLastName()));
-                    row.setAlignment(Pos.CENTER_LEFT);
+            isLoading = true;
+            for (User u : allEmployees) {
+                boolean isAssigned = assigned.stream().anyMatch(up -> up.getUserId() == u.getId());
+                if (isAssigned) {
+                    employeeDropdown.getCheckModel().check(u);
+                }
+            }
+            isLoading = false;
+        } catch (Exception e) {
+            isLoading = false;
+            AlertHelper.showError("Failed to load employees", e.getMessage());
+        }
+    }
 
-                    setGraphic(row);
-                    setText(null);
+    private void setupListener() {
+        employeeDropdown.getCheckModel().getCheckedItems().addListener((ListChangeListener<User>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (User u : change.getAddedSubList()) {
+                        assignedList.getItems().add(u);
+                        if (!isLoading) {
+                            try {
+                                userProfileManager.assignCoordinator(u.getId(), currentProfileId);
+                            } catch (Exception e) {
+                                AlertHelper.showError("Failed to assign employee", e.getMessage());
+                            }
+                        }
+                    }
+                }
+                if (change.wasRemoved()) {
+                    for (User u : change.getRemoved()) {
+                        assignedList.getItems().remove(u);
+                        if (!isLoading) {
+                            try {
+                                userProfileManager.removeCoordinator(u.getId(), currentProfileId);
+                            } catch (Exception e) {
+                                AlertHelper.showError("Failed to remove employee", e.getMessage());
+                            }
+                        }
+                    }
                 }
             }
         });
     }
 
-    private void loadAssignedEmployees() {
-        try {
-            List<UserProfile> assigned = userProfileManager.getCoordinatorsForEvent(currentProfileId);
-            ObservableList<User> assignedUsers = FXCollections.observableArrayList();
-
-            for (UserProfile up : assigned) {
-                allEmployees.stream()
-                        .filter(u -> u.getId() == up.getUserId())
-                        .findFirst()
-                        .ifPresent(assignedUsers::add);
-            }
-
-            assignedList.setItems(assignedUsers);
-
-            ObservableList<User> available = allEmployees.stream()
-                    .filter(u -> assignedUsers.stream().noneMatch(a -> a.getId() == u.getId()))
-                    .collect(FXCollections::observableArrayList, ObservableList::add, ObservableList::addAll);
-
-            employeeDropdown.setItems(available);
-
-        } catch (Exception e) {
-            AlertHelper.showError("Failed to load employees", e.getMessage());
-        }
-    }
-
-    @FXML
-    private void handleAssign(ActionEvent actionEvent) {
-        User selected = employeeDropdown.getValue();
-
-        if (selected == null) {
-            AlertHelper.showError("No selection", "Please select an employee to assign.");
-            return;
-        }
-
-        try {
-            userProfileManager.assignCoordinator(selected.getId(), currentProfileId);
-            assignedList.getItems().add(selected);
-            employeeDropdown.getItems().remove(selected);
-            employeeDropdown.setValue(null);
-        } catch (Exception e) {
-            AlertHelper.showError("Failed to assign employee", e.getMessage());
-        }
-    }
-
-    private void handleRemove(User user) {
-        if (user == null)
-            return;
-
-        try {
-            userProfileManager.removeCoordinator(user.getId(), currentProfileId);
-            assignedList.getItems().remove(user);
-            employeeDropdown.getItems().add(user);
-        } catch (Exception e) {
-            AlertHelper.showError("Failed to remove employee", e.getMessage());
-        }
-    }
-
     @FXML
     private void handleClose(ActionEvent actionEvent) {
-        ViewHandler.ASSIGN_EMPLOYEE_PROFILE.close();
-        ViewHandler.ASSIGN_EMPLOYEE_PROFILE.reset();
+        if (overlay != null) {
+            overlay.setVisible(false);
+            overlay.setManaged(false);
+        }
     }
 }

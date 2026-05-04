@@ -1,17 +1,11 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-// Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.CreateProfileController;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
-import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
-
-// Ikonli imports
 import org.kordamp.ikonli.javafx.FontIcon;
-
-// Java imports
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,8 +22,14 @@ public class ProfilesTabController implements Initializable {
     @FXML private TableView<Profile> tblProfiles;
     @FXML private TableColumn<Profile, String> colTitle;
     @FXML private TableColumn<Profile, Void> colManage;
+
+    // Create overlay — already wired
     @FXML private VBox createProfileOverlay;
     @FXML private CreateProfileController createProfileController;
+
+    // Assign overlay — new
+    @FXML private VBox assignEmployeeOverlay;
+    @FXML private AssignEmployeeProfileController assignEmployeeProfileController;
 
     private ProfileModel profileModel;
     private UserModel userModel;
@@ -47,8 +47,11 @@ public class ProfilesTabController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
         setupManageColumn();
+
         createProfileController.setOverlay(createProfileOverlay);
         createProfileController.setProfilesTabController(this);
+
+        assignEmployeeProfileController.setOverlay(assignEmployeeOverlay);
     }
 
     private void setupTable() {
@@ -64,7 +67,7 @@ public class ProfilesTabController implements Initializable {
             TableRow<Profile> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
-                    showOverlay();
+                    showCreateOverlay();
                     createProfileController.preloadUpdateWindow(row.getItem());
                 }
             });
@@ -96,26 +99,20 @@ public class ProfilesTabController implements Initializable {
             }
 
             private void handleAssignEmployee(Profile profile) {
-                if (profile == null)
-                    return;
+                if (profile == null) return;
 
-                ViewHandler.ASSIGN_EMPLOYEE_PROFILE.reset();
-                ViewHandler.ASSIGN_EMPLOYEE_PROFILE.show(false);
-
-                AssignEmployeeProfileController controller = ViewHandler.ASSIGN_EMPLOYEE_PROFILE.getController();
-                controller.init(userModel, profile.getId());
+                assignEmployeeProfileController.preload(userModel, profile.getId());
+                showAssignOverlay();
             }
 
             private void handleDeleteProfile(Profile profile) {
-                if (profile == null)
-                    return;
+                if (profile == null) return;
 
                 boolean confirmed = AlertHelper.showConfirmation(
                         "Delete Profile",
                         "Are you sure you want to delete \"" + profile.getTitle() + "\"?"
                 );
-                if (!confirmed)
-                    return;
+                if (!confirmed) return;
 
                 try {
                     profileModel.deleteProfile(profile);
@@ -135,7 +132,7 @@ public class ProfilesTabController implements Initializable {
 
     @FXML
     private void handleCreateProfile(ActionEvent event) {
-        showOverlay();
+        showCreateOverlay();
         createProfileController.preloadCreateWindow();
     }
 
@@ -143,8 +140,13 @@ public class ProfilesTabController implements Initializable {
         return tblProfiles;
     }
 
-    private void showOverlay() {
+    private void showCreateOverlay() {
         createProfileOverlay.setVisible(true);
         createProfileOverlay.setManaged(true);
+    }
+
+    private void showAssignOverlay() {
+        assignEmployeeOverlay.setVisible(true);
+        assignEmployeeOverlay.setManaged(true);
     }
 }
