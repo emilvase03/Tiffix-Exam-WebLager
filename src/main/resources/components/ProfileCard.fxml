@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 
 <?import org.controlsfx.control.CheckComboBox?>
-<VBox fx:id="createProfileCard" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="310.0" prefWidth="327.0" spacing="10.0" styleClass="overlay" stylesheets="@../css/profilesTab.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.CreateProfileController">
+<VBox fx:id="createProfileCard" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="310.0" prefWidth="327.0" spacing="10.0" styleClass="overlay" stylesheets="@../css/profilesTab.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.ProfileCardController">
    <children>
       <Label fx:id="lblHeader" text="Create a new profile.">
          <font>

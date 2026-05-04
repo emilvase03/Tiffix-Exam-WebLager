@@ -53,8 +53,8 @@
                 <Insets left="50.0" right="50.0" />
             </StackPane.margin>
         </VBox>
-        <VBox fx:id="createProfileOverlay" alignment="CENTER" managed="false" visible="false">
-            <fx:include fx:id="createProfile" source="../components/CreateProfileCard.fxml" />
+        <VBox fx:id="profileCardOverlay" alignment="CENTER" managed="false" visible="false">
+            <fx:include fx:id="profileCard" source="../components/ProfileCard.fxml" />
         </VBox>
         <VBox fx:id="assignEmployeeOverlay" alignment="CENTER" managed="false" visible="false">
             <fx:include fx:id="assignEmployeeProfile" source="../components/AssignEmployeeProfile.fxml" />

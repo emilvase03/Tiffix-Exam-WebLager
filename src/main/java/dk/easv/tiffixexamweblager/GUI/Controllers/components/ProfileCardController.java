@@ -24,23 +24,23 @@ import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CreateProfileController implements Initializable {
+public class ProfileCardController implements Initializable {
     @FXML private TextField txtTitle;
     @FXML private Label lblHeader;
     @FXML private CheckComboBox<Rule> rulesDropdown;
     @FXML private ListView<Rule> rulesList;
 
+    private boolean updateProfile = false;
     private VBox overlay;
     private ProfileModel profileModel;
     private ProfilesTabController profilesTabController;
-    private boolean updateProfile = false;
     private Profile profileToBeUpdated;
     private RuleModel ruleModel;
     private ProfileRuleModel profileRuleModel;
     private ObservableList<Rule> allRules = FXCollections.observableArrayList();
     private ObservableList<Rule> profileRules = FXCollections.observableArrayList();
 
-    public CreateProfileController() {
+    public ProfileCardController() {
         try {
             profileModel = new ProfileModel();
         } catch (Exception e) {
