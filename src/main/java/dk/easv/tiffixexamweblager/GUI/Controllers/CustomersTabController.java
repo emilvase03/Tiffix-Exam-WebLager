@@ -7,6 +7,8 @@ import dk.easv.tiffixexamweblager.GUI.Models.CustomerModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // Ikonli imports
+import javafx.geometry.Pos;
+import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 // Java imports
@@ -70,6 +72,7 @@ public class CustomersTabController implements Initializable {
         colManage.setCellFactory(col -> new TableCell<>() {
 
             private final Button btnDelete = new Button();
+            private final HBox container  = new HBox(8, btnDelete);
 
             {
                 btnDelete.setGraphic(new FontIcon("bi-trash"));
@@ -77,6 +80,8 @@ public class CustomersTabController implements Initializable {
                 btnDelete.setOnAction(e ->
                         handleDeleteCustomer(tblCustomer.getItems().get(getIndex()))
                 );
+
+                container.setAlignment(Pos.CENTER);
             }
 
             private void handleDeleteCustomer(Customer customer) {
@@ -99,7 +104,7 @@ public class CustomersTabController implements Initializable {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btnDelete);
+                setGraphic(empty ? null : container);
             }
         });
     }
