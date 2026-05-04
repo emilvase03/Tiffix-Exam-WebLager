@@ -170,6 +170,7 @@ public class CreateProfileController implements Initializable {
     private void handleClose() {
         if (overlay != null) {
             updateProfile = false;
+            txtTitle.clear();
             txtTitle.setStyle("");
             rulesList.setStyle("");
             overlay.setVisible(false);
