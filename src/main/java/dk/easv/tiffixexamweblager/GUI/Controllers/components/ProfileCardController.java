@@ -1,12 +1,11 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
 // Project imports
+import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.Rule;
 import dk.easv.tiffixexamweblager.GUI.Controllers.ProfilesTabController;
-import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
-import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
-import dk.easv.tiffixexamweblager.GUI.Models.RuleModel;
+import dk.easv.tiffixexamweblager.GUI.Models.*;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // ControlsFX imports
@@ -27,6 +26,7 @@ import java.util.ResourceBundle;
 public class ProfileCardController implements Initializable {
     @FXML private TextField txtTitle;
     @FXML private Label lblHeader;
+    @FXML private ComboBox<Customer> customerDropdown;
     @FXML private CheckComboBox<Rule> rulesDropdown;
     @FXML private ListView<Rule> rulesList;
 
@@ -37,6 +37,8 @@ public class ProfileCardController implements Initializable {
     private Profile profileToBeUpdated;
     private RuleModel ruleModel;
     private ProfileRuleModel profileRuleModel;
+    private CustomerModel customerModel;
+    private CustomerProfileModel customerProfileModel;
     private ObservableList<Rule> allRules = FXCollections.observableArrayList();
     private ObservableList<Rule> profileRules = FXCollections.observableArrayList();
 
@@ -56,6 +58,16 @@ public class ProfileCardController implements Initializable {
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to instantiate ProfileRuleModel");
         }
+        try {
+            customerModel = new CustomerModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate CustomerModel");
+        }
+        try {
+            customerProfileModel = new CustomerProfileModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate CustomerProfileModel");
+        }
     }
 
     @Override
@@ -69,28 +81,37 @@ public class ProfileCardController implements Initializable {
         profileRules.clear();
         allRules.clear();
 
-        rulesDropdown.setTitle("Select Rules");
-
         try {
             allRules.addAll(ruleModel.getAllRules());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve every profile rule from database");
         }
 
+        try {
+            customerDropdown.getItems().addAll(customerModel.getAllCustomers());
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to retrieve customers from database");
+        }
+
         // If update vs If create
         if (updateProfile) {
+            try {
+                customerDropdown.setValue(customerProfileModel.getCustomerForProfile(profileToBeUpdated));
+            } catch (Exception e) {
+                AlertHelper.showError("Error", "Failed to retrieve customer for profile from database");
+            }
             try {
                 profileRules.addAll(ruleModel.getRulesForProfile(profileToBeUpdated));
             } catch (Exception e) {
                 AlertHelper.showError("Error", "Failed to retrieve profile rules from database");
             }
+
             rulesDropdown.getItems().addAll(allRules);
             for (Rule r : profileRules) {
                 rulesDropdown.getCheckModel().check(r);
             }
 
         } else {
-
             rulesDropdown.getItems().addAll(allRules);
         }
     }
@@ -99,6 +120,10 @@ public class ProfileCardController implements Initializable {
     private void handleSave(ActionEvent event) {
         if (txtTitle.getText().isBlank()) {
             txtTitle.setStyle("-fx-border-color: #FF3D32; -fx-border-width: 1;");
+            return;
+        }
+        if (customerDropdown.getItems().isEmpty()) {
+            rulesList.setStyle("-fx-border-color: #FF3D32;");
             return;
         }
         if (rulesList.getItems().isEmpty()) {
@@ -144,6 +169,19 @@ public class ProfileCardController implements Initializable {
         handleClose();
     }
 
+    private void setupListeners() {
+        rulesDropdown.getCheckModel().getCheckedItems().addListener((ListChangeListener<Rule>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    rulesList.getItems().addAll(change.getAddedSubList());
+                }
+                if (change.wasRemoved()) {
+                    rulesList.getItems().removeAll(change.getRemoved());
+                }
+            }
+        } );
+    }
+
     public void setOverlay(VBox overlay) {
         this.overlay = overlay;
     }
@@ -172,21 +210,9 @@ public class ProfileCardController implements Initializable {
             txtTitle.clear();
             txtTitle.setStyle("");
             rulesList.setStyle("");
+            customerDropdown.setValue(null);
             overlay.setVisible(false);
             overlay.setManaged(false);
         }
-    }
-
-    private void setupListeners() {
-        rulesDropdown.getCheckModel().getCheckedItems().addListener((ListChangeListener<Rule>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    rulesList.getItems().addAll(change.getAddedSubList());
-                }
-                if (change.wasRemoved()) {
-                    rulesList.getItems().removeAll(change.getRemoved());
-                }
-            }
-        } );
     }
 }
