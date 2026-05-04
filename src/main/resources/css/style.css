@@ -179,7 +179,9 @@
     -fx-opacity: 0.6;
     -fx-cursor: default;
 }
-
+/*
+Employee Dashboard
+*/
 /*
    Choose Profile modal
 */
@@ -241,4 +243,42 @@
 
 .profile-item:hover {
     -fx-background-color: -color-accent-subtle;
+}
+/*
+   Document Tile
+    */
+.document-tile {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #d0d0d0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 10;
+
+    -fx-min-width: 90;
+    -fx-pref-width: 90;
+    -fx-min-height: 100;
+    -fx-pref-height: 100;
+
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+.document-tile:hover {
+    -fx-background-color: #e9ecef;
+    -fx-border-color: #a0a0a0;
+}
+
+.document-tile.selected {
+    -fx-background-color: #cfe2ff;
+    -fx-border-color: #0d6efd;
+}
+
+/*
+   Tile Text
+  */
+
+.document-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212529;
 }

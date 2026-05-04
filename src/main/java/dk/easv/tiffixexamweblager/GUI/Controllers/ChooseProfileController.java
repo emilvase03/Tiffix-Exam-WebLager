@@ -1,20 +1,30 @@
 
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-import atlantafx.base.controls.ModalPane;
-import dk.easv.tiffixexamweblager.BE.Profile;
-import dk.easv.tiffixexamweblager.BE.User;
-import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
-import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
-import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+// Java imports
+import java.util.ArrayList;
+import java.util.List;
+
+// JavaFX imports
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
-import java.util.List;
+// Project imports
+import dk.easv.tiffixexamweblager.BE.Box;
+import dk.easv.tiffixexamweblager.BE.Profile;
+import dk.easv.tiffixexamweblager.BE.User;
+import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
+import dk.easv.tiffixexamweblager.GUI.Models.DocumentModel;
+import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
+import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+import atlantafx.base.controls.ModalPane;
+
 public class ChooseProfileController {
 
     @FXML
@@ -24,17 +34,25 @@ public class ChooseProfileController {
 
     private ModalPane modalPane;
     private ProfileModel profileModel;
+    private DocumentModel documentModel;
+
+    @FXML private ComboBox<Box> boxComboBox;
 
     private final List<Profile> selectedProfiles = new ArrayList<>();
 
-    public void init(ModalPane modalPane) {
+    private Runnable onSessionReady;
+
+    public void init(ModalPane modalPane, Runnable onSessionReady) {
         this.modalPane = modalPane;
+        this.onSessionReady = onSessionReady;
 
         try {
             profileModel = new ProfileModel();
+            documentModel = new DocumentModel();
             loadAssignedProfiles();
+            loadBoxes();
         } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to load profiles.");
+            AlertHelper.showError("Error", "Failed to load profiles or boxes.");
         }
     }
 
@@ -54,8 +72,13 @@ public class ChooseProfileController {
         for (Profile profile : profiles) {
             profileList.getChildren().add(createProfileRow(profile));
         }
+    }
+    private void loadBoxes() throws Exception {
+        List<Box> boxes = documentModel.getAllBoxes();
+        boxComboBox.getItems().setAll(boxes);
 
-        btnSelectProfile.setDisable(profiles.isEmpty());
+        if (!boxes.isEmpty())
+            boxComboBox.getSelectionModel().selectFirst();
     }
 
     private HBox createProfileRow(Profile profile) {
@@ -67,7 +90,6 @@ public class ChooseProfileController {
             } else {
                 selectedProfiles.remove(profile);
             }
-            btnSelectProfile.setDisable(selectedProfiles.isEmpty());
         });
 
         HBox row = new HBox(cb);
@@ -80,10 +102,18 @@ public class ChooseProfileController {
     }
 
     @FXML
-    private void onBtnSelectProfile() {
-        if (selectedProfiles.isEmpty()) return;
+    private void onBtnStartSession(ActionEvent actionEvent) {
+        Box selectedBox = boxComboBox.getValue();
+        if (selectedProfiles.isEmpty() || selectedBox == null) return;
 
+        // store choices in the session
         UserSession.getInstance().setActiveProfiles(selectedProfiles);
+        UserSession.getInstance().setActiveBox(selectedBox);
+
         modalPane.hide();
+
+        // tells the dashboard to load documents
+        if (onSessionReady != null)
+            onSessionReady.run();
     }
 }

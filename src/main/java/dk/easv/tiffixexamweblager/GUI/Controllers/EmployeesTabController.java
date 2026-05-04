@@ -2,7 +2,6 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import atlantafx.base.controls.ModalPane;
 import dk.easv.tiffixexamweblager.BE.User;
-import dk.easv.tiffixexamweblager.GUI.Controllers.components.NewEmployeeController;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import javafx.beans.property.SimpleStringProperty;

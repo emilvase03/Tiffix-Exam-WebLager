@@ -1,6 +1,7 @@
 package dk.easv.tiffixexamweblager.BLL.Utils;
 
 // Project imports
+import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
 
@@ -12,6 +13,7 @@ public class UserSession {
     private static UserSession instance;
     private User currentUser;
     private List<Profile> activeProfiles = Collections.emptyList();
+    private Box activeBox;
 
     private UserSession() {}
 
@@ -46,9 +48,19 @@ public class UserSession {
     public List<Profile> getActiveProfiles() {
         return activeProfiles;
     }
-    public boolean hasActiveProfiles() {
-        return !activeProfiles.isEmpty();
+
+    public void setActiveBox(Box box) {
+        this.activeBox = box;
     }
+
+    public Box getActiveBox() {
+        return activeBox;
+    }
+
+    public boolean hasActiveBox() {
+        return activeBox != null;
+    }
+
     public void clear() {
         currentUser = null;
         activeProfiles = Collections.emptyList();

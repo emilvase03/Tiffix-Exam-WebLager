@@ -1,4 +1,4 @@
-package dk.easv.tiffixexamweblager.GUI.Controllers.components;
+package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import atlantafx.base.controls.ModalPane;
 import atlantafx.base.theme.Styles;
