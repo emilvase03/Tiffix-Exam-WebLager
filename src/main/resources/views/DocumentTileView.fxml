@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+
+<?import javafx.scene.image.ImageView?>
+<VBox fx:id="root" prefHeight="246.0" prefWidth="227.0" spacing="5" stylesheets="@../css/style.css" styleClass="document-tile" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.DocumentTileController">
+   <children>
+      <Label
+              fx:id="lblDocumentTitle"
+              wrapText="true"
+              styleClass="document-title"
+      />
+   </children>
+
+   <ImageView fx:id="icon"
+              fitWidth="40"
+              fitHeight="40"
+              preserveRatio="true"/>
+
+</VBox>

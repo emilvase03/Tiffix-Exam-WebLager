@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <StackPane xmlns="http://javafx.com/javafx/24.0.1"
            xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.NewEmployeeController"
+           fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.NewEmployeeController"
            style="-fx-background-color: transparent;"
 alignment="CENTER">
    <VBox
