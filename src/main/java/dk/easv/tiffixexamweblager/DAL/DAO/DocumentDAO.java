@@ -20,7 +20,7 @@ public class DocumentDAO implements IDocumentDataAccess {
     public List<Document> getDocumentsForBox(int boxId) throws Exception {
         List<Document> documents = new ArrayList<>();
 
-        String docSql = "SELECT Id, BoxId, SortOrder FROM Document WHERE BoxId = ? ORDER BY SortOrder";
+        String docSql = "SELECT Id, BoxId, SortOrder FROM Document WHERE BoxId = ? AND IsDeleted = 0 ORDER BY SortOrder";
 
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(docSql)) {
@@ -61,7 +61,7 @@ public class DocumentDAO implements IDocumentDataAccess {
 
     @Override
     public void deleteDocument(Document document) throws Exception {
-        String sql = "DELETE FROM Document WHERE Id = ?";
+        String sql = "UPDATE Document SET IsDeleted = 1 WHERE Id = ?";
 
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
