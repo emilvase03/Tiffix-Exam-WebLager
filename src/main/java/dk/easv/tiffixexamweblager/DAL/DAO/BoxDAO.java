@@ -19,7 +19,7 @@ public class BoxDAO implements IBoxDataAccess {
     @Override
     public List<Box> getAllBoxes() throws Exception {
         List<Box> boxes = new ArrayList<>();
-        String sql = "SELECT Id, Number FROM Box ORDER BY Id DESC";
+        String sql = "SELECT Id, Number FROM Box WHERE IsDeleted = 0 ORDER BY Id DESC";
 
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
