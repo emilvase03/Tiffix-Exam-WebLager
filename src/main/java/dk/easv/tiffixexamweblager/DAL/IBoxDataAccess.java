@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface IBoxDataAccess {
     List<Box> getAllBoxes() throws Exception;
-
+    Box       createBox(Box box) throws Exception;
+    void      deleteBox(Box box) throws Exception;
 }

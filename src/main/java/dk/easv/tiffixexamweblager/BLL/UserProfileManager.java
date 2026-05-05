@@ -9,25 +9,25 @@ import java.util.List;
 
 public class UserProfileManager {
 
-    private final IUserProfileDataAccess userProfileDAO;
+    private final IUserProfileDataAccess dataAccess;
 
     public UserProfileManager() throws Exception {
-        userProfileDAO = new UserProfileDAO();
+        dataAccess = new UserProfileDAO();
     }
 
      public List<UserProfile> getCoordinatorsForEvent(int profileId) throws Exception {
-        return userProfileDAO.getEmployeesForProfile(profileId);
+        return dataAccess.getEmployeesForProfile(profileId);
     }
 
     public void assignCoordinator(int userId, int profileId) throws Exception {
-        userProfileDAO.assignEmployees(userId, profileId);
+        dataAccess.assignEmployees(userId, profileId);
     }
 
     public void removeCoordinator(int userId, int profileId) throws Exception {
-        userProfileDAO.removeEmployees(userId, profileId);
+        dataAccess.removeEmployees(userId, profileId);
     }
 
     public List<Profile> getProfilesForEmployee(int userId) throws Exception {
-        return userProfileDAO.getProfilesForEmployee(userId);
+        return dataAccess.getProfilesForEmployee(userId);
     }
 }

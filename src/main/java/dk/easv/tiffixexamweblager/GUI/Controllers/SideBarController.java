@@ -12,6 +12,7 @@ public class SideBarController {
     @FXML private Button btnEmployees;
     @FXML private Button btnProfiles;
     @FXML private Button btnCustomers;
+    @FXML private Button btnBoxes;
 
     private AdminDashboardController dashboard;
 
@@ -38,11 +39,18 @@ public class SideBarController {
         dashboard.loadView("views/CustomersTab.fxml");
     }
 
+    @FXML
+    private void onBoxes(ActionEvent actionEvent) {
+        setActiveButton(btnBoxes);
+        dashboard.loadView("views/BoxesTab.fxml");
+    }
+
     // Visually highlights the selected nav button
     private void setActiveButton(Button active) {
         btnEmployees.getStyleClass().remove("sidebar-btn-active");
         btnProfiles.getStyleClass().remove("sidebar-btn-active");
         btnCustomers.getStyleClass().remove("sidebar-btn-active");
+        btnBoxes.getStyleClass().remove("sidebar-btn-active");
         active.getStyleClass().add("sidebar-btn-active");
     }
 

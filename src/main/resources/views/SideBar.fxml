@@ -37,9 +37,9 @@
                 </HBox>
             </graphic>
         </Button>
-
         <Button fx:id="btnProfiles" maxWidth="Infinity" mnemonicParsing="false" onAction="#onProfiles" styleClass="sidebar-btn" text=" Profiles" />
-      <Button fx:id="btnCustomers" maxWidth="Infinity" mnemonicParsing="false" onAction="#onCustomers" styleClass="sidebar-btn" text="Customers" />
+        <Button fx:id="btnCustomers" maxWidth="Infinity" mnemonicParsing="false" onAction="#onCustomers" styleClass="sidebar-btn" text="Customers" />
+        <Button fx:id="btnBoxes" maxWidth="Infinity" mnemonicParsing="false" onAction="#onBoxes" styleClass="sidebar-btn" text=" Boxes" />
 
         <Region VBox.vgrow="ALWAYS" />
     </VBox>

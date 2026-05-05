@@ -10,18 +10,18 @@ import java.util.List;
 
 public class UserManager {
 
-    private final IUserDataAccess userDAO;
+    private final IUserDataAccess dataAccess;
 
     public UserManager() throws Exception {
-        userDAO = new UserDAO();
+        dataAccess = new UserDAO();
     }
 
     public List<User> getAllUsers() throws Exception {
-        return userDAO.getAllUsers();
+        return dataAccess.getAllUsers();
     }
 
     public List<User> getEmployees() throws Exception {
-        return userDAO.getUsersByRole(Role.EMPLOYEE);
+        return dataAccess.getUsersByRole(Role.EMPLOYEE);
     }
 
     public User loginUser(String username, String password) throws Exception {
@@ -29,7 +29,7 @@ public class UserManager {
         if (username == null || password == null)
             return null;
 
-        User user = userDAO.getUserByUsername(username);
+        User user = dataAccess.getUserByUsername(username);
 
         if (user == null)
             return null;
@@ -45,7 +45,7 @@ public class UserManager {
                            String password,
                            Role role) throws Exception {
 
-        if (userDAO.usernameExists(username))
+        if (dataAccess.usernameExists(username))
             return null;
 
         String hashedPassword = Encrypter.hashPassword(password);
@@ -59,19 +59,19 @@ public class UserManager {
                 role
         );
 
-        return userDAO.createUser(newUser);
+        return dataAccess.createUser(newUser);
     }
 
     public void updateUser(User user, String rawPassword) throws Exception {
         if (rawPassword != null && !rawPassword.isBlank()) {
             user.setPassword(Encrypter.hashPassword(rawPassword));
         }
-        userDAO.updateUser(user);
+        dataAccess.updateUser(user);
     }
 
 
     public void deleteUser(User user) throws Exception {
-        userDAO.deleteUser(user);
+        dataAccess.deleteUser(user);
     }
 
     public static void main(String[] args) {
