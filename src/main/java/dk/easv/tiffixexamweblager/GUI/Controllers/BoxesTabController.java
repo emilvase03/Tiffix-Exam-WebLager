@@ -1,6 +1,7 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import dk.easv.tiffixexamweblager.BE.Box;
+import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.BoxCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
@@ -13,7 +14,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -25,12 +25,12 @@ public class BoxesTabController implements Initializable {
     @FXML private TableView<Box>            tblBoxes;
     @FXML private TableColumn<Box, Integer> colNumber;
     @FXML private TableColumn<Box, String>  colTitle;
+    @FXML private TableColumn<Box, String>  colCreatedBy;
     @FXML private TableColumn<Box, String>  colCreatedAt;
     @FXML private TableColumn<Box, Integer> colDocuments;
     @FXML private TableColumn<Box, Integer> colPages;
     @FXML private TableColumn<Box, Void>    colManage;
 
-    // BoxCard overlay — wired via fx:include in BoxesTab.fxml
     @FXML private VBox              boxCardOverlay;
     @FXML private BoxCardController boxCardController;
 
@@ -55,7 +55,10 @@ public class BoxesTabController implements Initializable {
         boxCardController.setOverlay(boxCardOverlay);
         boxCardController.setBoxesTabController(this);
         boxCardController.setBoxModel(boxModel);
-        boxCardController.setLoggedInUserId(UserSession.getInstance().getCurrentUser().getId());
+        boxCardController.setLoggedInUser(
+                UserSession.getInstance().getCurrentUser().getId(),
+                UserSession.getInstance().getCurrentUser().getUsername()
+        );
     }
 
     private void setupTable() {
@@ -64,6 +67,9 @@ public class BoxesTabController implements Initializable {
 
         colTitle.setCellValueFactory(d ->
                 new SimpleStringProperty(d.getValue().getTitle()));
+
+        colCreatedBy.setCellValueFactory(d ->
+                new SimpleStringProperty(d.getValue().getCreatedByUsername()));
 
         colCreatedAt.setCellValueFactory(d -> {
             LocalDateTime dt = d.getValue().getCreatedAt();
@@ -95,7 +101,6 @@ public class BoxesTabController implements Initializable {
                 btnDelete.setOnAction(e ->
                         handleDeleteBox(tblBoxes.getItems().get(getIndex()))
                 );
-
                 container.setAlignment(Pos.CENTER);
             }
 

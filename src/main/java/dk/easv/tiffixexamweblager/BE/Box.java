@@ -8,17 +8,30 @@ public class Box {
     private String title;
     private LocalDateTime createdAt;
     private int createdByUserId;
+    private String createdByUsername;
     private int documentsAmount;
     private int pagesAmount;
 
-    public Box(int id, int number, String title, LocalDateTime createdAt, int createdByUserId, int documentsAmount, int pagesAmount) {
-        this.id = id;
-        this.number = number;
-        this.title = title;
-        this.createdAt = createdAt;
+    public Box(int id, int number, String title, LocalDateTime createdAt,
+               String createdByUsername, int documentsAmount, int pagesAmount) {
+        this.id                = id;
+        this.number            = number;
+        this.title             = title;
+        this.createdAt         = createdAt;
+        this.createdByUsername = createdByUsername;
+        this.documentsAmount   = documentsAmount;
+        this.pagesAmount       = pagesAmount;
+    }
+
+    public Box(int id, int number, String title, LocalDateTime createdAt,
+               int createdByUserId, int documentsAmount, int pagesAmount) {
+        this.id              = id;
+        this.number          = number;
+        this.title           = title;
+        this.createdAt       = createdAt;
         this.createdByUserId = createdByUserId;
         this.documentsAmount = documentsAmount;
-        this.pagesAmount = pagesAmount;
+        this.pagesAmount     = pagesAmount;
     }
 
     public int getId() {
@@ -56,6 +69,13 @@ public class Box {
         this.createdByUserId = createdByUserId;
     }
 
+    public String getCreatedByUsername() {
+        return createdByUsername;
+    }
+    public void setCreatedByUsername(String createdByUsername) {
+        this.createdByUsername = createdByUsername;
+    }
+
     public int getDocumentsAmount() {
         return documentsAmount;
     }
@@ -72,14 +92,8 @@ public class Box {
 
     @Override
     public String toString() {
-        return "Box{" +
-                "id=" + id +
-                ", number=" + number +
-                ", title='" + title + '\'' +
-                ", createdAt=" + createdAt +
-                ", createdByUserId=" + createdByUserId +
-                ", documentsAmount=" + documentsAmount +
-                ", pagesAmount=" + pagesAmount +
-                '}';
+        return "Box{id=" + id + ", number=" + number + ", title='" + title + '\'' +
+                ", createdBy='" + createdByUsername + "'" +
+                ", documentsAmount=" + documentsAmount + ", pagesAmount=" + pagesAmount + '}';
     }
 }

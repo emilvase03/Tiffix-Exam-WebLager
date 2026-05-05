@@ -21,8 +21,8 @@ public class BoxCardController {
     private VBox               overlay;
     private BoxesTabController boxesTabController;
     private BoxModel           boxModel;
-    private int                loggedInUserId = 0; // set via UserSession
-
+    private int                loggedInUserId;
+    private String             loggedInUsername;
 
     public void setOverlay(VBox overlay) {
         this.overlay = overlay;
@@ -36,8 +36,9 @@ public class BoxCardController {
         this.boxModel = boxModel;
     }
 
-    public void setLoggedInUserId(int userId) {
-        this.loggedInUserId = userId;
+    public void setLoggedInUser(int userId, String username) {
+        this.loggedInUserId   = userId;
+        this.loggedInUsername = username;
     }
 
     public void preloadCreateWindow() {
@@ -66,8 +67,10 @@ public class BoxCardController {
 
         Box newBox = new Box(0, number, title, LocalDateTime.now(),
                 loggedInUserId, 0, 0);
+        newBox.setCreatedByUsername(loggedInUsername);
+
         try {
-            boxModel.createBox(newBox);   // persists and prepends to the observable list
+            boxModel.createBox(newBox);
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to create box.");
             return;

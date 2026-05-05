@@ -21,11 +21,13 @@ public class BoxDAO implements IBoxDataAccess {
     public List<Box> getAllBoxes() throws Exception {
         List<Box> boxes = new ArrayList<>();
         String sql = """
-                SELECT Id, Number, IsDeleted, Title, CreatedAt,
-                       CreatedByUserId, DocumentsAmount, PagesAmount
-                FROM Box
-                WHERE IsDeleted = 0
-                ORDER BY Number ASC
+                SELECT b.Id, b.Number, b.Title, b.CreatedAt,
+                       u.Username AS CreatedByUsername,
+                       b.DocumentsAmount, b.PagesAmount
+                FROM Box b
+                LEFT JOIN [User] u ON u.Id = b.CreatedByUserId
+                WHERE b.IsDeleted = 0
+                ORDER BY b.Number ASC
                 """;
 
         try (Connection conn = dbConnector.getConnection();
@@ -38,7 +40,7 @@ public class BoxDAO implements IBoxDataAccess {
                         rs.getInt("Number"),
                         rs.getString("Title"),
                         rs.getObject("CreatedAt", LocalDateTime.class),
-                        rs.getInt("CreatedByUserId"),
+                        rs.getString("CreatedByUsername"),   // read constructor
                         rs.getInt("DocumentsAmount"),
                         rs.getInt("PagesAmount")
                 ));

@@ -54,12 +54,13 @@
                            prefHeight="505.0" prefWidth="752.0"
                            VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colNumber"    prefWidth="70.0"  text="#" />
-                        <TableColumn fx:id="colTitle"     prefWidth="280.0" text="Title" />
-                        <TableColumn fx:id="colCreatedAt" prefWidth="150.0" text="Created At" />
-                        <TableColumn fx:id="colDocuments" prefWidth="110.0" text="Documents" />
-                        <TableColumn fx:id="colPages"     prefWidth="90.0"  text="Pages" />
-                        <TableColumn fx:id="colManage"    prefWidth="100.0" text="Manage" />
+                        <TableColumn fx:id="colNumber"    prefWidth="60.0"  text="#" />
+                        <TableColumn fx:id="colTitle"     prefWidth="220.0" text="Title" />
+                        <TableColumn fx:id="colCreatedBy" prefWidth="130.0" text="Created By" />
+                        <TableColumn fx:id="colCreatedAt" prefWidth="140.0" text="Created At" />
+                        <TableColumn fx:id="colDocuments" prefWidth="90.0"  text="Documents" />
+                        <TableColumn fx:id="colPages"     prefWidth="70.0"  text="Pages" />
+                        <TableColumn fx:id="colManage"    prefWidth="90.0"  text="Manage" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -77,6 +78,5 @@
         <VBox fx:id="boxCardOverlay" alignment="CENTER" managed="false" visible="false">
             <fx:include fx:id="boxCard" source="../components/BoxCard.fxml" />
         </VBox>
-
     </children>
 </StackPane>
