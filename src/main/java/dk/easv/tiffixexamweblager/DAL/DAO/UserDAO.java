@@ -22,7 +22,7 @@ public class UserDAO implements IUserDataAccess {
     @Override
     public List<User> getAllUsers() throws Exception {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId FROM [User]";
+        String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId FROM [User] WHERE IsDeleted = 0";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -97,7 +97,7 @@ public class UserDAO implements IUserDataAccess {
 
     @Override
     public void deleteUser(User user) throws Exception {
-        String sql = "DELETE FROM [User] WHERE Id = ?";
+        String sql = "UPDATE [User] SET IsDeleted = 1 WHERE Id = ?";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -122,7 +122,7 @@ public class UserDAO implements IUserDataAccess {
     }
 
     public User getUserByUsername(String username) throws Exception {
-        String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId FROM [User] WHERE username = ?";
+        String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId FROM [User] WHERE username = ? AND IsDeleted = 0;";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -138,7 +138,7 @@ public class UserDAO implements IUserDataAccess {
 
     @Override
     public List<User> getUsersByRole(Role role) throws Exception {
-        String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId FROM [User] WHERE RoleId = (?)";
+        String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId FROM [User] WHERE RoleId = (?) AND IsDeleted = 0;";
         List<User> users = new ArrayList<>();
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

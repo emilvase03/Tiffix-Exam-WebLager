@@ -1,7 +1,7 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import dk.easv.tiffixexamweblager.BE.Profile;
-import dk.easv.tiffixexamweblager.GUI.Controllers.components.CreateProfileController;
+import dk.easv.tiffixexamweblager.GUI.Controllers.components.ProfileCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
@@ -24,8 +24,8 @@ public class ProfilesTabController implements Initializable {
     @FXML private TableColumn<Profile, Void> colManage;
 
     // Create overlay — already wired
-    @FXML private VBox createProfileOverlay;
-    @FXML private CreateProfileController createProfileController;
+    @FXML private VBox profileCardOverlay;
+    @FXML private ProfileCardController profileCardController;
 
     // Assign overlay — new
     @FXML private VBox assignEmployeeOverlay;
@@ -48,8 +48,8 @@ public class ProfilesTabController implements Initializable {
         setupTable();
         setupManageColumn();
 
-        createProfileController.setOverlay(createProfileOverlay);
-        createProfileController.setProfilesTabController(this);
+        profileCardController.setOverlay(profileCardOverlay);
+        profileCardController.setProfilesTabController(this);
 
         assignEmployeeProfileController.setOverlay(assignEmployeeOverlay);
     }
@@ -68,7 +68,7 @@ public class ProfilesTabController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
                     showCreateOverlay();
-                    createProfileController.preloadUpdateWindow(row.getItem());
+                    profileCardController.preloadUpdateWindow(row.getItem());
                 }
             });
             return row;
@@ -133,7 +133,7 @@ public class ProfilesTabController implements Initializable {
     @FXML
     private void handleCreateProfile(ActionEvent event) {
         showCreateOverlay();
-        createProfileController.preloadCreateWindow();
+        profileCardController.preloadCreateWindow();
     }
 
     public TableView<Profile> getTable() {
@@ -141,8 +141,8 @@ public class ProfilesTabController implements Initializable {
     }
 
     private void showCreateOverlay() {
-        createProfileOverlay.setVisible(true);
-        createProfileOverlay.setManaged(true);
+        profileCardOverlay.setVisible(true);
+        profileCardOverlay.setManaged(true);
     }
 
     private void showAssignOverlay() {

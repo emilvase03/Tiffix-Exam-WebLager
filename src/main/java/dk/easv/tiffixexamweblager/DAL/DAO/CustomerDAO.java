@@ -1,29 +1,31 @@
 package dk.easv.tiffixexamweblager.DAL.DAO;
 
 // Project imports
-import dk.easv.tiffixexamweblager.BE.Profile;
+import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
-import dk.easv.tiffixexamweblager.DAL.IProfileDataAccess;
+import dk.easv.tiffixexamweblager.DAL.ICustomerDataAccess;
 
 // Java imports
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileDAO implements IProfileDataAccess {
+public class CustomerDAO implements ICustomerDataAccess {
 
         private final DBConnector databaseConnector;
 
-        public ProfileDAO() throws Exception {
+        public CustomerDAO() throws Exception {
             databaseConnector = new DBConnector();
         }
 
         @Override
-        public List<Profile> getAllProfiles() throws Exception {
+        public List<Customer> getAllCustomers() throws Exception {
+            List<Customer> customers = new ArrayList<>();
 
-            List<Profile> profiles = new ArrayList<>();
-
-            String sql = "SELECT Id, Title FROM Profile WHERE IsDeleted = 0";
+            String sql = "SELECT Id, Name FROM Customer WHERE IsDeleted = 0;";
 
             try (Connection conn = databaseConnector.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql);
@@ -31,25 +33,24 @@ public class ProfileDAO implements IProfileDataAccess {
 
                 while (rs.next()) {
                     int id = rs.getInt("Id");
-                    String title = rs.getString("Title");
-                    Profile p = new Profile(title);
-                    p.setId(id);
-                    profiles.add(p);
+                    String name = rs.getString("Name");
+                    Customer c = new Customer(name);
+                    c.setId(id);
+                    customers.add(c);
                 }
             }
-
-            return profiles;
+            return customers;
 
         }
 
     @Override
-    public Profile createProfile(Profile newProfile) throws Exception {
-        String sql = "INSERT INTO Profile (Title) VALUES (?)";
+    public Customer createCustomer(Customer newCustomer) throws Exception {
+        String sql = "INSERT INTO Customer (Name) VALUES (?)";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setString(1, newProfile.getTitle());
+            stmt.setString(1, newCustomer.getName());
 
             stmt.executeUpdate();
 
@@ -59,38 +60,38 @@ public class ProfileDAO implements IProfileDataAccess {
             if (rs.next())
                 id = rs.getInt(1);
 
-            Profile p = new Profile(newProfile.getTitle());
-            p.setId(id);
-            return p;
+            Customer c = new Customer(newCustomer.getName());
+            c.setId(id);
+            return c;
         }
     }
 
     @Override
-    public void updateProfile(Profile profile) throws Exception {
+    public void updateCustomer(Customer customer) throws Exception {
         String sql = """
-                UPDATE Profile
-                SET Title = ?
+                UPDATE Customer
+                SET Name = ?
                 WHERE id = ?
                 """;
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, profile.getTitle());
-            stmt.setInt(2, profile.getId());
+            stmt.setString(1, customer.getName());
+            stmt.setInt(2, customer.getId());
 
             stmt.executeUpdate();
         }
     }
 
     @Override
-    public void deleteProfile(Profile profile) throws Exception {
-        String sql = "UPDATE Profile SET IsDeleted = 1 WHERE Id = ?";
+    public void deleteCustomer(Customer customer) throws Exception {
+        String sql = "UPDATE Customer SET IsDeleted = 1 WHERE id = ?";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, profile.getId());
+            stmt.setInt(1, customer.getId());
             stmt.executeUpdate();
         }
     }

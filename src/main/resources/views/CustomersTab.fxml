@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane stylesheets="@../css/profilesTab.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.ProfilesTabController">
+<StackPane stylesheets="@../css/profilesTab.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.CustomersTabController">
     <children>
         <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="505.0" prefWidth="772.0" spacing="5.0">
             <children>
@@ -19,14 +19,14 @@
                     <children>
                         <HBox alignment="CENTER_LEFT" prefHeight="32.0" prefWidth="606.0" HBox.hgrow="ALWAYS">
                             <children>
-                                <Label text="Profiles">
+                                <Label text="Customers">
                                     <font>
                                         <Font name="Roboto Regular" size="24.0" />
                                     </font>
                                 </Label>
                             </children>
                         </HBox>
-                        <Button mnemonicParsing="false" onAction="#handleCreateProfile" prefHeight="32.0" prefWidth="138.0" styleClass="action-btn" text="Create Profile">
+                        <Button mnemonicParsing="false" onAction="#handleCreateCustomer" prefHeight="32.0" prefWidth="138.0" styleClass="action-btn" text="Create Customer">
                             <cursor>
                                 <Cursor fx:constant="DEFAULT" />
                             </cursor>
@@ -36,9 +36,9 @@
                         <Insets top="10.0" />
                     </VBox.margin>
                 </HBox>
-                <TableView fx:id="tblProfiles" prefHeight="505.0" prefWidth="752.0" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tblCustomer" prefHeight="505.0" prefWidth="752.0" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colTitle" prefWidth="602.3333740234375" text="Title" />
+                        <TableColumn fx:id="colTitle" prefWidth="602.3333740234375" text="Name" />
                         <TableColumn fx:id="colManage" prefWidth="147.6666259765625" text="Manage" />
                     </columns>
                     <columnResizePolicy>
@@ -53,11 +53,8 @@
                 <Insets left="50.0" right="50.0" />
             </StackPane.margin>
         </VBox>
-        <VBox fx:id="profileCardOverlay" alignment="CENTER" managed="false" visible="false">
-            <fx:include fx:id="profileCard" source="../components/ProfileCard.fxml" />
-        </VBox>
-        <VBox fx:id="assignEmployeeOverlay" alignment="CENTER" managed="false" visible="false">
-            <fx:include fx:id="assignEmployeeProfile" source="../components/AssignEmployeeProfile.fxml" />
+        <VBox fx:id="customerCardOverlay" alignment="CENTER" managed="false" visible="false">
+            <fx:include fx:id="customerCard" source="../components/CustomerCard.fxml" />
         </VBox>
     </children>
 </StackPane>

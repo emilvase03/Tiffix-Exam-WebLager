@@ -9,10 +9,9 @@ import javafx.scene.control.Button;
 
 public class SideBarController {
 
-    @FXML
-    private Button btnEmployees;
-    @FXML
-    private Button btnProfiles;
+    @FXML private Button btnEmployees;
+    @FXML private Button btnProfiles;
+    @FXML private Button btnCustomers;
 
     private AdminDashboardController dashboard;
 
@@ -33,10 +32,17 @@ public class SideBarController {
         dashboard.loadView("views/ProfilesTab.fxml");
     }
 
+    @FXML
+    private void onCustomers(ActionEvent event) {
+        setActiveButton(btnCustomers);
+        dashboard.loadView("views/CustomersTab.fxml");
+    }
+
     // Visually highlights the selected nav button
     private void setActiveButton(Button active) {
         btnEmployees.getStyleClass().remove("sidebar-btn-active");
         btnProfiles.getStyleClass().remove("sidebar-btn-active");
+        btnCustomers.getStyleClass().remove("sidebar-btn-active");
         active.getStyleClass().add("sidebar-btn-active");
     }
 
