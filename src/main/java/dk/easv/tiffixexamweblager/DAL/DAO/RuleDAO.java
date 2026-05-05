@@ -24,7 +24,7 @@ public class RuleDAO implements IRuleDataAccess {
     public List<Rule> getAllRules() throws Exception {
         List<Rule> allRules = new ArrayList<>();
 
-        String sql = "SELECT * FROM [Rule]";
+        String sql = "SELECT * FROM [Rule] WHERE IsDeleted = 0;";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -50,7 +50,7 @@ public class RuleDAO implements IRuleDataAccess {
                 SELECT [Rule].Id, [Rule].Name, [Rule].Amount FROM [Rule]
                 JOIN ProfileRule ON [Rule].Id = ProfileRule.RuleId
                 JOIN Profile ON ProfileRule.ProfileId = Profile.Id
-                WHERE Profile.Id = ?;
+                WHERE Profile.Id = ? AND [Rule].IsDeleted = 0;
                 """;
 
         try (Connection conn = databaseConnector.getConnection();

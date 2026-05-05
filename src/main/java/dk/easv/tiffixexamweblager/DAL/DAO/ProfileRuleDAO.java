@@ -45,7 +45,7 @@ public class ProfileRuleDAO implements IProfileRuleDataAccess {
 
     @Override
     public void deleteRulesForProfile(Profile profile) throws Exception {
-        String sql = "DELETE FROM ProfileRule WHERE ProfileId = ?";
+        String sql = "UPDATE ProfileRule SET IsDeleted = 1 WHERE ProfileId = ?";
 
         try (Connection conn = databaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, profile.getId());
@@ -59,7 +59,7 @@ public class ProfileRuleDAO implements IProfileRuleDataAccess {
         try {
          conn.setAutoCommit(false);
 
-         PreparedStatement deleteStmt = conn.prepareStatement("DELETE FROM ProfileRule WHERE ProfileId = ?");
+         PreparedStatement deleteStmt = conn.prepareStatement("UPDATE ProfileRule SET IsDeleted = 1 WHERE ProfileId = ?");
          deleteStmt.setInt(1, profile.getId());
          deleteStmt.executeUpdate();
 

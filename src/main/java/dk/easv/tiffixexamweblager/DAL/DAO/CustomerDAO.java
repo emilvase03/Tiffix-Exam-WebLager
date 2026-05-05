@@ -25,7 +25,7 @@ public class CustomerDAO implements ICustomerDataAccess {
         public List<Customer> getAllCustomers() throws Exception {
             List<Customer> customers = new ArrayList<>();
 
-            String sql = "SELECT Id, Name FROM Customer";
+            String sql = "SELECT Id, Name FROM Customer WHERE IsDeleted = 0;";
 
             try (Connection conn = databaseConnector.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql);
@@ -86,7 +86,7 @@ public class CustomerDAO implements ICustomerDataAccess {
 
     @Override
     public void deleteCustomer(Customer customer) throws Exception {
-        String sql = "DELETE FROM Customer WHERE id = ?";
+        String sql = "UPDATE Customer SET IsDeleted = 1 WHERE id = ?";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

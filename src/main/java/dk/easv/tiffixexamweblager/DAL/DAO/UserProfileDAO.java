@@ -20,7 +20,7 @@ public class UserProfileDAO implements IUserProfileDataAccess {
     @Override
     public List<UserProfile> getEmployeesForProfile(int profileId) throws Exception {
         List<UserProfile> list = new ArrayList<>();
-        String sql = "SELECT * FROM UserProfile WHERE ProfileId = ?";
+        String sql = "SELECT * FROM UserProfile WHERE ProfileId = ? AND IsDeleted = 0";
 
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -44,7 +44,7 @@ public class UserProfileDAO implements IUserProfileDataAccess {
         SELECT p.Id, p.Title
         FROM Profile p
         JOIN UserProfile up ON p.Id = up.ProfileId
-        WHERE up.UserId = ?
+        WHERE up.UserId = ? AND p.IsDeleted = 0;
     """;
 
         try (Connection conn = dbConnector.getConnection();
@@ -73,7 +73,7 @@ public class UserProfileDAO implements IUserProfileDataAccess {
 
     @Override
     public void removeEmployees(int userId, int profileId) throws Exception {
-        String sql = "DELETE FROM UserProfile WHERE UserId = ? AND ProfileId = ?";
+        String sql = "UPDATE UserProfile SET IsDeleted = 1 WHERE UserId = ? AND ProfileId = ?";
 
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

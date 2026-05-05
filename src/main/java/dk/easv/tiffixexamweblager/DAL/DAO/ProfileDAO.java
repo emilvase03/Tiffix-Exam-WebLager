@@ -23,7 +23,7 @@ public class ProfileDAO implements IProfileDataAccess {
 
             List<Profile> profiles = new ArrayList<>();
 
-            String sql = "SELECT Id, Title FROM Profile";
+            String sql = "SELECT Id, Title FROM Profile WHERE IsDeleted = 0";
 
             try (Connection conn = databaseConnector.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql);
@@ -85,7 +85,7 @@ public class ProfileDAO implements IProfileDataAccess {
 
     @Override
     public void deleteProfile(Profile profile) throws Exception {
-        String sql = "DELETE FROM Profile WHERE id = ?";
+        String sql = "UPDATE Profile SET IsDeleted = 1 WHERE Id = ?";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

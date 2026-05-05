@@ -25,7 +25,7 @@ public class CustomerProfileDAO implements ICustomerProfileDataAccess {
                     SELECT Customer.Id, Customer.Name FROM Customer
                     JOIN CustomerProfile ON Customer.Id = CustomerProfile.CustomerId
                     JOIN Profile ON CustomerProfile.ProfileId = Profile.Id
-                    WHERE Profile.Id = ?;
+                    WHERE Profile.Id = ? AND Profile.IsDeleted = 0;
                     """;
 
         try (Connection conn = databaseConnector.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -62,8 +62,8 @@ public class CustomerProfileDAO implements ICustomerProfileDataAccess {
         try {
             conn.setAutoCommit(false);
 
-            PreparedStatement deleteStmt = conn.prepareStatement("DELETE FROM CustomerProfile WHERE CustomerId = ?");
-            deleteStmt.setInt(1, customer.getId());
+            PreparedStatement deleteStmt = conn.prepareStatement("UPDATE CustomerProfile SET IsDeleted = 1 WHERE ProfileId = ?");
+            deleteStmt.setInt(1, profile.getId());
             deleteStmt.executeUpdate();
 
             PreparedStatement insertStmt = conn.prepareStatement("INSERT INTO CustomerProfile (CustomerId, ProfileId) VALUES (?,?)");

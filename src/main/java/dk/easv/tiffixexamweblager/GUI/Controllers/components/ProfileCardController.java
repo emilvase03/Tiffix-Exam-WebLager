@@ -30,7 +30,6 @@ public class ProfileCardController implements Initializable {
     @FXML private CheckComboBox<Rule> rulesDropdown;
     @FXML private ListView<Rule> rulesList;
 
-    private boolean updateProfile = false;
     private VBox overlay;
     private ProfileModel profileModel;
     private ProfilesTabController profilesTabController;
@@ -39,6 +38,7 @@ public class ProfileCardController implements Initializable {
     private ProfileRuleModel profileRuleModel;
     private CustomerModel customerModel;
     private CustomerProfileModel customerProfileModel;
+    private boolean updateProfile = false;
     private ObservableList<Rule> allRules = FXCollections.observableArrayList();
     private ObservableList<Rule> profileRules = FXCollections.observableArrayList();
 
@@ -122,8 +122,8 @@ public class ProfileCardController implements Initializable {
             txtTitle.setStyle("-fx-border-color: #FF3D32; -fx-border-width: 1;");
             return;
         }
-        if (customerDropdown.getItems().isEmpty()) {
-            rulesList.setStyle("-fx-border-color: #FF3D32;");
+        if (customerDropdown.getValue() == null) {
+            customerDropdown.setStyle("-fx-border-color: #FF3D32;");
             return;
         }
         if (rulesList.getItems().isEmpty()) {
@@ -136,11 +136,12 @@ public class ProfileCardController implements Initializable {
             try {
                 if (profileToBeUpdated != null) {
                     profileToBeUpdated.setTitle(txtTitle.getText().trim());
+
                     profileModel.updateProfile(profileToBeUpdated);
-
                     profileRuleModel.updateRulesForProfile(profileToBeUpdated, rulesList.getItems());
-
+                    customerProfileModel.updateProfileForCustomer(customerDropdown.getSelectionModel().getSelectedItem(), profileToBeUpdated);
                     profilesTabController.getTable().refresh();
+
                     txtTitle.clear();
                     lblHeader.setText("Create a new profile.");
                     handleClose();
@@ -155,6 +156,7 @@ public class ProfileCardController implements Initializable {
                 profilesTabController.getTable().getItems().add(profile);
 
                 profileRuleModel.addRulesToProfile(profile, rulesList.getItems());
+                customerProfileModel.addProfileToCustomer(customerDropdown.getSelectionModel().getSelectedItem(), profile);
 
                 txtTitle.clear();
                 handleClose();
@@ -210,6 +212,7 @@ public class ProfileCardController implements Initializable {
             txtTitle.clear();
             txtTitle.setStyle("");
             rulesList.setStyle("");
+            customerDropdown.getItems().clear();
             customerDropdown.setValue(null);
             overlay.setVisible(false);
             overlay.setManaged(false);
