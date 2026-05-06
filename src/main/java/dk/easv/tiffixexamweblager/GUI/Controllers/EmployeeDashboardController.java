@@ -53,6 +53,10 @@ public class EmployeeDashboardController {
     private int previewIndex = 0;
 
     private int previewRotation = 0;
+    @FXML
+    private Label lblTotalFilesText;
+    @FXML
+    private Label lblTotalDocText;
 
     @FXML
     private void initialize() {
@@ -62,7 +66,23 @@ public class EmployeeDashboardController {
             AlertHelper.showError("Documents unavailable",
                     "The documents could not be loaded now.");
         }
+        setTotalsVisible(false);
     }
+    private void setTotalsVisible(boolean visible) {
+        lblTotalDocText.setVisible(visible);
+        lblTotalDocText.setManaged(visible);
+
+        lblTotalDocInBox.setVisible(visible);
+        lblTotalDocInBox.setManaged(visible);
+
+        lblTotalFilesText.setVisible(visible);
+        lblTotalFilesText.setManaged(visible);
+
+        lblTotalFilesInDoc.setVisible(visible);
+        lblTotalFilesInDoc.setManaged(visible);
+    }
+
+
 
     private void showChooseProfileModal() {
         try {
@@ -92,6 +112,9 @@ public class EmployeeDashboardController {
             filesTilePane.getChildren().clear();
             lblTotalFilesInDoc.setText("0");
             topOverview.setVisible(false);
+
+            setTotalsVisible(true);
+
         } catch (Exception e) {
             AlertHelper.showError("Load error",
                     "Could not load documents for selected box.");
@@ -199,7 +222,7 @@ public class EmployeeDashboardController {
 
             BufferedImage buffered = ImageIO.read(imageFile);
             if (buffered == null) {
-                AlertHelper.showError("Error", "Could load image: " + path);
+                AlertHelper.showError("Error", "Could not load image: " + path);
                 return;
             }
 
