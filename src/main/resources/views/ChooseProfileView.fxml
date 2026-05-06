@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
@@ -37,9 +38,8 @@
                 <padding>
                     <Insets bottom="12" left="20" right="20" top="16" />
                 </padding>
-
-                <Label styleClass="modal-subtitle" text="1. Choose your profile(s):" wrapText="true" />
-
+                <Label styleClass="modal-subtitle" text="1. Choose your profile:" wrapText="true" />
+            <TextField fx:id="txtfieldSearchbar" promptText="Search profiles" />
                 <ScrollPane fitToWidth="true" prefHeight="180" styleClass="profile-scroll">
                     <content>
                         <VBox fx:id="profileList" spacing="8" styleClass="profile-list">

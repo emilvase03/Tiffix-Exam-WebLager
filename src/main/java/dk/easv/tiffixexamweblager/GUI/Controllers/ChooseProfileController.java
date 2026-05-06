@@ -1,18 +1,4 @@
-
 package dk.easv.tiffixexamweblager.GUI.Controllers;
-
-// Java imports
-import java.util.ArrayList;
-import java.util.List;
-
-// JavaFX imports
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
@@ -23,18 +9,31 @@ import dk.easv.tiffixexamweblager.GUI.Models.DocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
+// AtlantaFX imports
 import atlantafx.base.controls.ModalPane;
+
+// Java imports
+import java.util.ArrayList;
+import java.util.List;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 public class ChooseProfileController {
 
-    @FXML
-    private Button btnSelectProfile;
-    @FXML
-    private VBox profileList;
+    @FXML private Button btnSelectProfile;
+    @FXML private VBox profileList;
+    @FXML private TextField txtfieldSearchbar;
 
     private ModalPane modalPane;
     private ProfileModel profileModel;
     private DocumentModel documentModel;
+    private List<Profile> profiles = new ArrayList<>();
 
     @FXML private ComboBox<Box> boxComboBox;
 
@@ -51,6 +50,7 @@ public class ChooseProfileController {
             documentModel = new DocumentModel();
             loadAssignedProfiles();
             loadBoxes();
+            setupSearchbar();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to load profiles or boxes.");
         }
@@ -63,9 +63,7 @@ public class ChooseProfileController {
             return;
         }
 
-        List<Profile> profiles =
-                profileModel.getUserProfileManager()
-                        .getProfilesForEmployee(currentUser.getId());
+        profiles = profileModel.getUserProfileManager().getProfilesForEmployee(currentUser.getId());
 
         profileList.getChildren().clear();
 
@@ -73,6 +71,7 @@ public class ChooseProfileController {
             profileList.getChildren().add(createProfileRow(profile));
         }
     }
+
     private void loadBoxes() throws Exception {
         List<Box> boxes = documentModel.getAllBoxes();
         boxComboBox.getItems().setAll(boxes);
@@ -115,5 +114,20 @@ public class ChooseProfileController {
         // tells the dashboard to load documents
         if (onSessionReady != null)
             onSessionReady.run();
+    }
+
+    private void setupSearchbar() {
+        txtfieldSearchbar.textProperty().addListener((obs, oldVal, newVal) -> {
+            profileList.getChildren().clear();
+
+            profiles.stream()
+                    .filter(profile -> {
+                        if (newVal == null || newVal.isBlank())
+                            return true;
+                        return profile.getTitle().toLowerCase().contains(newVal.toLowerCase());
+                    })
+                    .map(profile -> createProfileRow(profile))
+                    .forEach(node -> profileList.getChildren().add(node));
+        });
     }
 }
