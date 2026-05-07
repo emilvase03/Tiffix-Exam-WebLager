@@ -3,6 +3,7 @@ package dk.easv.tiffixexamweblager.GUI.Models;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BE.Role;
+import dk.easv.tiffixexamweblager.BLL.UserProfileManager;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.BLL.UserManager;
 import dk.easv.tiffixexamweblager.GUI.Utils.BackgroundExecutor;
@@ -23,14 +24,12 @@ public class UserModel {
     private final BooleanProperty loginFailed = new SimpleBooleanProperty(false);
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final ObservableList<User> employees = FXCollections.observableArrayList();
+    private final UserProfileManager userProfileManager;
 
 
-    public UserModel() {
-        try {
-            userManager = new UserManager();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize UserManager", e);
-        }
+    public UserModel() throws Exception {
+        userManager = new UserManager();
+        userProfileManager = new UserProfileManager();
     }
 
     public void loginUser(String username, String password) {
@@ -141,6 +140,10 @@ public class UserModel {
                 e -> { throw new RuntimeException("Failed to delete user", e); },
                 loading::set
         );
+    }
+
+    public UserProfileManager getUserProfileManager() {
+        return userProfileManager;
     }
 
     public ObservableList<User> getEmployees ()          { return employees; }

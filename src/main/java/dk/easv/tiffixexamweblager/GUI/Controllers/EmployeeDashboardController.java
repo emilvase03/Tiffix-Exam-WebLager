@@ -11,8 +11,10 @@ import dk.easv.tiffixexamweblager.GUI.Models.DocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
-// JavaFX imports
+// AtlantaFX
 import atlantafx.base.controls.ModalPane;
+
+// Java imports
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,8 +28,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
-
-// Java imports
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeDashboardController {
-
     @FXML private StackPane root;
     @FXML private ModalPane modalPane;
     @FXML private Label lblBoxID;
@@ -46,17 +45,13 @@ public class EmployeeDashboardController {
     @FXML private ImageView previewImageView;
     @FXML private TilePane documentsTilePane;
     @FXML private TilePane filesTilePane;
+    @FXML private Label lblTotalFilesText;
+    @FXML private Label lblTotalDocText;
 
     private DocumentModel documentModel;
-
     private List<ScannedFile> currentFiles = new ArrayList<>();
     private int previewIndex = 0;
-
     private int previewRotation = 0;
-    @FXML
-    private Label lblTotalFilesText;
-    @FXML
-    private Label lblTotalDocText;
 
     @FXML
     private void initialize() {

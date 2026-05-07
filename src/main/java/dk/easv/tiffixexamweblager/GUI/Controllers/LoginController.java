@@ -1,25 +1,36 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Role;
+import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
+
+// Java imports
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 public class LoginController {
-
-    private static final PseudoClass DANGER = PseudoClass.getPseudoClass("danger");
-
-    private final UserModel userModel = new UserModel();
-
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
     @FXML private Label lblUserError;
     @FXML private Label lblPasswordError;
     @FXML private Label lblGeneralError;
     @FXML private Button btnLogin;
+
+    private static final PseudoClass DANGER = PseudoClass.getPseudoClass("danger");
+    private UserModel userModel;
+
+    public LoginController() {
+        try {
+            userModel = new UserModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate UserModel");
+        }
+    }
+
 
     @FXML
     private void initialize() {
