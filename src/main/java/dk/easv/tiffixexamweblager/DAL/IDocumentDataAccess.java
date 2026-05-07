@@ -1,11 +1,15 @@
 package dk.easv.tiffixexamweblager.DAL;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Document;
 
+// Java imports
 import java.util.List;
 
 public interface IDocumentDataAccess {
-    List<Document> getDocumentsForBox(int boxId) throws Exception;
-    Document createDocument(int boxId, int sortOrder) throws Exception;
-    void deleteDocument(Document document) throws Exception;
+    public List<Document> getDocumentsForBox(int boxId) throws Exception;
+
+    public Document createDocument(int boxId, int sortOrder) throws Exception;
+
+    public void deleteDocument(Document document) throws Exception;
 }

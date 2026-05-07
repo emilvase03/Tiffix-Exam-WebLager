@@ -6,7 +6,8 @@ import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.GUI.Models.DocumentModel;
-import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
+import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
+import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // AtlantaFX imports
@@ -24,21 +25,18 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class ChooseProfileController {
-
+public class ChooseScanSettingsController {
     @FXML private Button btnSelectProfile;
     @FXML private VBox profileList;
     @FXML private TextField txtfieldSearchbar;
-
-    private ModalPane modalPane;
-    private ProfileModel profileModel;
-    private DocumentModel documentModel;
-    private List<Profile> profiles = new ArrayList<>();
-
     @FXML private ComboBox<Box> boxComboBox;
 
+    private ModalPane modalPane;
+    private ProfileRuleModel profileRuleModel;
+    private DocumentModel documentModel;
+    private UserModel userModel;
+    private List<Profile> profiles = new ArrayList<>();
     private final List<Profile> selectedProfiles = new ArrayList<>();
-
     private Runnable onSessionReady;
 
     public void init(ModalPane modalPane, Runnable onSessionReady) {
@@ -46,8 +44,9 @@ public class ChooseProfileController {
         this.onSessionReady = onSessionReady;
 
         try {
-            profileModel = new ProfileModel();
+            profileRuleModel = new ProfileRuleModel();
             documentModel = new DocumentModel();
+            userModel = new UserModel();
             loadAssignedProfiles();
             loadBoxes();
             setupSearchbar();
@@ -63,7 +62,7 @@ public class ChooseProfileController {
             return;
         }
 
-        profiles = profileModel.getUserProfileManager().getProfilesForEmployee(currentUser.getId());
+        profiles = userModel.getUserProfileManager().getProfilesForEmployee(currentUser.getId());
 
         profileList.getChildren().clear();
 

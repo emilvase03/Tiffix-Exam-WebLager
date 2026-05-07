@@ -17,7 +17,7 @@ public class UserManager {
     }
 
     public List<User> getAllUsers() throws Exception {
-        return dataAccess.getAllUsers();
+        return dataAccess.getAll();
     }
 
     public List<User> getEmployees() throws Exception {
@@ -59,19 +59,19 @@ public class UserManager {
                 role
         );
 
-        return dataAccess.createUser(newUser);
+        return dataAccess.create(newUser);
     }
 
     public void updateUser(User user, String rawPassword) throws Exception {
         if (rawPassword != null && !rawPassword.isBlank()) {
             user.setPassword(Encrypter.hashPassword(rawPassword));
         }
-        dataAccess.updateUser(user);
+        dataAccess.update(user);
     }
 
 
     public void deleteUser(User user) throws Exception {
-        dataAccess.deleteUser(user);
+        dataAccess.delete(user);
     }
 
     public static void main(String[] args) {

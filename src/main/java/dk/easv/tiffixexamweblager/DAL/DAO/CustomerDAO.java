@@ -3,7 +3,7 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
-import dk.easv.tiffixexamweblager.DAL.ICustomerDataAccess;
+import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
 // Java imports
 import java.sql.Connection;
@@ -13,7 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomerDAO implements ICustomerDataAccess {
+public class CustomerDAO implements ICRUDDataAccess<Customer> {
 
         private final DBConnector databaseConnector;
 
@@ -22,7 +22,7 @@ public class CustomerDAO implements ICustomerDataAccess {
         }
 
         @Override
-        public List<Customer> getAllCustomers() throws Exception {
+        public List<Customer> getAll() throws Exception {
             List<Customer> customers = new ArrayList<>();
 
             String sql = "SELECT Id, Name FROM Customer WHERE IsDeleted = 0;";
@@ -44,7 +44,7 @@ public class CustomerDAO implements ICustomerDataAccess {
         }
 
     @Override
-    public Customer createCustomer(Customer newCustomer) throws Exception {
+    public Customer create(Customer newCustomer) throws Exception {
         String sql = "INSERT INTO Customer (Name) VALUES (?)";
 
         try (Connection conn = databaseConnector.getConnection();
@@ -67,7 +67,7 @@ public class CustomerDAO implements ICustomerDataAccess {
     }
 
     @Override
-    public void updateCustomer(Customer customer) throws Exception {
+    public void update(Customer customer) throws Exception {
         String sql = """
                 UPDATE Customer
                 SET Name = ?
@@ -85,7 +85,7 @@ public class CustomerDAO implements ICustomerDataAccess {
     }
 
     @Override
-    public void deleteCustomer(Customer customer) throws Exception {
+    public void delete(Customer customer) throws Exception {
         String sql = "UPDATE Customer SET IsDeleted = 1 WHERE id = ?";
 
         try (Connection conn = databaseConnector.getConnection();
