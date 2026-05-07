@@ -7,7 +7,7 @@ import dk.easv.tiffixexamweblager.BE.ScannedFile;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.DocumentTileController;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController;
-import dk.easv.tiffixexamweblager.GUI.Models.DocumentModel;
+import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
@@ -48,7 +48,7 @@ public class EmployeeDashboardController {
     @FXML private Label lblTotalFilesText;
     @FXML private Label lblTotalDocText;
 
-    private DocumentModel documentModel;
+    private BoxDocumentModel boxDocumentModel;
     private List<ScannedFile> currentFiles = new ArrayList<>();
     private int previewIndex = 0;
     private int previewRotation = 0;
@@ -56,7 +56,7 @@ public class EmployeeDashboardController {
     @FXML
     private void initialize() {
         try {
-            documentModel = new DocumentModel();
+            boxDocumentModel = new BoxDocumentModel();
         } catch (Exception e) {
             AlertHelper.showError("Documents unavailable",
                     "The documents could not be loaded now.");
@@ -99,7 +99,7 @@ public class EmployeeDashboardController {
             Box box = UserSession.getInstance().getActiveBox();
             lblBoxID.setText(String.valueOf(box.getNumber()));
 
-            var documents = documentModel.loadDocumentsForBox(box);
+            var documents = boxDocumentModel.loadDocumentsForBox(box);
             lblTotalDocInBox.setText(String.valueOf(documents.size()));
 
             populateDocumentTilePane(documents);
@@ -144,7 +144,7 @@ public class EmployeeDashboardController {
         try {
             lblDocumentNr.setText(String.valueOf(doc.getSortOrder()));
 
-            var files = documentModel.loadFilesForDocument(doc);
+            var files = boxDocumentModel.loadFilesForDocument(doc);
             lblTotalFilesInDoc.setText(String.valueOf(files.size()));
 
             currentFiles = new ArrayList<>(files);

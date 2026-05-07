@@ -5,7 +5,7 @@ import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
-import dk.easv.tiffixexamweblager.GUI.Models.DocumentModel;
+import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
@@ -33,7 +33,7 @@ public class ChooseScanSettingsController {
 
     private ModalPane modalPane;
     private ProfileRuleModel profileRuleModel;
-    private DocumentModel documentModel;
+    private BoxDocumentModel boxDocumentModel;
     private UserModel userModel;
     private List<Profile> profiles = new ArrayList<>();
     private final List<Profile> selectedProfiles = new ArrayList<>();
@@ -45,7 +45,7 @@ public class ChooseScanSettingsController {
 
         try {
             profileRuleModel = new ProfileRuleModel();
-            documentModel = new DocumentModel();
+            boxDocumentModel = new BoxDocumentModel();
             userModel = new UserModel();
             loadAssignedProfiles();
             loadBoxes();
@@ -72,7 +72,7 @@ public class ChooseScanSettingsController {
     }
 
     private void loadBoxes() throws Exception {
-        List<Box> boxes = documentModel.getAllBoxes();
+        List<Box> boxes = boxDocumentModel.getAllBoxes();
         boxComboBox.getItems().setAll(boxes);
 
         if (!boxes.isEmpty())

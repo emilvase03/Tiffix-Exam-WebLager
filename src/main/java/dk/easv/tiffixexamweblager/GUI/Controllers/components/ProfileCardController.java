@@ -34,7 +34,6 @@ public class ProfileCardController implements Initializable {
     private ProfileRuleModel profileRuleModel;
     private ProfilesTabController profilesTabController;
     private Profile profileToBeUpdated;
-    private CustomerModel customerModel;
     private CustomerProfileModel customerProfileModel;
     private boolean updateProfile = false;
     private ObservableList<Rule> allRules = FXCollections.observableArrayList();
@@ -47,14 +46,9 @@ public class ProfileCardController implements Initializable {
             AlertHelper.showError("Error", "Failed to instantiate ProfileRuleModel.");
         }
         try {
-            customerModel = new CustomerModel();
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to instantiate CustomerModel.");
-        }
-        try {
             customerProfileModel = new CustomerProfileModel();
         } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to instantiate CustomerProfileModel.");
+            AlertHelper.showError("Error", "Failed to instantiate CustomerModel.");
         }
     }
 
@@ -76,7 +70,7 @@ public class ProfileCardController implements Initializable {
         }
 
         try {
-            customerDropdown.getItems().addAll(customerModel.getAllCustomers());
+            customerDropdown.getItems().addAll(customerProfileModel.getAllCustomers());
         } catch (Exception e) {
             e.printStackTrace();
             AlertHelper.showError("Error", "Failed to retrieve customers from database");
