@@ -20,7 +20,7 @@ public class UserDAO implements IUserDataAccess {
     }
 
     @Override
-    public List<User> getAllUsers() throws Exception {
+    public List<User> getAll() throws Exception {
         List<User> users = new ArrayList<>();
         String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId FROM [User] WHERE IsDeleted = 0";
 
@@ -38,7 +38,7 @@ public class UserDAO implements IUserDataAccess {
 
 
     @Override
-    public User createUser(User newUser) throws Exception {
+    public User create(User newUser) throws Exception {
         String sql = """
                 INSERT INTO [User] (FirstName, LastName, Username, Password, RoleId)
                 VALUES (?, ?, ?, ?, ?)
@@ -73,7 +73,7 @@ public class UserDAO implements IUserDataAccess {
     }
 
     @Override
-    public void updateUser(User user) throws Exception {
+    public void update(User user) throws Exception {
 
         String sql = """
                 UPDATE [User]
@@ -96,7 +96,7 @@ public class UserDAO implements IUserDataAccess {
     }
 
     @Override
-    public void deleteUser(User user) throws Exception {
+    public void delete(User user) throws Exception {
         String sql = "UPDATE [User] SET IsDeleted = 1 WHERE Id = ?";
 
         try (Connection conn = databaseConnector.getConnection();

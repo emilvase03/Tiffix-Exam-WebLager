@@ -3,14 +3,14 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
-import dk.easv.tiffixexamweblager.DAL.IProfileDataAccess;
+import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
 // Java imports
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileDAO implements IProfileDataAccess {
+public class ProfileDAO implements ICRUDDataAccess<Profile> {
 
         private final DBConnector databaseConnector;
 
@@ -19,7 +19,7 @@ public class ProfileDAO implements IProfileDataAccess {
         }
 
         @Override
-        public List<Profile> getAllProfiles() throws Exception {
+        public List<Profile> getAll() throws Exception {
 
             List<Profile> profiles = new ArrayList<>();
 
@@ -43,7 +43,7 @@ public class ProfileDAO implements IProfileDataAccess {
         }
 
     @Override
-    public Profile createProfile(Profile newProfile) throws Exception {
+    public Profile create(Profile newProfile) throws Exception {
         String sql = "INSERT INTO Profile (Title) VALUES (?)";
 
         try (Connection conn = databaseConnector.getConnection();
@@ -66,7 +66,7 @@ public class ProfileDAO implements IProfileDataAccess {
     }
 
     @Override
-    public void updateProfile(Profile profile) throws Exception {
+    public void update(Profile profile) throws Exception {
         String sql = """
                 UPDATE Profile
                 SET Title = ?
@@ -84,7 +84,7 @@ public class ProfileDAO implements IProfileDataAccess {
     }
 
     @Override
-    public void deleteProfile(Profile profile) throws Exception {
+    public void delete(Profile profile) throws Exception {
         String sql = "UPDATE Profile SET IsDeleted = 1 WHERE Id = ?";
 
         try (Connection conn = databaseConnector.getConnection();

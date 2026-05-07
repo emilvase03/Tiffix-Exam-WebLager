@@ -1,9 +1,11 @@
 package dk.easv.tiffixexamweblager.DAL.DAO;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
 import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
 import dk.easv.tiffixexamweblager.DAL.IScannedFileDataAccess;
 
+// Java imports
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
