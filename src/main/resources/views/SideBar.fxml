@@ -19,7 +19,6 @@
         </Button>
 
         <HBox alignment="CENTER_LEFT" spacing="6">
-            <FontIcon iconLiteral="bi-gear-fill" styleClass="sidebar-logo" />
             <Label styleClass="sidebar-app-name" text="Tiffix" />
         </HBox>
 
@@ -37,9 +36,27 @@
                 </HBox>
             </graphic>
         </Button>
-        <Button fx:id="btnProfiles" maxWidth="Infinity" mnemonicParsing="false" onAction="#onProfiles" styleClass="sidebar-btn" text=" Profiles" />
-        <Button fx:id="btnCustomers" maxWidth="Infinity" mnemonicParsing="false" onAction="#onCustomers" styleClass="sidebar-btn" text="Customers" />
-        <Button fx:id="btnBoxes" maxWidth="Infinity" mnemonicParsing="false" onAction="#onBoxes" styleClass="sidebar-btn" text=" Boxes" />
+        <Button fx:id="btnProfiles" maxWidth="Infinity" mnemonicParsing="false" onAction="#onProfiles" styleClass="sidebar-btn" text=" Profiles">
+            <graphic>
+                <HBox alignment="CENTER" spacing="6">
+                    <FontIcon iconLiteral="bi-layout-text-window-reverse" />
+                </HBox>
+            </graphic>
+        </Button>
+        <Button fx:id="btnCustomers" maxWidth="Infinity" mnemonicParsing="false" onAction="#onCustomers" styleClass="sidebar-btn" text="Customers" >
+            <graphic>
+                <HBox alignment="CENTER" spacing="6">
+                    <FontIcon iconLiteral="bi-building" />
+                </HBox>
+            </graphic>
+        </Button>
+        <Button fx:id="btnBoxes" maxWidth="Infinity" mnemonicParsing="false" onAction="#onBoxes" styleClass="sidebar-btn" text=" Boxes" >
+            <graphic>
+                <HBox alignment="CENTER" spacing="6">
+                    <FontIcon iconLiteral="bi-box-seam" />
+                </HBox>
+            </graphic>
+        </Button>
 
         <Region VBox.vgrow="ALWAYS" />
     </VBox>
