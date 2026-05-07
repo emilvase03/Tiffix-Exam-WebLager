@@ -458,8 +458,8 @@
 .file-tile {
     -fx-background-color:  -wl-surface-card;
     -fx-border-color:      -wl-border;
-    -fx-border-radius:     6px;
-    -fx-background-radius: 6px;
+    -fx-border-radius:     10px;
+    -fx-background-radius: 10px;
     -fx-padding:           8;
     -fx-min-width:   90px;
     -fx-pref-width:  90px;
@@ -477,6 +477,7 @@
     -fx-background-color: -wl-accent-subtle;
     -fx-border-color:     -wl-accent;
     -fx-border-width:     2px;
+    fx-effect: dropshadow(gaussian, rgba(79,140,255,0.4), 12, 0.4, 0, 0);
 }
 
 /*

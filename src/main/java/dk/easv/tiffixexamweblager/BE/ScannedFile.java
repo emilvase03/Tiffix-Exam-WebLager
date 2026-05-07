@@ -1,68 +1,51 @@
 package dk.easv.tiffixexamweblager.BE;
 
-import java.time.LocalDateTime;
-
 public class ScannedFile {
 
-    private final int id;
-    private final int documentId;
-    private final int scanOrder;
-    private int sortOrder;
-    private final String filePath;
-    private int rotationAngle;
-    private final LocalDateTime createdAt;
+    private int id;              // 0 if unsaved
+    private int documentId;      // 0 if unsaved
+    private int scanOrder;       // original order (never changes)
+    private int sortOrder;       // UI order (changes)
+    private String filePath;
+    private double rotationAngle;
 
-    public ScannedFile(
-            int id,
-            int documentId,
-            int scanOrder,
-            int sortOrder,
-            String filePath,
-            int rotationAngle,
-            LocalDateTime createdAt
-    ) {
+    public ScannedFile(int id, int documentId,
+                       int scanOrder, int sortOrder,
+                       String filePath, double rotationAngle) {
         this.id = id;
         this.documentId = documentId;
         this.scanOrder = scanOrder;
         this.sortOrder = sortOrder;
         this.filePath = filePath;
         this.rotationAngle = rotationAngle;
-        this.createdAt = createdAt;
     }
 
-    public int getId() {
-        return id;
+    // ✅ Factory for API/imported files
+    public static ScannedFile unsaved(int order, String filePath) {
+        return new ScannedFile(
+                0,
+                0,
+                order,
+                order,
+                filePath,
+                0.0
+        );
     }
 
-    public int getDocumentId() {
-        return documentId;
-    }
-
-    public int getScanOrder() {
-        return scanOrder;
-    }
-
-    public int getSortOrder() {
-        return sortOrder;
-    }
+    // Getters & setters
+    public int getScanOrder() { return scanOrder; }
+    public int getSortOrder() { return sortOrder; }
+    public String getFilePath() { return filePath; }
 
     public void setSortOrder(int sortOrder) {
         this.sortOrder = sortOrder;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public int getRotationAngle() {
-        return rotationAngle;
-    }
-
-    public void setRotationAngle(int rotationAngle) {
+    public void setRotationAngle(double rotationAngle) {
         this.rotationAngle = rotationAngle;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public double getRotationAngle() {
+        return rotationAngle;
     }
 }

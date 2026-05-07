@@ -1,61 +1,72 @@
 package dk.easv.tiffixexamweblager.DAL.API;
 
-import dk.easv.tiffixexamweblager.BE.ExtractedFile;
-
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/**
- * Unpacks a ZIP delivered as raw bytes and returns every TIFF entry inside.
- * Ignores directories and any non-TIFF entries (e.g. __MACOSX metadata).
- */
 public class ZipExtractor {
 
-    /**
-     * @param zipBytes raw bytes of a ZIP archive
-     * @return list of ExtractedFile, one per .tif / .tiff entry found
-     * @throws Exception if the bytes are not a valid ZIP or reading fails
-     */
-    public List<ExtractedFile> extractTiffs(byte[] zipBytes) throws Exception {
-        List<ExtractedFile> results = new ArrayList<>();
+    public static class ExtractedFile {
+        private final String fileName;
+        private final byte[] fileBytes;
 
-        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+
+        /* Creates a new extracted file container.
+         *
+         * @param fileName  the name of the extracted file
+         * @param fileBytes the binary content of the file
+         */
+
+    public ExtractedFile(String fileName, byte[] fileBytes) {
+            this.fileName = fileName;
+            this.fileBytes = fileBytes;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public byte[] getFileBytes() {
+            return fileBytes;
+        }
+    }
+
+
+   /**
+     * Extracts all TIFF files from a ZIP archive provided as a byte array.
+     *
+     * <p>The method iterates through all entries in the ZIP file and
+     * extracts only files with the extensions {@code .tif} or {@code .tiff}.
+     * Other file types are ignored.</p>
+     *
+     * @param zipBytes the raw ZIP file data received from the API
+     * @return a list of extracted TIFF files
+     * @throws IOException if the ZIP input cannot be read
+    */
+
+public List<ExtractedFile> extractTiffs(byte[] zipBytes) throws IOException {
+        List<ExtractedFile> files = new ArrayList<>();
+
+        try (ZipInputStream zis =
+                     new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
-                if (entry.isDirectory() || !isTiff(entry.getName())) {
-                    zis.closeEntry();
-                    continue;
+
+                if (entry.getName().toLowerCase().endsWith(".tif")
+                        || entry.getName().toLowerCase().endsWith(".tiff")) {
+
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                    zis.transferTo(buffer);
+
+                    files.add(new ExtractedFile(
+                            entry.getName(),
+                            buffer.toByteArray()
+                    ));
                 }
-
-                byte[] fileBytes = zis.readAllBytes();
-                // Use only the plain filename, strip any path inside the ZIP
-                String fileName = extractFileName(entry.getName());
-                results.add(new ExtractedFile(fileName, fileBytes));
-
-                zis.closeEntry();
             }
         }
-
-        if (results.isEmpty()) {
-            throw new Exception("ZIP contained no TIFF files.");
-        }
-
-        return results;
-    }
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private boolean isTiff(String name) {
-        String lower = name.toLowerCase();
-        return lower.endsWith(".tif") || lower.endsWith(".tiff");
-    }
-
-    /** Strips any folder path that may be present inside the ZIP entry name. */
-    private String extractFileName(String entryName) {
-        int slash = Math.max(entryName.lastIndexOf('/'), entryName.lastIndexOf('\\'));
-        return slash >= 0 ? entryName.substring(slash + 1) : entryName;
+        return files;
     }
 }

@@ -7,5 +7,8 @@ import dk.easv.tiffixexamweblager.BE.ScannedFile;
 import java.util.List;
 
 public interface IScannedFileDataAccess {
-    public List<ScannedFile> getFilesForDocument(int documentId) throws Exception;
+
+    List<ScannedFile> getFilesForDocument(int documentId) throws Exception;
+
+
 }

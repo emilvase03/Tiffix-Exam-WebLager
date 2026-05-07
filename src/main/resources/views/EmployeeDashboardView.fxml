@@ -29,7 +29,7 @@
                                 <graphic><FontIcon iconLiteral="bi-box-arrow-right" /></graphic>
                             </Button>
                             <Button fx:id="StartScanningSession" mnemonicParsing="false" onAction="#onBtnStartScanningSession" prefHeight="25.0" prefWidth="179.0" styleClass="action-btn" text="Start scanning session" />
-                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" styleClass="action-btn" text="Fetch" />
+                            <Button fx:id="btnFetch" mnemonicParsing="false" onAction="#onBtnFetch" prefHeight="25.0" prefWidth="80.0" styleClass="action-btn" text="Fetch" />
                             <Region prefHeight="32.0" prefWidth="153.0" HBox.hgrow="ALWAYS" />
                             <Label prefHeight="17.0" prefWidth="112.0" text="Current Box" />
                             <Label fx:id="lblBoxID" prefHeight="17.0" prefWidth="46.0" text="ID" />
@@ -75,12 +75,12 @@
                                 </children>
                             </HBox>
 
-                            <StackPane prefHeight="466.0" prefWidth="327.0">
+                            <StackPane >
                                 <children>
 
                                     <ScrollPane fx:id="filesScrollPane" fitToWidth="true" prefHeight="466.0" prefWidth="314.0" styleClass="filesView">
                                         <content>
-                                            <TilePane fx:id="filesTilePane" hgap="14.0" prefColumns="3" prefHeight="458.0" prefWidth="315.0" vgap="14.0">
+                                            <TilePane fx:id="filesTilePane" hgap="14.0" prefColumns="3"  vgap="14.0">
                                                 <padding><Insets bottom="5.0" left="5.0" right="5.0" top="5.0" /></padding>
                                             </TilePane>
                                         </content>
