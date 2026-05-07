@@ -11,55 +11,70 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<StackPane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EmployeesTabController">
+<StackPane xmlns="http://javafx.com/javafx/24.0.1"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EmployeesTabController"
+           stylesheets="@../css/style.css">
 
     <BorderPane prefHeight="322.0" prefWidth="390.0">
-        <center>
-            <VBox prefHeight="241.0" prefWidth="390.0" spacing="5.0" BorderPane.alignment="CENTER">
-                <children>
-                    <HBox prefHeight="38.0" prefWidth="390.0" spacing="5.0">
-                        <children>
-                            <Label text="Employees">
-                        <font>
-                           <Font size="18.0" />
-                        </font></Label>
-                            <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                            <Button fx:id="btnCreate" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#onBtnCreateEmployee" styleClass="action-btn" text="Create Employee">
-                                <HBox.margin>
-                                    <Insets right="5.0" />
-                                </HBox.margin>
-                            </Button>
-                        </children>
-                        <padding>
-                            <Insets left="5.0" top="5.0" />
-                        </padding>
-                    </HBox>
-                    <TableView fx:id="tblEmployeeContainer" prefHeight="243.0" prefWidth="390.0" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colFirstName" prefWidth="114.0" text="First name" />
-                            <TableColumn fx:id="colLastName" prefWidth="72.0" text="Last Name" />
-                            <TableColumn fx:id="colUsername" prefWidth="90.0" text="Username" />
-                            <TableColumn fx:id="colManage" prefWidth="140.0" resizable="false" text="Manage" />
-                        </columns>
-                  <VBox.margin>
-                     <Insets left="5.0" right="5.0" />
-                  </VBox.margin>
-                  <columnResizePolicy>
-                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                  </columnResizePolicy>
-                    </TableView>
-                </children>
-            <BorderPane.margin>
-               <Insets bottom="10.0" left="10.0" right="10.0" />
-            </BorderPane.margin>
-            </VBox>
-        </center>
+
         <top>
             <VBox prefHeight="18.0" prefWidth="390.0" BorderPane.alignment="CENTER" />
         </top>
+
+        <center>
+            <VBox prefHeight="241.0" prefWidth="390.0" spacing="5.0"
+                  BorderPane.alignment="CENTER">
+
+                <BorderPane.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" />
+                </BorderPane.margin>
+
+                <HBox prefHeight="38.0" prefWidth="390.0"
+                      spacing="5.0" alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets left="5.0" top="5.0" />
+                    </padding>
+
+                    <Label styleClass="h2" text="Employees" />
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <Button fx:id="btnCreate"
+                            alignment="CENTER_RIGHT"
+                            mnemonicParsing="false"
+                            onAction="#onBtnCreateEmployee"
+                            styleClass="button, accent"
+                            text="Create Employee">
+                        <HBox.margin>
+                            <Insets right="5.0" />
+                        </HBox.margin>
+                    </Button>
+                </HBox>
+
+                <TableView fx:id="tblEmployeeContainer"
+                           prefHeight="243.0" prefWidth="390.0"
+                           VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colFirstName" prefWidth="114.0" text="First name" />
+                        <TableColumn fx:id="colLastName"  prefWidth="72.0"  text="Last Name" />
+                        <TableColumn fx:id="colUsername"  prefWidth="90.0"  text="Username" />
+                        <TableColumn fx:id="colManage"    prefWidth="140.0" resizable="false" text="Manage" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                    <VBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                    </VBox.margin>
+                </TableView>
+
+            </VBox>
+        </center>
     </BorderPane>
+
     <ModalPane fx:id="modalPane" />
 
 </StackPane>
+

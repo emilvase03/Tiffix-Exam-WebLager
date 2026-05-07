@@ -44,7 +44,6 @@
         <Region VBox.vgrow="ALWAYS" />
     </VBox>
 
-    <!-- ── Footer: version left, logout right ── -->
     <HBox alignment="CENTER_LEFT" spacing="8" styleClass="sidebar-footer">
 
         <Label styleClass="sidebar-version" text="v1.0.0" />
