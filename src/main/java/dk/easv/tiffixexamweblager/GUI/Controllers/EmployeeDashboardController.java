@@ -87,10 +87,10 @@ public class EmployeeDashboardController {
     private void showChooseProfileModal() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/views/ChooseProfileView.fxml")
+                    getClass().getResource("/views/ChooseScanSettingsView.fxml")
             );
             Parent modalContent = loader.load();
-            ChooseProfileController controller = loader.getController();
+            ChooseScanSettingsController controller = loader.getController();
             controller.init(modalPane, this::onSessionStarted);
             modalPane.show(modalContent);
         } catch (Exception e) {
