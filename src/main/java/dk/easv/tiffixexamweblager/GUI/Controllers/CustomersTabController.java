@@ -3,7 +3,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.CustomerCardController;
-import dk.easv.tiffixexamweblager.GUI.Models.CustomerModel;
+import dk.easv.tiffixexamweblager.GUI.Models.CustomerProfileModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // Ikonli imports
@@ -28,11 +28,11 @@ public class CustomersTabController implements Initializable {
     @FXML private VBox customerCardOverlay;
     @FXML private CustomerCardController customerCardController;
 
-    private CustomerModel customerModel;
+    private CustomerProfileModel customerProfileModel;
 
     public CustomersTabController() {
         try {
-            customerModel = new CustomerModel();
+            customerProfileModel = new CustomerProfileModel();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to initialize CustomerModel.");
         }
@@ -51,7 +51,7 @@ public class CustomersTabController implements Initializable {
         colTitle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getName()));
 
         try {
-            tblCustomer.setItems(customerModel.getAllCustomers());
+            tblCustomer.setItems(customerProfileModel.getAllCustomers());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve customers from database.");
         }
@@ -94,7 +94,7 @@ public class CustomersTabController implements Initializable {
                 if (!confirmed) return;
 
                 try {
-                    customerModel.deleteCustomer(customer);
+                    customerProfileModel.deleteCustomer(customer);
                     tblCustomer.getItems().remove(customer);
                 } catch (Exception e) {
                     AlertHelper.showError("Error", "Failed to delete customer.");

@@ -3,7 +3,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.GUI.Controllers.CustomersTabController;
-import dk.easv.tiffixexamweblager.GUI.Models.CustomerModel;
+import dk.easv.tiffixexamweblager.GUI.Models.CustomerProfileModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // Java imports
@@ -20,11 +20,11 @@ public class CustomerCardController {
     private CustomersTabController customersTabController;
     private boolean updateCustomer = false;
     private Customer customerToBeUpdated;
-    private CustomerModel customerModel;
+    private CustomerProfileModel customerProfileModel;
 
     public CustomerCardController() {
         try {
-            customerModel = new CustomerModel();
+            customerProfileModel = new CustomerProfileModel();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to instantiate CustomerModel.");
         }
@@ -42,7 +42,7 @@ public class CustomerCardController {
             try {
                 if (customerToBeUpdated != null) {
                     customerToBeUpdated.setName(txtName.getText().trim());
-                    customerModel.updateCustomer(customerToBeUpdated);
+                    customerProfileModel.updateCustomer(customerToBeUpdated);
 
                     customersTabController.getTable().refresh();
                     txtName.clear();
@@ -55,7 +55,7 @@ public class CustomerCardController {
             }
         } else {
             try {
-                Customer newCustomer = customerModel.createCustomer(new Customer(txtName.getText().trim()));
+                Customer newCustomer = customerProfileModel.createCustomer(new Customer(txtName.getText().trim()));
                 customersTabController.getTable().getItems().add(newCustomer);
 
                 txtName.clear();
