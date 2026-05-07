@@ -92,8 +92,6 @@ public class Box {
 
     @Override
     public String toString() {
-        return "Box{id=" + id + ", number=" + number + ", title='" + title + '\'' +
-                ", createdBy='" + createdByUsername + "'" +
-                ", documentsAmount=" + documentsAmount + ", pagesAmount=" + pagesAmount + '}';
+        return "Box " + getNumber();
     }
 }
