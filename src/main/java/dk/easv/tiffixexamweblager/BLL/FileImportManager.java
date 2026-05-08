@@ -31,7 +31,7 @@ public class FileImportManager {
 
         ZipExtractor extractor = new ZipExtractor();
         List<ZipExtractor.ExtractedFile> extracted =
-                extractor.extractTiffs(zipResult.getFileBytes());
+                extractor.extractTiffs(zipResult.fileBytes());
 
         List<ScanResult> results = new ArrayList<>();
 
