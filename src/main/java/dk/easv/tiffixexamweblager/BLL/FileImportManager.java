@@ -39,8 +39,7 @@ public class FileImportManager {
         for (ZipExtractor.ExtractedFile file : extracted) {
             results.add(new ScanResult(
                     file.getFileName(),
-                    file.getFileBytes(),
-                    false
+                    file.getFileBytes()
             ));
         }
 

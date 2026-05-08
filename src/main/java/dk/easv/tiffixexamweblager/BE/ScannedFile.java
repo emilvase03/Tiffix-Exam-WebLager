@@ -2,10 +2,10 @@ package dk.easv.tiffixexamweblager.BE;
 
 public class ScannedFile {
 
-    private int id;              // 0 if unsaved
-    private int documentId;      // 0 if unsaved
-    private int scanOrder;       // original order (never changes)
-    private int sortOrder;       // UI order (changes)
+    private int id;
+    private int documentId;
+    private int scanOrder;
+    private int sortOrder;
     private String filePath;
     private double rotationAngle;
 
@@ -20,7 +20,7 @@ public class ScannedFile {
         this.rotationAngle = rotationAngle;
     }
 
-    // ✅ Factory for API/imported files
+
     public static ScannedFile unsaved(int order, String filePath) {
         return new ScannedFile(
                 0,
@@ -32,10 +32,12 @@ public class ScannedFile {
         );
     }
 
-    // Getters & setters
-    public int getScanOrder() { return scanOrder; }
-    public int getSortOrder() { return sortOrder; }
-    public String getFilePath() { return filePath; }
+    public int getScanOrder() {
+        return scanOrder; }
+    public int getSortOrder() {
+        return sortOrder; }
+    public String getFilePath() {
+        return filePath; }
 
     public void setSortOrder(int sortOrder) {
         this.sortOrder = sortOrder;
