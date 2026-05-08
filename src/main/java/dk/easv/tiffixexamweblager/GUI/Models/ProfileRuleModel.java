@@ -49,10 +49,6 @@ public class ProfileRuleModel {
         profileRuleManager.addRulesToProfile(profile, rules);
     }
 
-    public void deleteRulesForProfile(Profile profile) throws Exception {
-        profileRuleManager.deleteRulesForProfile(profile);
-    }
-
     public void updateRulesForProfile(Profile profile, List<Rule> rules) throws Exception {
         profileRuleManager.updateRulesForProfile(profile, rules);
     }
