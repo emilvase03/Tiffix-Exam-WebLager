@@ -36,6 +36,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +45,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import javafx.scene.control.ScrollPane;
 
 public class EmployeeDashboardController {
     @FXML private StackPane root;
@@ -60,6 +62,11 @@ public class EmployeeDashboardController {
     @FXML private ImageView previewImageView;
     @FXML private Button     btnFetch;
 
+
+    @FXML
+    private ScrollPane previewScrollPane;
+
+
     private BoxDocumentModel boxDocumentModel;
     private FileImportModel fileImportModel;
     private Document activeDocument = null;
@@ -73,6 +80,7 @@ public class EmployeeDashboardController {
 
     @FXML
     private void initialize() {
+        setupPreview();
         try {
             boxDocumentModel = new BoxDocumentModel();
             fileImportModel = new FileImportModel();
@@ -450,7 +458,7 @@ public class EmployeeDashboardController {
                     ScannedFile moved = currentFiles.remove(draggedIndex);
                     currentFiles.add(targetIndex, moved);
                     updateSortOrders();
-                    openPreviewAt(targetIndex);
+
                 }
                 success = true;
             }
@@ -461,6 +469,15 @@ public class EmployeeDashboardController {
 
         tile.setOnDragDone(e -> tile.setOpacity(1));
     }
+     public void setupPreview(){
+
+         previewScrollPane.viewportBoundsProperty().addListener((obs, oldVal, bounds) -> {
+             previewImageView.setFitWidth(bounds.getWidth());
+             previewImageView.setFitHeight(bounds.getHeight());
+
+         });
+     }
+
 
 
 }
