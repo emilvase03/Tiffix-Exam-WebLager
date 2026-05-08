@@ -48,7 +48,7 @@ public class FileApiClient {
         if (response.statusCode() != 200) {
             throw new Exception("Scanner API returned HTTP " + response.statusCode());
         }
-//______________Explain here_____
+
         byte[] zipBytes = response.body();
         if (zipBytes == null || zipBytes.length == 0) {
             throw new Exception("Scanner API returned an empty response.");
@@ -60,10 +60,8 @@ public class FileApiClient {
                 .map(FileApiClient::extractFileName)
                 .orElse("scan_" + System.currentTimeMillis() + ".zip");
 
-        return new ScanResult(fileName, zipBytes, false);
+        return new ScanResult(fileName, zipBytes);
     }
-
-    // ── Helper ────────────────────────────────────────────────────────────────
 
     private static String extractFileName(String disposition) {
         int idx = disposition.indexOf("filename=");

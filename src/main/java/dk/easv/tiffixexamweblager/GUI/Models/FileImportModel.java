@@ -17,18 +17,13 @@ public class FileImportModel {
         manager = new FileImportManager();
     }
 
-    /**
-     * Fetches scans from API (ZIP → TIFFs) and appends all results.
-     */
     public void fetchScansFromApi() throws Exception {
 
         List<ScanResult> results = manager.importScansFromApi();
         scanResults.addAll(results);
     }
 
-    /**
-     * Clears between documents / barcode splits.
-     */
+    // For future clear between documents / barcode splits.
     public void clear() {
         scanResults.clear();
     }

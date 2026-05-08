@@ -8,7 +8,6 @@ import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.DocumentTileController;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
-
 import dk.easv.tiffixexamweblager.GUI.Models.FileImportModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
@@ -17,7 +16,6 @@ import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 import atlantafx.base.controls.ModalPane;
 
 // Java imports
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;

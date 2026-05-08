@@ -1,6 +1,15 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
+//Project imports
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
+
+//Java imports
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.awt.image.BufferedImage;
+
+//JavaFX imports
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
@@ -11,11 +20,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-
 public class ScannedFileTileController {
 
     private static final double THUMB_W = 120;
