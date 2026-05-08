@@ -457,6 +457,9 @@ public class EmployeeDashboardController {
 
                     ScannedFile moved = currentFiles.remove(draggedIndex);
                     currentFiles.add(targetIndex, moved);
+
+                    sessionData.put(activeDocument, new ArrayList<>(currentFiles));
+
                     updateSortOrders();
 
                 }
