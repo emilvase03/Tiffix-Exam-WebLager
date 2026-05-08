@@ -27,6 +27,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
@@ -64,7 +67,6 @@ public class EmployeeDashboardController {
 
     private int previewIndex = 0;
 
-    private int previewRotation = 0;
     //where your app puts scanned files temporarily
     private Path scanTempDir;
 
@@ -103,7 +105,7 @@ public class EmployeeDashboardController {
                 int order = fileSizeBefore + 1;
                 for (int i = modelSizeBefore; i < allResults.size(); i++) {
                     var scan = allResults.get(i);
-                    Path dest = writeTempFile(scan.getFileName(), scan.getFileBytes());
+                    Path dest = writeTempFile(scan.fileName(), scan.fileBytes());
                     newFiles.add(ScannedFile.unsaved(order++, dest.toString()));
                 }
                 return newFiles;
@@ -229,6 +231,9 @@ public class EmployeeDashboardController {
             ScannedFileTileController ctrl = loader.getController();
             ctrl.setScannedFile(file);
             tile.setOnMouseClicked(e -> openPreviewAt(currentFiles.indexOf(file)));
+
+            enableDragReorder(tile, file);
+
             return tile;
         } catch (Exception e) {
             AlertHelper.showError("Display error",
@@ -318,6 +323,7 @@ public class EmployeeDashboardController {
 
     @FXML
     private void onBtnExport(ActionEvent event) {
+        updateSortOrders();
 
     }
 
@@ -354,5 +360,62 @@ public class EmployeeDashboardController {
         lblTotalFilesInDoc.setVisible(visible);
         lblTotalFilesInDoc.setManaged(visible);
     }
+
+    private void updateSortOrders() {
+        for (int i = 0; i < currentFiles.size(); i++) {
+            currentFiles.get(i).setSortOrder(i);
+        }
+    }
+
+
+
+    private void enableDragReorder(Node tile, ScannedFile file) {
+
+        tile.setOnDragDetected(e -> {
+            Dragboard db = tile.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
+            content.putString(file.getFilePath());
+            db.setContent(content);
+            tile.setOpacity(0.5);
+            e.consume();
+        });
+
+        tile.setOnDragOver(e -> {
+            if (e.getGestureSource() != tile && e.getDragboard().hasString()) {
+                e.acceptTransferModes(TransferMode.MOVE);
+            }
+            e.consume();
+        });
+
+        tile.setOnDragDropped(e -> {
+            Dragboard db = e.getDragboard();
+            boolean success = false;
+
+            if (db.hasString()) {
+                Node draggedTile = (Node) e.getGestureSource();
+
+                int draggedIndex = filesTilePane.getChildren().indexOf(draggedTile);
+                int targetIndex = filesTilePane.getChildren().indexOf(tile);
+
+                if (draggedIndex != targetIndex) {
+
+                    filesTilePane.getChildren().remove(draggedTile);
+                    filesTilePane.getChildren().add(targetIndex, draggedTile);
+
+                    ScannedFile moved = currentFiles.remove(draggedIndex);
+                    currentFiles.add(targetIndex, moved);
+                    updateSortOrders();
+                    openPreviewAt(targetIndex);
+                }
+                success = true;
+            }
+
+            e.setDropCompleted(success);
+            e.consume();
+        });
+
+        tile.setOnDragDone(e -> tile.setOpacity(1));
+    }
+
 
 }
