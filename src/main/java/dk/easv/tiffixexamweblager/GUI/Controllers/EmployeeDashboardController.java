@@ -4,6 +4,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BE.Document;
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
+import dk.easv.tiffixexamweblager.BLL.Utils.BarcodeDetector;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.DocumentTileController;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class EmployeeDashboardController {
@@ -47,23 +49,21 @@ public class EmployeeDashboardController {
     @FXML private Label lblDocumentNr;
     @FXML private Label lblTotalDocInBox;
     @FXML private Label lblTotalFilesInDoc;
-
     @FXML private Label      lblTotalDocText;
     @FXML private Label      lblTotalFilesText;
-
     @FXML private TilePane   documentsTilePane;
     @FXML private TilePane   filesTilePane;
-
     @FXML private BorderPane topOverview;
     @FXML private ImageView previewImageView;
     @FXML private Button     btnFetch;
 
     private BoxDocumentModel boxDocumentModel;
-    private List<ScannedFile> currentFiles = new ArrayList<>();
     private FileImportModel fileImportModel;
-
+    private Document activeDocument = null;
+    private List<ScannedFile> currentFiles = new ArrayList<>();
+    private LinkedHashMap<Document, List<ScannedFile>> sessionData = new LinkedHashMap<>();
+    private int nextDocSortOrder = 1;
     private int previewIndex = 0;
-
     private int previewRotation = 0;
     //where your app puts scanned files temporarily
     private Path scanTempDir;
@@ -103,15 +103,30 @@ public class EmployeeDashboardController {
                 int order = fileSizeBefore + 1;
                 for (int i = modelSizeBefore; i < allResults.size(); i++) {
                     var scan = allResults.get(i);
-                    Path dest = writeTempFile(scan.getFileName(), scan.getFileBytes());
+                    Path dest = writeTempFile(scan.fileName(), scan.fileBytes());
                     newFiles.add(ScannedFile.unsaved(order++, dest.toString()));
                 }
                 return newFiles;
             }
         };
+
         task.setOnSucceeded(e -> {
             List<ScannedFile> newFiles = task.getValue();
+
             for (ScannedFile f : newFiles) {
+                File tiffFile = new File(f.getFilePath());
+                boolean isBarcode = BarcodeDetector.hasBarcode(tiffFile);
+
+                if (isBarcode) {
+                    createNewDocument();
+                    currentFiles.clear();
+                    filesTilePane.getChildren().clear();
+                } else if (activeDocument == null) {
+                    AlertHelper.showError("No document selected", "Scan a barcode page first to start a new document.");
+                    break;
+                }
+
+                sessionData.get(activeDocument).add(f);
                 currentFiles.add(f);
                 filesTilePane.getChildren().add(createFileTile(f));
             }
@@ -161,7 +176,18 @@ public class EmployeeDashboardController {
 
             populateDocumentTilePane(documents);
 
+            if (!documents.isEmpty()) {
+                activeDocument = documents.get(documents.size() -1);
+                nextDocSortOrder = documents.size() + 1;
+            } else {
+                activeDocument = null;
+                nextDocSortOrder = 1;
+            }
+
             // Clear file panel for the new session
+            activeDocument = null;
+            nextDocSortOrder = boxDocumentModel.loadDocumentsForBox(box).size() + 1;
+            sessionData.clear();
             currentFiles.clear();
             fileImportModel.clear();
             filesTilePane.getChildren().clear();
@@ -200,25 +226,30 @@ public class EmployeeDashboardController {
     }
 
     private void onDocumentSelected(Document doc) {
-        try {
-            lblDocumentNr.setText(String.valueOf(doc.getSortOrder()));
+        activeDocument = doc;
+        lblDocumentNr.setText(String.valueOf(doc.getSortOrder()));
 
-            var files = boxDocumentModel.loadFilesForDocument(doc);
-            currentFiles.clear();
-            currentFiles.addAll(files);
+        currentFiles.clear();
+        filesTilePane.getChildren().clear();
 
-            filesTilePane.getChildren().clear();
-            for (ScannedFile f : currentFiles) {
-                filesTilePane.getChildren().add(createFileTile(f));
+        if (!doc.isUnsaved()) {
+            try {
+                var dbFiles = boxDocumentModel.loadFilesForDocument(doc);
+                sessionData.putIfAbsent(doc, new ArrayList<>(dbFiles));
+            } catch (Exception e) {
+                AlertHelper.showError("Load error",
+                        "Could not load files for the selected document.");
             }
-
-            lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
-            topOverview.setVisible(false);
-
-        } catch (Exception e) {
-            AlertHelper.showError("Load error",
-                    "Could not load files for the selected document.");
         }
+
+        currentFiles.addAll(sessionData.getOrDefault(doc, new ArrayList<>()));
+
+        for (ScannedFile f : currentFiles) {
+            filesTilePane.getChildren().add(createFileTile(f));
+        }
+
+        lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
+        topOverview.setVisible(false);
     }
 
     private Node createFileTile(ScannedFile file) {
@@ -236,6 +267,19 @@ public class EmployeeDashboardController {
             return new VBox();
         }
     }
+
+
+    private void createNewDocument() {
+        Box box = UserSession.getInstance().getActiveBox();
+        Document doc = new Document(-1, box.getId(), nextDocSortOrder++);
+
+        activeDocument = doc;
+        sessionData.put(doc, new ArrayList<>());
+
+        documentsTilePane.getChildren().add(createDocumentTile(doc));
+        lblTotalDocInBox.setText(String.valueOf(documentsTilePane.getChildren().size()));
+    }
+
 //files to show in preview
     private void openPreviewAt(int index) {
         if (currentFiles.isEmpty()) return;
@@ -318,7 +362,10 @@ public class EmployeeDashboardController {
 
     @FXML
     private void onBtnExport(ActionEvent event) {
-
+        if (sessionData.isEmpty()) {
+            AlertHelper.showError("Error", "Nothing to save.");
+            return;
+        }
     }
 
   //preview, thumbnails, tiles, export
