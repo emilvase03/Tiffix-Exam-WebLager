@@ -25,8 +25,6 @@ public class BarcodeDetector {
             new MultiFormatReader().decode(bitmap);
             return true;
 
-        } catch (NotFoundException e) {
-            return false;
         } catch (Exception e) {
             return false;
         }
