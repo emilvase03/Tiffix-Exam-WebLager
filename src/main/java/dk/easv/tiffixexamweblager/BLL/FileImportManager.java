@@ -1,9 +1,10 @@
 package dk.easv.tiffixexamweblager.BLL;
 
-import dk.easv.tiffixexamweblager.BE.ExtractedFile;
+import dk.easv.tiffixexamweblager.BE.ScanResult;
 import dk.easv.tiffixexamweblager.DAL.API.FileApiClient;
 import dk.easv.tiffixexamweblager.DAL.API.ZipExtractor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,25 +12,37 @@ import java.util.List;
  * Deliberately knows nothing about Documents, Boxes, or persistence —
  * that is the responsibility of whoever consumes the returned ExtractedFile list.
  */
+
 public class FileImportManager {
 
-    private final FileApiClient fileApiClient;
-    private final ZipExtractor  zipExtractor;
-
-    public FileImportManager() {
-        fileApiClient = new FileApiClient();
-        zipExtractor  = new ZipExtractor();
-    }
+    private final FileApiClient apiClient = new FileApiClient();
 
     /**
-     * Fetches a ZIP from the API and returns all TIFF files found inside it.
+     * Fetches a ZIP file from the external API, extracts all TIFF files found inside it,
+     * and converts each TIFF into a {@link ScanResult}.
      *
-     * @return one ExtractedFile per TIFF entry in the ZIP, never empty
-     * @throws Exception if the network call fails, the response is not a valid ZIP,
-     *                   or the ZIP contains no TIFF files
+     * @return one ScanResult per TIFF found in the ZIP; may be empty if none are present
+     * @throws Exception if the API fetch fails or the ZIP cannot be processed
      */
-    public List<ExtractedFile> fetchAndExtract() throws Exception {
-        byte[] zipBytes = fileApiClient.fetchRandomFile();
-        return zipExtractor.extractTiffs(zipBytes);
+
+    public List<ScanResult> importScansFromApi() throws Exception {
+
+        ScanResult zipResult = apiClient.fetchScanZip();
+
+        ZipExtractor extractor = new ZipExtractor();
+        List<ZipExtractor.ExtractedFile> extracted =
+                extractor.extractTiffs(zipResult.fileBytes());
+
+        List<ScanResult> results = new ArrayList<>();
+
+
+        for (ZipExtractor.ExtractedFile file : extracted) {
+            results.add(new ScanResult(
+                    file.getFileName(),
+                    file.getFileBytes()
+            ));
+        }
+
+        return results;
     }
 }

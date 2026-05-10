@@ -3,31 +3,31 @@ package dk.easv.tiffixexamweblager.BLL;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.DAL.DAO.CustomerDAO;
-import dk.easv.tiffixexamweblager.DAL.ICustomerDataAccess;
+import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
 // Java imports
 import java.util.List;
 
 public class CustomerManager {
-    private ICustomerDataAccess dataAccess;
+    private ICRUDDataAccess<Customer> dataAccess;
 
     public CustomerManager() throws Exception{
         dataAccess = new CustomerDAO();
     }
 
     public List<Customer> getAllCustomers() throws Exception {
-        return dataAccess.getAllCustomers();
+        return dataAccess.getAll();
     }
 
     public Customer createCustomer(Customer newCustomer) throws Exception {
-        return dataAccess.createCustomer(newCustomer);
+        return dataAccess.create(newCustomer);
     }
 
     public void updateCustomer(Customer customer) throws Exception {
-        dataAccess.updateCustomer(customer);
+        dataAccess.update(customer);
     }
 
     public void deleteCustomer(Customer customer) throws Exception {
-        dataAccess.deleteCustomer(customer);
+        dataAccess.delete(customer);
     }
 }

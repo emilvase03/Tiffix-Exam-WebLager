@@ -17,19 +17,13 @@ public class NewEmployeeController {
     @FXML private TextField txtLastName;
     @FXML private TextField txtUserName;
     @FXML private TextField txtPassword;
+    @FXML private Label lblFirstNameError;
+    @FXML private Label lblLastNameError;
+    @FXML private Label lblUsernameError;
+    @FXML private Label lblPasswordError;
 
-
-
-    private UserModel            userModel;
-    private ModalPane            modalPane;
-    @FXML
-    private Label lblFirstNameError;
-    @FXML
-    private Label lblLastNameError;
-    @FXML
-    private Label lblUsernameError;
-    @FXML
-    private Label lblPasswordError;
+    private UserModel userModel;
+    private ModalPane modalPane;
 
 
     public void init(UserModel userModel, ModalPane modalPane, ObservableList<User> employeeList) {

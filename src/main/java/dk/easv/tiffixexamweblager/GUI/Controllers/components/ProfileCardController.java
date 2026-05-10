@@ -31,12 +31,9 @@ public class ProfileCardController implements Initializable {
     @FXML private ListView<Rule> rulesList;
 
     private VBox overlay;
-    private ProfileModel profileModel;
+    private ProfileRuleModel profileRuleModel;
     private ProfilesTabController profilesTabController;
     private Profile profileToBeUpdated;
-    private RuleModel ruleModel;
-    private ProfileRuleModel profileRuleModel;
-    private CustomerModel customerModel;
     private CustomerProfileModel customerProfileModel;
     private boolean updateProfile = false;
     private ObservableList<Rule> allRules = FXCollections.observableArrayList();
@@ -44,29 +41,14 @@ public class ProfileCardController implements Initializable {
 
     public ProfileCardController() {
         try {
-            profileModel = new ProfileModel();
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to instantiate ProfileModel.");
-        }
-        try {
-            ruleModel = new RuleModel();
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to instantiate RuleModel");
-        }
-        try {
             profileRuleModel = new ProfileRuleModel();
         } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to instantiate ProfileRuleModel");
-        }
-        try {
-            customerModel = new CustomerModel();
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to instantiate CustomerModel");
+            AlertHelper.showError("Error", "Failed to instantiate ProfileRuleModel.");
         }
         try {
             customerProfileModel = new CustomerProfileModel();
         } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to instantiate CustomerProfileModel");
+            AlertHelper.showError("Error", "Failed to instantiate CustomerModel.");
         }
     }
 
@@ -82,14 +64,15 @@ public class ProfileCardController implements Initializable {
         allRules.clear();
 
         try {
-            allRules.addAll(ruleModel.getAllRules());
+            allRules.addAll(profileRuleModel.getAllRules());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve every profile rule from database");
         }
 
         try {
-            customerDropdown.getItems().addAll(customerModel.getAllCustomers());
+            customerDropdown.getItems().addAll(customerProfileModel.getAllCustomers());
         } catch (Exception e) {
+            e.printStackTrace();
             AlertHelper.showError("Error", "Failed to retrieve customers from database");
         }
 
@@ -98,10 +81,11 @@ public class ProfileCardController implements Initializable {
             try {
                 customerDropdown.setValue(customerProfileModel.getCustomerForProfile(profileToBeUpdated));
             } catch (Exception e) {
+                e.printStackTrace();
                 AlertHelper.showError("Error", "Failed to retrieve customer for profile from database");
             }
             try {
-                profileRules.addAll(ruleModel.getRulesForProfile(profileToBeUpdated));
+                profileRules.addAll(profileRuleModel.getRulesForProfile(profileToBeUpdated));
             } catch (Exception e) {
                 AlertHelper.showError("Error", "Failed to retrieve profile rules from database");
             }
@@ -137,7 +121,7 @@ public class ProfileCardController implements Initializable {
                 if (profileToBeUpdated != null) {
                     profileToBeUpdated.setTitle(txtTitle.getText().trim());
 
-                    profileModel.updateProfile(profileToBeUpdated);
+                    profileRuleModel.updateProfile(profileToBeUpdated);
                     profileRuleModel.updateRulesForProfile(profileToBeUpdated, rulesList.getItems());
                     customerProfileModel.updateProfileForCustomer(customerDropdown.getSelectionModel().getSelectedItem(), profileToBeUpdated);
                     profilesTabController.getTable().refresh();
@@ -152,7 +136,7 @@ public class ProfileCardController implements Initializable {
             }
         } else {
             try {
-                Profile profile = profileModel.createProfile(new Profile(txtTitle.getText().trim()));
+                Profile profile = profileRuleModel.createProfile(new Profile(txtTitle.getText().trim()));
                 profilesTabController.getTable().getItems().add(profile);
 
                 profileRuleModel.addRulesToProfile(profile, rulesList.getItems());

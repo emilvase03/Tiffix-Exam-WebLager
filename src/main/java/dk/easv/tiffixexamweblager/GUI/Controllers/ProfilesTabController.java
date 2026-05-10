@@ -2,7 +2,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ProfileCardController;
-import dk.easv.tiffixexamweblager.GUI.Models.ProfileModel;
+import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -31,12 +31,12 @@ public class ProfilesTabController implements Initializable {
     @FXML private VBox assignEmployeeOverlay;
     @FXML private AssignEmployeeProfileController assignEmployeeProfileController;
 
-    private ProfileModel profileModel;
+    private ProfileRuleModel profileRuleModel;
     private UserModel userModel;
 
     public ProfilesTabController() {
         try {
-            profileModel = new ProfileModel();
+            profileRuleModel = new ProfileRuleModel();
             userModel    = new UserModel();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to initialize models.");
@@ -58,7 +58,7 @@ public class ProfilesTabController implements Initializable {
         colTitle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTitle()));
 
         try {
-            tblProfiles.setItems(profileModel.getAllProfiles());
+            tblProfiles.setItems(profileRuleModel.getAllProfiles());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve profiles from database.");
         }
@@ -115,7 +115,7 @@ public class ProfilesTabController implements Initializable {
                 if (!confirmed) return;
 
                 try {
-                    profileModel.deleteProfile(profile);
+                    profileRuleModel.deleteProfile(profile);
                     tblProfiles.getItems().remove(profile);
                 } catch (Exception e) {
                     AlertHelper.showError("Error", "Failed to delete profile.");

@@ -1,9 +1,17 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-import atlantafx.base.controls.ModalPane;
+// Project imports
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// AtlantaFX imports
+import atlantafx.base.controls.ModalPane;
+
+// Ikonli imports
+import org.kordamp.ikonli.javafx.FontIcon;
+
+// Java imports
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,27 +22,25 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
-import org.kordamp.ikonli.javafx.FontIcon;
-
 import java.io.IOException;
 
-public class  EmployeesTabController {
+public class EmployeesTabController {
+    @FXML private ModalPane modalPane;
+    @FXML private TableView<User> tblEmployeeContainer;
+    @FXML private TableColumn<User, String> colFirstName;
+    @FXML private TableColumn<User, String> colLastName;
+    @FXML private TableColumn<User, String> colUsername;
+    @FXML private TableColumn<User, Void> colManage;
 
+    private UserModel userModel;
 
-    @FXML
-    private ModalPane modalPane;
-    @FXML
-    private TableView<User> tblEmployeeContainer;
-    @FXML
-    private TableColumn<User, String> colFirstName;
-    @FXML
-    private TableColumn<User, String> colLastName;
-    @FXML
-    private TableColumn<User, String> colUsername;
-    @FXML
-    private TableColumn<User, Void> colManage;
-
-    private final UserModel userModel = new UserModel();
+    public EmployeesTabController() {
+        try {
+            userModel = new UserModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate UserModel");
+        }
+    }
 
     @FXML
     public void initialize() {

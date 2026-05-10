@@ -3,7 +3,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.BoxCardController;
-import dk.easv.tiffixexamweblager.GUI.Models.BoxModel;
+import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import org.kordamp.ikonli.javafx.FontIcon;
 import javafx.beans.property.SimpleObjectProperty;
@@ -37,11 +37,11 @@ public class BoxesTabController implements Initializable {
     private static final DateTimeFormatter DATE_FMT =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    private BoxModel boxModel;
+    private BoxDocumentModel boxDocumentModel;
 
     public BoxesTabController() {
         try {
-            boxModel = new BoxModel();
+            boxDocumentModel = new BoxDocumentModel();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to initialize Box model.");
         }
@@ -54,7 +54,7 @@ public class BoxesTabController implements Initializable {
 
         boxCardController.setOverlay(boxCardOverlay);
         boxCardController.setBoxesTabController(this);
-        boxCardController.setBoxModel(boxModel);
+        boxCardController.setBoxModel(boxDocumentModel);
         boxCardController.setLoggedInUser(
                 UserSession.getInstance().getCurrentUser().getId(),
                 UserSession.getInstance().getCurrentUser().getUsername()
@@ -83,7 +83,7 @@ public class BoxesTabController implements Initializable {
                 new SimpleObjectProperty<>(d.getValue().getPagesAmount()));
 
         try {
-            tblBoxes.setItems(boxModel.getAllBoxes());
+            tblBoxes.setItems(boxDocumentModel.getAllObservableBoxes());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve boxes from database.");
         }
@@ -115,7 +115,7 @@ public class BoxesTabController implements Initializable {
                 if (!confirmed) return;
 
                 try {
-                    boxModel.deleteBox(box);
+                    boxDocumentModel.deleteBox(box);
                 } catch (Exception e) {
                     AlertHelper.showError("Error", "Failed to delete box.");
                 }

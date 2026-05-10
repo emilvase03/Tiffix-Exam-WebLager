@@ -2,7 +2,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
 import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.GUI.Controllers.BoxesTabController;
-import dk.easv.tiffixexamweblager.GUI.Models.BoxModel;
+import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,15 +14,15 @@ import java.time.LocalDateTime;
 
 public class BoxCardController {
 
-    @FXML private Label     lblHeader;
+    @FXML private Label lblHeader;
     @FXML private TextField txtNumber;
     @FXML private TextField txtTitle;
 
-    private VBox               overlay;
+    private VBox overlay;
     private BoxesTabController boxesTabController;
-    private BoxModel           boxModel;
-    private int                loggedInUserId;
-    private String             loggedInUsername;
+    private BoxDocumentModel boxDocumentModel;
+    private int loggedInUserId;
+    private String loggedInUsername;
 
     public void setOverlay(VBox overlay) {
         this.overlay = overlay;
@@ -32,8 +32,8 @@ public class BoxCardController {
         this.boxesTabController = controller;
     }
 
-    public void setBoxModel(BoxModel boxModel) {
-        this.boxModel = boxModel;
+    public void setBoxModel(BoxDocumentModel boxDocumentModel) {
+        this.boxDocumentModel = boxDocumentModel;
     }
 
     public void setLoggedInUser(int userId, String username) {
@@ -70,7 +70,7 @@ public class BoxCardController {
         newBox.setCreatedByUsername(loggedInUsername);
 
         try {
-            boxModel.createBox(newBox);
+            boxDocumentModel.createBox(newBox);
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to create box.");
             return;

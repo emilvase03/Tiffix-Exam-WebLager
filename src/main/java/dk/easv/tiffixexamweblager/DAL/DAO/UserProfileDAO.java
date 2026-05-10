@@ -1,10 +1,12 @@
 package dk.easv.tiffixexamweblager.DAL.DAO;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.UserProfile;
 import dk.easv.tiffixexamweblager.DAL.IUserProfileDataAccess;
 import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
 
+// Java imports
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

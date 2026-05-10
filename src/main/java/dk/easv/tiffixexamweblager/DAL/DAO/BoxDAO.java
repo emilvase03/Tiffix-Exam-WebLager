@@ -1,15 +1,17 @@
 package dk.easv.tiffixexamweblager.DAL.DAO;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
-import dk.easv.tiffixexamweblager.DAL.IBoxDataAccess;
+import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
+// Java imports
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BoxDAO implements IBoxDataAccess {
+public class BoxDAO implements ICRUDDataAccess<Box> {
 
     private final DBConnector dbConnector;
 
@@ -18,7 +20,7 @@ public class BoxDAO implements IBoxDataAccess {
     }
 
     @Override
-    public List<Box> getAllBoxes() throws Exception {
+    public List<Box> getAll() throws Exception {
         List<Box> boxes = new ArrayList<>();
         String sql = """
                 SELECT b.Id, b.Number, b.Title, b.CreatedAt,
@@ -50,7 +52,7 @@ public class BoxDAO implements IBoxDataAccess {
     }
 
     @Override
-    public Box createBox(Box box) throws Exception {
+    public Box create(Box box) throws Exception {
         String sql = """
                 INSERT INTO Box (Number, Title, CreatedAt, CreatedByUserId,
                                  DocumentsAmount, PagesAmount, IsDeleted)
@@ -78,7 +80,12 @@ public class BoxDAO implements IBoxDataAccess {
     }
 
     @Override
-    public void deleteBox(Box box) throws Exception {
+    public void update(Box entity) throws Exception {
+        return;
+    }
+
+    @Override
+    public void delete(Box box) throws Exception {
         String sql = "UPDATE Box SET IsDeleted = 1 WHERE Id = ?";
 
         try (Connection conn = dbConnector.getConnection();
