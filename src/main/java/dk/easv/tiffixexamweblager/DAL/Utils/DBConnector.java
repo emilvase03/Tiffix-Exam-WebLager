@@ -1,4 +1,4 @@
-package dk.easv.tiffixexamweblager.DAL.DB;
+package dk.easv.tiffixexamweblager.DAL.Utils;
 
 // JDBC imports
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
