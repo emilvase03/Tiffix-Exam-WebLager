@@ -1,33 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.VBox?>
+        <?import javafx.scene.control.Label?>
+        <?import javafx.scene.image.ImageView?>
+        <?import javafx.scene.layout.StackPane?>
+        <?import javafx.scene.layout.VBox?>
 
-<!--
-    DocumentTileView.fxml
-    ──────────────────────
-    The tile gets all sizing and color from .document-tile in style.css.
-    prefHeight / prefWidth removed from root — CSS defines pref sizes.
-    The old values (246×227) were far too large for a tile.
-    Now: 90×100px per .document-tile (style guide compact tile sizing).
--->
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <VBox fx:id="root"
-      spacing="5"
+      spacing="4"
       stylesheets="@../css/style.css"
       styleClass="document-tile"
       xmlns="http://javafx.com/javafx/24.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.DocumentTileController">
 
-   <ImageView fx:id="icon"
-              fitWidth="40"
-              fitHeight="40"
-              preserveRatio="true" />
 
-   <Label fx:id="lblDocumentTitle"
-          wrapText="true"
-          styleClass="document-title" />
+<StackPane fx:id="thumbArea" VBox.vgrow="ALWAYS">
+
+   <VBox fx:id="iconPlaceholder"
+         alignment="CENTER"
+         spacing="2"
+         styleClass="doc-icon-placeholder">
+
+      <FontIcon fx:id="icon"
+                iconLiteral="bi-folder-fill"
+                styleClass="doc-folder-icon"/>
+
+      <Label fx:id="lblIconSubtitle"
+             styleClass="doc-icon-subtitle"/>
+
+   </VBox>
+
+   <ImageView fx:id="imgThumbnail"
+              preserveRatio="false"
+              visible="false"
+              managed="false"/>
+
+</StackPane>
+
+<Label fx:id="lblDocumentTitle"
+       wrapText="false"
+       styleClass="document-title"/>
+
+<Label fx:id="lblFileCount"
+       styleClass="doc-count-label"/>
 
 </VBox>
-
