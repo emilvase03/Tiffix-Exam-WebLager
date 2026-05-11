@@ -16,8 +16,10 @@ import atlantafx.base.controls.ModalPane;
 // Java imports
 import java.util.ArrayList;
 import java.util.List;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -42,16 +44,33 @@ public class ChooseScanSettingsController {
     public void init(ModalPane modalPane, Runnable onSessionReady) {
         this.modalPane = modalPane;
         this.onSessionReady = onSessionReady;
+        setupSearchbar();
+        setupBoxListener();
 
         try {
             profileRuleModel = new ProfileRuleModel();
-            boxDocumentModel = new BoxDocumentModel();
-            userModel = new UserModel();
-            loadAssignedProfiles();
-            loadBoxes();
-            setupSearchbar();
         } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to load profiles or boxes.");
+            AlertHelper.showError("Error", "Failed to instantiate ProfileRuleModel.");
+        }
+        try {
+            boxDocumentModel = new BoxDocumentModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate BoxDocumentModel.");
+        }
+        try {
+            userModel = new UserModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate UserModel.");
+        }
+        try {
+            loadAssignedProfiles();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to load profiles.");
+        }
+        try {
+            loadBoxes();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to load boxes.");
         }
     }
 
@@ -74,9 +93,6 @@ public class ChooseScanSettingsController {
     private void loadBoxes() throws Exception {
         List<Box> boxes = boxDocumentModel.getAllBoxes();
         boxComboBox.getItems().setAll(boxes);
-
-        if (!boxes.isEmpty())
-            boxComboBox.getSelectionModel().selectFirst();
     }
 
     private HBox createProfileRow(Profile profile) {
@@ -92,8 +108,10 @@ public class ChooseScanSettingsController {
 
         HBox row = new HBox(cb);
         row.getStyleClass().add("profile-item");
+        row.setUserData(profile);
         return row;
     }
+
     @FXML
     private void onBtnClose() {
         modalPane.hide();
@@ -128,5 +146,45 @@ public class ChooseScanSettingsController {
                     .map(profile -> createProfileRow(profile))
                     .forEach(node -> profileList.getChildren().add(node));
         });
+    }
+
+    private void setupBoxListener() {
+        // Re-apply lock whenever the profile list is updated via search
+        profileList.getChildren().addListener((ListChangeListener<Node>) change -> {
+            Box selectedBox = boxComboBox.getSelectionModel().getSelectedItem();
+            if (selectedBox == null)
+                return;
+
+            applyLock(selectedBox);
+        });
+
+        // Apply lock when a different box is selected
+        boxComboBox.getSelectionModel().selectedItemProperty().addListener((obs, old, selectedBox) -> {
+            if (selectedBox == null)
+                return;
+
+            applyLock(selectedBox);
+        });
+    }
+
+    private void applyLock(Box selectedBox) {
+        for (Node node : profileList.getChildren()) {
+            HBox hbox = (HBox) node;
+            CheckBox cb = (CheckBox) hbox.getChildren().getFirst();
+            Profile profile = (Profile) hbox.getUserData();
+
+            if (selectedBox.getProfileId() != null) {
+                if (profile.getId() == selectedBox.getProfileId()) {
+                    selectedProfiles.remove(profile); // prevent listener firing duplicate
+                    cb.setSelected(true);
+                } else {
+                    cb.setSelected(false);
+                }
+                cb.setDisable(true);
+            } else {
+                cb.setSelected(false);
+                cb.setDisable(false);
+            }
+        }
     }
 }
