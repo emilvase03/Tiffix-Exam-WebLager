@@ -24,6 +24,9 @@ public class BoxCardController {
     private int loggedInUserId;
     private String loggedInUsername;
 
+    private boolean updateBox = false;
+    private Box boxToBeUpdated;
+
     public void setOverlay(VBox overlay) {
         this.overlay = overlay;
     }
@@ -43,8 +46,18 @@ public class BoxCardController {
 
     public void preloadCreateWindow() {
         lblHeader.setText("Create a new box.");
+        updateBox = false;
+        boxToBeUpdated = null;
         txtNumber.clear();
         txtTitle.clear();
+    }
+
+    public void preloadEditWindow(Box box) {
+        lblHeader.setText("Edit box.");
+        updateBox = true;
+        boxToBeUpdated = box;
+        txtNumber.setText(String.valueOf(box.getNumber()));
+        txtTitle.setText(box.getTitle());
     }
 
     @FXML
@@ -65,15 +78,26 @@ public class BoxCardController {
             return;
         }
 
-        Box newBox = new Box(0, number, title, LocalDateTime.now(),
-                loggedInUserId, 0, 0);
-        newBox.setCreatedByUsername(loggedInUsername);
+        if (updateBox) {
+            try {
+                boxToBeUpdated.setNumber(number);
+                boxToBeUpdated.setTitle(title);
+                boxDocumentModel.updateBox(boxToBeUpdated);
+            } catch (Exception e) {
+                AlertHelper.showError("Error", "Failed to update box.");
+                return;
+            }
+        } else {
+            Box newBox = new Box(0, number, title, LocalDateTime.now(),
+                    loggedInUserId, 0, 0);
+            newBox.setCreatedByUsername(loggedInUsername);
 
-        try {
-            boxDocumentModel.createBox(newBox);
-        } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to create box.");
-            return;
+            try {
+                boxDocumentModel.createBox(newBox);
+            } catch (Exception e) {
+                AlertHelper.showError("Error", "Failed to create box.");
+                return;
+            }
         }
 
         hideOverlay();
@@ -89,6 +113,8 @@ public class BoxCardController {
             overlay.setVisible(false);
             overlay.setManaged(false);
         }
+        updateBox = false;
+        boxToBeUpdated = null;
         txtNumber.clear();
         txtTitle.clear();
     }

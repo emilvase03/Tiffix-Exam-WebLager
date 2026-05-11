@@ -18,6 +18,9 @@
            stylesheets="@../css/style.css">
 
     <BorderPane prefHeight="322.0" prefWidth="390.0">
+        <StackPane.margin>
+            <Insets left="50.0" right="50.0" />
+        </StackPane.margin>
 
         <top>
             <VBox prefHeight="18.0" prefWidth="390.0" BorderPane.alignment="CENTER" />
@@ -79,4 +82,3 @@
     <ModalPane fx:id="modalPane" />
 
 </StackPane>
-
