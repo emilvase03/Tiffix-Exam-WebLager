@@ -33,7 +33,7 @@
                 </padding>
 
                 <Label styleClass="modal-subtitle" text="1. Choose the box to work on:" />
-                <ComboBox fx:id="boxComboBox" maxWidth="Infinity" promptText="Select a box" styleClass="combo-box-base" />
+                <ComboBox fx:id="boxComboBox" editable="true" maxWidth="Infinity" promptText="Select or create a box" styleClass="combo-box-base" />
             </VBox>
 
             <Separator />

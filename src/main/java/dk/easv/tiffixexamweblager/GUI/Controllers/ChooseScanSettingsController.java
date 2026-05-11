@@ -14,6 +14,7 @@ import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import atlantafx.base.controls.ModalPane;
 
 // Java imports
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.ListChangeListener;
@@ -26,6 +27,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 public class ChooseScanSettingsController {
     @FXML private Button btnSelectProfile;
@@ -46,6 +48,7 @@ public class ChooseScanSettingsController {
         this.onSessionReady = onSessionReady;
         setupSearchbar();
         setupBoxListener();
+        setupBoxConverter();
 
         try {
             profileRuleModel = new ProfileRuleModel();
@@ -128,7 +131,24 @@ public class ChooseScanSettingsController {
     @FXML
     private void onBtnStartSession(ActionEvent actionEvent) {
         Box selectedBox = boxComboBox.getValue();
-        if (selectedProfiles.isEmpty() || selectedBox == null) return;
+        if (selectedProfiles.isEmpty() || selectedBox == null)
+            return;
+
+        boolean isNew = !boxComboBox.getItems().contains(selectedBox);
+
+        if (isNew) {
+            String[] parts = selectedBox.getTitle().split(" ", 2);
+            String number = parts[1];
+
+            Box newBox = new Box(-1, Integer.parseInt(number), selectedBox.getTitle(), LocalDateTime.now(), UserSession.getInstance().getCurrentUser().getId(), 0, 0);
+            newBox.setProfileId(selectedProfiles.getFirst().getId());
+            try {
+                selectedBox = boxDocumentModel.createBox(newBox);
+            } catch (Exception e) {
+                AlertHelper.showError("Error", "Failed to create " + selectedBox.getTitle());
+                return;
+            }
+        }
 
         // store choices in the session
         UserSession.getInstance().setActiveProfiles(selectedProfiles);
@@ -173,6 +193,27 @@ public class ChooseScanSettingsController {
 
             applyLock(selectedBox);
         });
+    }
+
+    private void setupBoxConverter() {
+        boxComboBox.setConverter(new StringConverter<Box>() {
+            @Override
+            public String toString(Box box) {
+                return box == null ? "" : box.getTitle();
+            }
+
+            @Override
+            public Box fromString(String text) {
+                if (text == null || text.trim().isEmpty())
+                    return null;
+
+                return boxComboBox.getItems().stream()
+                        .filter(b -> b.getTitle().equalsIgnoreCase(text.trim()))
+                        .findFirst()
+                        .orElse(new Box(-1, -1, text.trim(), null, null, -1, -1));
+            }
+        });
+
     }
 
     private void applyLock(Box selectedBox) {
