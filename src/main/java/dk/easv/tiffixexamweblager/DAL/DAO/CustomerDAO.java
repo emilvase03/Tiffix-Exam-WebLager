@@ -2,7 +2,7 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Customer;
-import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
+import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
 import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
 // Java imports

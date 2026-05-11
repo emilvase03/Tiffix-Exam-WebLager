@@ -3,7 +3,7 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.Rule;
-import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
+import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
 import dk.easv.tiffixexamweblager.DAL.IRuleDataAccess;
 
 // Java imports
