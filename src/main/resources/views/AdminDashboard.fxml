@@ -8,21 +8,41 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane fx:id="root" prefHeight="600" prefWidth="900" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.AdminDashboardController">
+
+<StackPane fx:id="root"
+           prefHeight="600" prefWidth="900"
+           stylesheets="@../css/style.css"
+           xmlns="http://javafx.com/javafx/25"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.AdminDashboardController">
+
     <VBox>
-        <HBox alignment="CENTER_LEFT" spacing="16" styleClass="top-bar">
-            <Button mnemonicParsing="false" onAction="#onBtnOpenSideBar" styleClass="hamburger-btn" text="☰" />
-            <Label styleClass="top-bar-title" text="Admin Dashboard" />
-            <Region HBox.hgrow="ALWAYS" />
+
+        <HBox alignment="CENTER_LEFT"
+              spacing="16"
+              styleClass="top-bar">
+
+            <Button mnemonicParsing="false"
+                    onAction="#onBtnOpenSideBar"
+                    styleClass="hamburger-btn"
+                    text="☰"/>
+
+            <Label styleClass="top-bar-title" text="Admin Dashboard"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
 
             <HBox alignment="CENTER_LEFT" spacing="8">
-                <FontIcon iconLiteral="bi-person-circle" />
-                <Label styleClass="top-bar-user" text="Welcome, Admin" />
-                <fx:include source="../components/ThemeToggleButton.fxml" />
+                <FontIcon iconLiteral="bi-person-circle"/>
+                <Label styleClass="top-bar-user" text="Welcome, Admin"/>
+                <fx:include source="../components/ThemeToggleButton.fxml"/>
             </HBox>
 
         </HBox>
-        <StackPane fx:id="contentArea" styleClass="content-area" VBox.vgrow="ALWAYS" />
+
+        <StackPane fx:id="contentArea"
+                   styleClass="content-area"
+                   VBox.vgrow="ALWAYS"/>
+
     </VBox>
 
 </StackPane>

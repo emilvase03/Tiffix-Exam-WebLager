@@ -21,66 +21,68 @@
          styleClass="card">
 
       <padding>
-         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
       </padding>
 
       <HBox alignment="CENTER">
-         <Label styleClass="h2" text="Create Employee" />
-         <VBox.margin><Insets bottom="12.0" /></VBox.margin>
+         <Label styleClass="h2" text="Create Employee"/>
+         <VBox.margin><Insets bottom="12.0"/></VBox.margin>
       </HBox>
 
       <VBox spacing="4.0">
-         <padding><Insets top="4.0" /></padding>
+         <padding><Insets top="4.0"/></padding>
 
          <TextField fx:id="txtFirstName"
                     maxWidth="Infinity"
                     promptText="First Name"
-                    styleClass="text-field" />
+                    styleClass="text-field"/>
          <Label fx:id="lblFirstNameError"
                 prefHeight="14.0" maxWidth="Infinity"
                 visible="false" managed="false"
-                styleClass="error-label" />
+                styleClass="error-label"/>
 
          <TextField fx:id="txtLastName"
                     maxWidth="Infinity"
                     promptText="Last Name"
-                    styleClass="text-field" />
+                    styleClass="text-field"/>
          <Label fx:id="lblLastNameError"
                 prefHeight="14.0" maxWidth="Infinity"
                 visible="false" managed="false"
-                styleClass="error-label" />
+                styleClass="error-label"/>
 
          <TextField fx:id="txtUserName"
                     maxWidth="Infinity"
                     promptText="Username"
-                    styleClass="text-field" />
+                    styleClass="text-field"/>
          <Label fx:id="lblUsernameError"
                 prefHeight="14.0" maxWidth="Infinity"
                 visible="false" managed="false"
-                styleClass="error-label" />
+                styleClass="error-label"/>
 
          <TextField fx:id="txtPassword"
                     maxWidth="Infinity"
                     promptText="Password"
-                    styleClass="text-field" />
+                    styleClass="text-field"/>
          <Label fx:id="lblPasswordError"
                 prefHeight="14.0" maxWidth="Infinity"
                 visible="false" managed="false"
-                styleClass="error-label" />
+                styleClass="error-label"/>
       </VBox>
 
       <HBox alignment="CENTER_RIGHT" spacing="8.0">
-         <VBox.margin><Insets top="16.0" /></VBox.margin>
+         <VBox.margin><Insets top="16.0"/></VBox.margin>
+
          <Button fx:id="btnCreate"
                  mnemonicParsing="false"
                  onAction="#onBtnCreate"
                  styleClass="button, accent"
-                 text="Create" />
+                 text="Create"/>
+
          <Button fx:id="btnCancel"
                  mnemonicParsing="false"
                  onAction="#onBtnCancel"
-                 styleClass="button"
-                 text="Cancel" />
+                 styleClass="button, neutral"
+                 text="Cancel"/>
       </HBox>
 
    </VBox>

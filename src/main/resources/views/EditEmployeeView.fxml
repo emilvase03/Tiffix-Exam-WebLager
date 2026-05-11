@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+
 <StackPane xmlns="http://javafx.com/javafx/24.0.1"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EditEmployeeController"
@@ -21,73 +22,65 @@
           styleClass="card">
 
         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
         </padding>
 
-        <Label styleClass="title" text="Edit Employee" />
+        <Label styleClass="title" text="Edit Employee"/>
 
         <VBox spacing="4.0" maxWidth="Infinity">
+
             <TextField fx:id="txtFirstName"
                        maxWidth="Infinity"
                        promptText="First Name"
-                       styleClass="text-field" />
+                       styleClass="text-field"/>
             <Label fx:id="lblFirstNameError"
-                   prefHeight="14.0"
-                   maxWidth="Infinity"
-                   visible="false"
-                   managed="false"
-                   styleClass="error-label" />
+                   prefHeight="14.0" maxWidth="Infinity"
+                   visible="false" managed="false"
+                   styleClass="error-label"/>
 
             <TextField fx:id="txtLastName"
                        maxWidth="Infinity"
                        promptText="Last Name"
-                       styleClass="text-field" />
+                       styleClass="text-field"/>
             <Label fx:id="lblLastNameError"
-                   prefHeight="14.0"
-                   maxWidth="Infinity"
-                   visible="false"
-                   managed="false"
-                   styleClass="error-label" />
+                   prefHeight="14.0" maxWidth="Infinity"
+                   visible="false" managed="false"
+                   styleClass="error-label"/>
 
             <TextField fx:id="txtUserName"
                        maxWidth="Infinity"
                        promptText="Username"
-                       styleClass="text-field" />
+                       styleClass="text-field"/>
             <Label fx:id="lblUsernameError"
-                   prefHeight="14.0"
-                   maxWidth="Infinity"
-                   visible="false"
-                   managed="false"
-                   styleClass="error-label" />
+                   prefHeight="14.0" maxWidth="Infinity"
+                   visible="false" managed="false"
+                   styleClass="error-label"/>
 
             <TextField fx:id="txtPassword"
                        maxWidth="Infinity"
                        promptText="Leave blank to keep current password"
-                       styleClass="text-field" />
+                       styleClass="text-field"/>
             <Label fx:id="lblPasswordError"
-                   prefHeight="14.0"
-                   maxWidth="Infinity"
-                   visible="false"
-                   managed="false"
-                   styleClass="error-label" />
+                   prefHeight="14.0" maxWidth="Infinity"
+                   visible="false" managed="false"
+                   styleClass="error-label"/>
+
         </VBox>
 
         <HBox alignment="CENTER_RIGHT" spacing="8.0">
-            <VBox.margin>
-                <Insets top="12.0" />
-            </VBox.margin>
+            <VBox.margin><Insets top="12.0"/></VBox.margin>
 
             <Button fx:id="btnCancel"
                     mnemonicParsing="false"
                     onAction="#onBtnCancel"
-                    text="Cancel"
-                    styleClass="button neutral" />
+                    styleClass="button, neutral"
+                    text="Cancel"/>
 
             <Button fx:id="btnSave"
                     mnemonicParsing="false"
                     onAction="#onBtnSave"
-                    text="Save"
-                    styleClass="button primary" />
+                    styleClass="button, primary"
+                    text="Save"/>
         </HBox>
 
     </VBox>

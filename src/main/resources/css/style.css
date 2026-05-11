@@ -1,4 +1,4 @@
-/*    Still working on it to figure ouut how to make it work with dark/light modes
+/*
    WEBLAGER BRAND → ATLANTAFX VARIABLE MAPPING
    ─────────────────────────────────────────────────────────────────
    Style-guide token         Hex         AtlantaFX variable
@@ -16,141 +16,148 @@
    Success                   #4CD07D  →  -color-success-emphasis
    Placeholder               #BFBFBF  →  -color-fg-subtle
    ─────────────────────────────────────────────────────────────────
-   ========================================================= */
+*/
 
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS  (all CSS variables live here on .root)
+   ═══════════════════════════════════════════════════════════════ */
 .root {
+    /* Brand green — WebLager signature sidebar color */
+    -wl-brand-green:        #24C79F;
+    -wl-brand-green-hover:  derive(#24C79F, -12%);
+    -wl-brand-green-active: derive(#24C79F, -20%);
+    -wl-brand-green-text:   #FFFFFF;
 
-    /* The teal/green sidebar color — WebLager's signature color */
-    -wl-brand-green: #24C79F;
-
-    /*derive() works at paint-resolve time so it's always
-       relative to the base color even after theme swap.       */
-    -wl-brand-green-hover: derive(#24C79F, -12%); /* darker on hover  */
-    -wl-brand-green-active: derive(#24C79F, -20%); /* darker on active */
-
-    -wl-brand-green-text: #FFFFFF;
-
-    /* Primary dark navy — used for filled primary buttons, headings */
-    -wl-brand-dark: #2D3D4F;
+    /* Primary dark navy */
+    -wl-brand-dark:       #2D3D4F;
     -wl-brand-dark-hover: #1C252F;
 
-    /* Danger / destructive — fixed red */
-    -wl-brand-danger: #EF4444;
-
-    /* Success */
+    /* Semantic */
+    -wl-brand-danger:  #EF4444;
     -wl-brand-success: #4CD07D;
 
-    /* Page and panel backgrounds */
-    -wl-surface: -color-bg-default; /* page bg       */
-    -wl-surface-card: -color-bg-subtle; /* card / modal  */
-    -wl-surface-inset: -color-bg-inset; /* nested content*/
-    -wl-surface-hover: -color-border-muted; /* row / tile hover */
+    /* Surfaces */
+    -wl-surface:       -color-bg-default;
+    -wl-surface-card:  -color-bg-subtle;
+    -wl-surface-inset: -color-bg-inset;
+    -wl-surface-hover: -color-border-muted;
 
     /* Text */
-    -wl-text-main: -color-fg-default; /* body text     */
-    -wl-text-muted: -color-fg-muted; /* secondary     */
-    -wl-text-subtle: -color-fg-subtle; /* placeholder   */
-    -wl-text-on-emphasis: -color-fg-on-emphasis; /* text on dark fills */
+    -wl-text-main:        -color-fg-default;
+    -wl-text-muted:       -color-fg-muted;
+    -wl-text-subtle:      -color-fg-subtle;
+    -wl-text-on-emphasis: -color-fg-on-emphasis;
 
     /* Borders */
-    -wl-border: -color-border-default;
+    -wl-border:        -color-border-default;
     -wl-border-subtle: -color-border-muted;
 
-    /* Interactive accent (primary buttons, selected states) */
-    -wl-accent: -color-accent-emphasis;
-    -wl-accent-hover: -color-accent-muted;
-    -wl-accent-subtle: -color-accent-subtle; /* light accent bg */
+    /* Accent */
+    -wl-accent:        -color-accent-emphasis;
+    -wl-accent-hover:  -color-accent-muted;
+    -wl-accent-subtle: -color-accent-subtle;
 
-    /* Danger (destructive actions) */
-    -wl-danger: -color-danger-emphasis;
-    -wl-danger-text: -color-danger-fg;
+    /* Danger */
+    -wl-danger:        -color-danger-emphasis;
+    -wl-danger-text:   -color-danger-fg;
     -wl-danger-subtle: -color-danger-subtle;
 
     /* Success */
-    -wl-success: -color-success-emphasis;
+    -wl-success:        -color-success-emphasis;
     -wl-success-subtle: -color-success-subtle;
 
     /* Neutral / secondary */
     -wl-neutral: -color-neutral-emphasis;
-}
-.root {
-    -fx-font-size:   12px;
 
+    /* Base */
+    -fx-font-size:        12px;
     -fx-background-color: -wl-surface;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════ */
+
 .h1 {
-    /* Style guide: 21px / Bold */
     -fx-font-size:   21px;
     -fx-font-weight: 700;
     -fx-text-fill:   -wl-text-main;
 }
 
 .h2 {
-    /* Style guide: 18px / SemiBold */
     -fx-font-size:   18px;
     -fx-font-weight: 600;
     -fx-text-fill:   -wl-text-main;
 }
 
 .h3 {
-    /* Style guide: 15px / SemiBold */
     -fx-font-size:   15px;
     -fx-font-weight: 600;
     -fx-text-fill:   -wl-text-main;
 }
 
-/* Labels  */
-.label {
+/* Generic modal / card title (used as styleClass="title" in modals) */
+.title {
+    -fx-font-size:   16px;
+    -fx-font-weight: 700;
+    -fx-text-fill:   -wl-text-main;
+}
 
+.label {
     -fx-text-fill: -wl-text-main;
 }
 
 .text-muted {
-    /*helper text */
-    -fx-text-fill:   -wl-text-muted;
-    -fx-font-size:   12px;
+    -fx-text-fill: -wl-text-muted;
+    -fx-font-size: 12px;
 }
 
 .helper-text {
-    -fx-font-size:  10px;
-    -fx-text-fill:  -wl-text-muted;
+    -fx-font-size: 10px;
+    -fx-text-fill: -wl-text-muted;
 }
 
 .error-label {
-    /* Inline validation message under form fields */
-    -fx-font-size:  11px;
-    -fx-text-fill:  -wl-danger-text;
+    -fx-font-size: 11px;
+    -fx-text-fill: -wl-danger-text;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════════════════ */
+
 .button {
-    -fx-pref-height:      20px;
-    -fx-font-size:        12px;
-    -fx-font-weight:      500;
+    -fx-pref-height:       20px;
+    -fx-font-size:         12px;
+    -fx-font-weight:       500;
     -fx-background-radius: 6px;
     -fx-border-radius:     6px;
     -fx-cursor:            hand;
 }
 
-/* Primary filled button */
-.button.accent {
+/* Primary / accent — dark navy fill */
+.button.accent,
+.button.primary {
     -fx-background-color: -wl-brand-dark;
     -fx-text-fill:        white;
 }
-.button.accent:hover {
+.button.accent:hover,
+.button.primary:hover {
     -fx-background-color: -wl-brand-dark-hover;
 }
 
-/* Secondary button  */
-.button.secondary {
+/* Secondary / neutral — grey fill */
+.button.secondary,
+.button.neutral {
     -fx-background-color: -wl-neutral;
     -fx-text-fill:        -wl-text-on-emphasis;
 }
-.button.secondary:hover {
+.button.secondary:hover,
+.button.neutral:hover {
     -fx-background-color: derive(-wl-neutral, -10%);
 }
 
-/* outline  */
+/* Tertiary — outlined */
 .button.tertiary {
     -fx-background-color: -wl-surface-card;
     -fx-text-fill:        -wl-text-main;
@@ -161,135 +168,99 @@
     -fx-background-color: -wl-surface-hover;
 }
 
-/* Danger button  */
+/* Danger */
 .button.danger {
     -fx-background-color: -wl-brand-danger;
-    -fx-text-fill:        white;  /* white on #EF4444 — contrast 4.3:1 */
+    -fx-text-fill:        white;
 }
 .button.danger:hover {
     -fx-background-color: derive(-wl-brand-danger, -10%);
 }
 
-/*  page-header buttons */
+/* Large variant for page-header buttons */
 .button-lg {
     -fx-pref-height: 33px;
 }
 
+/* Action button — teal inline toolbar button */
+.action-btn {
+    -fx-padding:          6;
+    -fx-border-color:     transparent;
+    -fx-background-color: #33A9EE;
+    -fx-text-fill:        black;
+    -fx-background-radius: 6px;
+    -fx-border-radius:    6px;
+    -fx-cursor:           hand;
+}
+.action-btn:hover {
+    -fx-background-color: #0094EA;
+    -fx-text-fill:        white;
+}
+.action-btn:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor:  default;
+}
 
-/*  Input fields*/
+/* Hamburger menu button (☰) in AdminDashboard top bar */
+.hamburger-btn {
+    -fx-background-color: transparent;
+    -fx-font-size:        16px;
+    -fx-cursor:           hand;
+    -fx-background-radius: 6px;
+    -fx-padding:          4 8;
+}
+.hamburger-btn:hover {
+    -fx-background-color: -wl-surface-hover;
+}
+
+/* Close / X button (transparent icon button) */
+.close-btn {
+    -fx-background-color: transparent;
+    -fx-padding:          0;
+    -fx-min-width:   32px;
+    -fx-min-height:  32px;
+    -fx-pref-width:  32px;
+    -fx-pref-height: 32px;
+    -fx-cursor:      hand;
+}
+.close-btn .ikonli-font-icon,
+.close-icon {
+    -fx-icon-size:  24px;
+    -fx-icon-color: -wl-text-main;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INPUTS
+   ═══════════════════════════════════════════════════════════════ */
+
 .text-field {
-    -fx-pref-height: 30px;   /* style guide default */
+    -fx-pref-height: 30px;
     -fx-font-size:   12px;
 }
 .text-field-lg {
-    -fx-pref-height: 33px;   /* style guide: primary action height */
+    -fx-pref-height: 33px;
     -fx-font-size:   12px;
-}/*
-   components
-
-/*
-   Sidebar
-   */
-
-.sidebar {
-    /* Brand green — per style guide "secondary navigation bg"      */
-    -fx-background-color: -wl-brand-green;
-
-    /* Style guide: 0px 2px 12px rgba(0,0,0,0.1) shadow            */
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 12, 0, 0, 2);
 }
 
-.sidebar-header {
-    /* 12px top/bottom, 16px left/right — 3px scale: 12 = 4×3       */
-    -fx-padding: 12 16;
+/* ComboBox — matches text-field height so forms align */
+.combo-box-base {
+    -fx-pref-height: 30px;
+    -fx-font-size:   12px;
 }
 
-.sidebar-topbar {
-    -fx-padding: 6;
-}
+/* ═══════════════════════════════════════════════════════════════
+   ICON BUTTONS  (edit / delete in table rows, toolbars)
+   styleClass="icon-button"  or  styleClass="icon-button, danger"
+   ═══════════════════════════════════════════════════════════════ */
 
-/* App name — white on green, 15px/SemiBold */
-.sidebar-app-name {
-    -fx-text-fill:   -wl-brand-green-text;  /* white */
-    -fx-font-size:   15px;
-    -fx-font-weight: 600;
-}
-
-/* Nav buttons */
-.sidebar-btn {
-    -fx-background-color: transparent;
-    -fx-text-fill:        -wl-brand-green-text;  /* white */
-    -fx-alignment:        CENTER_LEFT;
-    /* Literal px — JavaFX variables cannot be used for dimensions  */
-    -fx-padding:          8 12;
+.icon-button {
+    -fx-background-color:  -wl-accent-subtle;
     -fx-background-radius: 6px;
-    -fx-font-size:        12px;
-    -fx-font-weight:      500;
-    -fx-cursor:           hand;
-}
-
-.sidebar-btn .ikonli-font-icon {
-    /* Icons inside sidebar must use primary color per style guide  */
-    -fx-icon-color: -wl-brand-dark;
-}
-
-.sidebar-btn:hover {
-    /* Darker green — still readable with white text.
-       Using a white-semi-transparent overlay via derive().          */
-    -fx-background-color: -wl-brand-green-hover;
-}
-
-/* Active / selected nav item */
-.sidebar-btn-active {
-    -fx-background-color: -wl-brand-green-active;
-    -fx-text-fill:        -wl-brand-green-text;
-    -fx-font-weight:      600;
-}
-
-/* Logout button */
-.sidebar-btn-logout {
-    -fx-background-color: transparent;
-    -fx-background-radius: 6px;
+    -fx-border-color:      transparent;
     -fx-pref-width:  30px;
     -fx-pref-height: 30px;
     -fx-cursor:      hand;
-}
-.sidebar-btn-logout .ikonli-font-icon {
-    -fx-icon-size:  18px;
-    -fx-icon-color: -wl-brand-green-text;   /* white on green */
-}
-.sidebar-btn-logout:hover {
-    /* Red danger tint on hover — still clearly visible on green bg */
-    -fx-background-color: rgba(239, 68, 68, 0.25);
-}
-.sidebar-btn-logout:hover .ikonli-font-icon {
-    -fx-icon-color: -wl-brand-danger;
-}
-
-/* Version label at bottom of sidebar */
-.sidebar-version {
-    -fx-text-fill:  rgba(255,255,255,0.65);  /* white at 65% — readable */
-    -fx-font-size:  10px;
-}
-
-/* =========================================================
-   Icon buttons (edit / delete in table rows, toolbar)
-   Usage: styleClass="icon-button"
-          styleClass="icon-button danger"
-   =========================================================
-   DARK MODE: -wl-accent-subtle is AtlantaFX's subtle accent tint.
-   In NordLight it's a light blue-grey; in NordDark a muted dark.
-   Both are readable with -wl-text-main on top.
-   ========================================================= */
-.icon-button {
-    -fx-background-color: -wl-accent-subtle;
-    -fx-background-radius: 6px;
-    -fx-border-color: transparent;
-    -fx-pref-width: 30px;
-    -fx-pref-height: 30px;
-    -fx-cursor: hand;
-    -fx-padding: 0;
-    -fx-margin: 0 4 0 0;
+    -fx-padding:     0;
 }
 .icon-button .ikonli-font-icon {
     -fx-icon-size:  16px;
@@ -301,8 +272,6 @@
 .icon-button:hover .ikonli-font-icon {
     -fx-icon-color: -wl-text-on-emphasis;
 }
-
-/* Danger variant */
 .icon-button.danger {
     -fx-background-color: -wl-danger-subtle;
 }
@@ -315,56 +284,52 @@
 .icon-button.danger:hover .ikonli-font-icon {
     -fx-icon-color: white;
 }
-
-/* Disabled state — 60% opacity per style guide */
 .icon-button:disabled {
     -fx-opacity: 0.6;
     -fx-cursor:  default;
 }
 
-/*
-   Cards
-   */
+/* ═══════════════════════════════════════════════════════════════
+   CARDS
+   ═══════════════════════════════════════════════════════════════ */
+
 .card {
     -fx-background-color:  -wl-surface-card;
     -fx-background-radius: 10px;
     -fx-border-radius:     10px;
-    /* Style guide shadow: 0px 2px 12px rgba(0,0,0,0.1) */
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 12, 0, 0, 2);
-    /* Style guide: 20px card padding */
     -fx-padding: 20;
 }
 
-/*
-   Modal / Choose-Profile card
-   */
+/* ═══════════════════════════════════════════════════════════════
+   MODALS
+   ═══════════════════════════════════════════════════════════════ */
+
 .modal-card {
     -fx-background-color:  -wl-surface-card;
     -fx-background-radius: 10px;
     -fx-border-radius:     10px;
-    /* Style guide overlay shadow: rgba(0,0,0,0.25) */
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 24, 0.25, 0, 10);
 }
 
-/* Modal header strip — slightly recessed bg */
 .modal-header {
     -fx-background-color:  -wl-surface-inset;
     -fx-background-radius: 10 10 0 0;
     -fx-border-radius:     10 10 0 0;
 }
 
-/* Modal typography */
 .modal-title {
     -fx-font-size:   16px;
     -fx-font-weight: 700;
     -fx-text-fill:   -wl-text-main;
 }
+
 .modal-subtitle {
-    -fx-font-size:  13px;
-    -fx-text-fill:  -wl-text-muted;
+    -fx-font-size: 13px;
+    -fx-text-fill: -wl-text-muted;
 }
 
-/* Profile list scroll area inside modal */
+/* Profile-picker scroll area inside modal */
 .profile-scroll {
     -fx-background-color: transparent;
     -fx-background:       transparent;
@@ -388,47 +353,206 @@
     -fx-background-color: -wl-accent-subtle;
 }
 
-/*
-   Top bar / dashboard toolbar
-  */
+/* ═══════════════════════════════════════════════════════════════
+   TOP BAR  (AdminDashboard and similar full-width toolbar)
+   ═══════════════════════════════════════════════════════════════ */
+
 .top-bar {
-    /* Surface card so it lifts slightly above the page bg */
     -fx-background-color: -wl-surface-card;
     -fx-padding:          0 16;
     -fx-pref-height:      48px;
-    /* Bottom border separator */
     -fx-border-color: -wl-border transparent transparent transparent;
     -fx-border-width: 0 0 1 0;
 }
 
-.close-btn {
-    -fx-background-color: transparent;
-    -fx-padding:          0;
-    -fx-min-width:   32px;
-    -fx-min-height:  32px;
-    -fx-pref-width:  32px;
-    -fx-pref-height: 32px;
-    -fx-cursor:      hand;
-}
-.close-btn .ikonli-font-icon {
-    -fx-icon-size:  24px;
-    /* On white/dark toolbar — use main text color, not hardcoded */
-    -fx-icon-color: -wl-text-main;
+/* App title in AdminDashboard top bar */
+.top-bar-title {
+    -fx-font-size:   15px;
+    -fx-font-weight: 600;
+    -fx-text-fill:   -wl-text-main;
 }
 
-/*
-   Document tile (left panel)
-  */
+/* "Welcome, Admin" label */
+.top-bar-user {
+    -fx-font-size: 12px;
+    -fx-text-fill: -wl-text-muted;
+}
+
+/* Main content StackPane in AdminDashboard */
+.content-area {
+    -fx-background-color: -wl-surface;
+    -fx-padding:          16;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════════════════════════════ */
+
+.sidebar {
+    -fx-background-color: -wl-brand-green;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 12, 0, 0, 2);
+}
+
+.sidebar-topbar {
+    -fx-padding: 6;
+}
+
+.sidebar-header {
+    -fx-padding: 12 16;
+}
+
+.sidebar-app-name {
+    -fx-text-fill:   -wl-brand-green-text;
+    -fx-font-size:   15px;
+    -fx-font-weight: 600;
+}
+
+/* Navigation section of the sidebar */
+.sidebar-nav {
+    -fx-background-color: transparent;
+}
+
+/* Footer section (version + logout) */
+.sidebar-footer {
+    -fx-padding:          8 12;
+    -fx-border-color:     rgba(255,255,255,0.18) transparent transparent transparent;
+    -fx-border-width:     1 0 0 0;
+}
+
+.sidebar-btn {
+    -fx-background-color:  transparent;
+    -fx-text-fill:         -wl-brand-green-text;
+    -fx-alignment:         CENTER_LEFT;
+    -fx-padding:           8 12;
+    -fx-background-radius: 6px;
+    -fx-font-size:         12px;
+    -fx-font-weight:       500;
+    -fx-cursor:            hand;
+}
+.sidebar-btn .ikonli-font-icon {
+    -fx-icon-color: -wl-brand-dark;
+}
+.sidebar-btn:hover {
+    -fx-background-color: -wl-brand-green-hover;
+}
+
+.sidebar-btn-active {
+    -fx-background-color: -wl-brand-green-active;
+    -fx-text-fill:        -wl-brand-green-text;
+    -fx-font-weight:      600;
+}
+
+.sidebar-btn-logout {
+    -fx-background-color:  transparent;
+    -fx-background-radius: 6px;
+    -fx-pref-width:   30px;
+    -fx-pref-height:  30px;
+    -fx-cursor:       hand;
+}
+.sidebar-btn-logout .ikonli-font-icon {
+    -fx-icon-size:  18px;
+    -fx-icon-color: -wl-brand-green-text;
+}
+.sidebar-btn-logout:hover {
+    -fx-background-color: rgba(239, 68, 68, 0.25);
+}
+.sidebar-btn-logout:hover .ikonli-font-icon {
+    -fx-icon-color: -wl-brand-danger;
+}
+
+.sidebar-version {
+    -fx-text-fill: rgba(255,255,255,0.65);
+    -fx-font-size: 10px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD  (EmployeeDashboard)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Outer BorderPane wrapper */
+.dashboard {
+    -fx-background-color: -wl-surface;
+}
+
+/* Top toolbar strip inside the dashboard */
+.dashboard-toolbar {
+    -fx-background-color: -wl-surface-card;
+    -fx-padding:          6 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 1);
+}
+
+/* ── Content panels ──────────────────────────────────────────── */
+
+.panel {
+    -fx-background-color: -wl-surface;
+    -fx-padding:          12;
+}
+.panel-title {
+    -fx-font-weight: 600;
+    -fx-font-size:   15px;
+    -fx-text-fill:   -wl-text-main;
+}
+
+/* Documents panel (left split pane half) */
+.documents-panel {
+    -fx-background-color: -wl-surface;
+    -fx-padding:          6;
+    -fx-spacing:          6;
+}
+
+/* Files panel (right split pane half) */
+.files-panel {
+    -fx-background-color: -wl-surface;
+    -fx-padding:          6;
+    -fx-spacing:          6;
+}
+
+/* ── ScrollPanes ─────────────────────────────────────────────── */
+
+/* Generic transparent scroll (applies to both panels) */
+.transparent-scroll,
+.transparent-scroll > .viewport {
+    -fx-background-color: transparent;
+    -fx-background:       transparent;
+    -fx-border-color:     transparent;
+}
+
+/* Files-panel scroll area alias (keeps backward compat with old styleClass="filesView") */
+.filesView,
+.filesView > .viewport {
+    -fx-background-color: transparent;
+    -fx-background:       transparent;
+    -fx-border-color:     transparent;
+}
+
+/* SplitPane divider */
+.split-pane > .split-pane-divider {
+    -fx-background-color: -wl-border;
+    -fx-padding: 0 0.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DOCUMENT TILE
+   ─────────────────────────────────────────────────────────────
+   Width:  100px (leaves room for 4 columns with 14px gaps)
+   Height: 130px  folder icon (30px) + title (11px) + count (10px)
+                  + spacing + padding comfortably fits
+
+   BEFORE: 90×100px with 72px icon → title always clipped.
+   AFTER:  100×130px with 30px icon → all labels fully visible.
+   ═══════════════════════════════════════════════════════════════ */
+
 .document-tile {
     -fx-background-color:  -wl-surface-card;
     -fx-border-color:      -wl-border;
+    -fx-border-width:      1px;
     -fx-border-radius:     6px;
     -fx-background-radius: 6px;
-    -fx-padding:           10;
-    -fx-min-width:   90px;
-    -fx-pref-width:  90px;
-    -fx-min-height:  100px;
-    -fx-pref-height: 100px;
+    -fx-padding:           8;
+    -fx-min-width:   100px;
+    -fx-pref-width:  100px;
+    -fx-min-height:  130px;
+    -fx-pref-height: 130px;
     -fx-alignment:   center;
     -fx-cursor:      hand;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 4, 0, 0, 1);
@@ -437,38 +561,65 @@
     -fx-background-color: -wl-surface-hover;
     -fx-border-color:     -wl-accent-hover;
 }
-/* Selected — toggled via controller: tile.getStyleClass().add("selected") */
+
+/*
+  Selected state — toggled via DocumentTileController.setSelected()
+  using getStyleClass().add/remove("selected") so CSS stays in control.
+*/
 .document-tile.selected {
     -fx-background-color: -wl-accent-subtle;
     -fx-border-color:     -wl-accent;
     -fx-border-width:     2px;
-    -fx-border-radius: 6;
+    -fx-border-radius:    6;
 }
 
-/* Label inside document tile  */
+/* Folder icon inside the tile — 30px is readable without eating all the vertical space */
+.doc-folder-icon {
+    -fx-icon-size:  30px;
+    -fx-icon-color: #2f80ed;
+}
+
+/* VBox wrapping the folder icon and subtitle — centre-aligned, minimal top padding */
+.doc-icon-placeholder {
+    -fx-alignment: center;
+    -fx-padding:   6 0 4 0;
+}
+
+/*
+  thumbArea StackPane — no fixed min-height here.
+  VBox.vgrow="ALWAYS" in the FXML lets it fill whatever space
+  remains after the labels claim their natural height.
+  Removing the old #thumbArea { -fx-min-height: 150 } rule that
+  forced 150px inside a 100px tile (that was the clip bug).
+*/
+
+/* Small "Document N" text rendered inside the icon placeholder */
+.doc-icon-subtitle {
+    -fx-font-size: 9px;
+    -fx-text-fill: -wl-text-muted;
+    -fx-alignment: CENTER;
+}
+
+/* Bold label below the thumb area: "Document 1" */
 .document-title {
     -fx-font-size:   11px;
     -fx-font-weight: 600;
     -fx-text-fill:   -wl-text-main;
-    -fx-wrap-text:   true;
-}
-.doc-folder-icon {
-    -fx-icon-size: 72px;
-    -fx-icon-color: #2f80ed;
+    -fx-wrap-text:   false;
+    -fx-alignment:   CENTER;
 }
 
-.doc-icon-placeholder {
-    -fx-alignment: center;
-    -fx-padding: 40 0 5 0;
+/* Muted label below the title: "3 pages" */
+.doc-count-label {
+    -fx-font-size: 9px;
+    -fx-text-fill: -wl-text-muted;
+    -fx-alignment: CENTER;
 }
 
-#thumbArea {
-    -fx-min-height: 150;
-}
+/* ═══════════════════════════════════════════════════════════════
+   FILE TILE
+   ═══════════════════════════════════════════════════════════════ */
 
-/*
-   File tile
- */
 .file-tile {
     -fx-background-color:  -wl-surface-card;
     -fx-border-color:      -wl-border;
@@ -492,12 +643,13 @@
     -fx-background-color: -wl-accent-subtle;
     -fx-border-color:     -wl-accent;
     -fx-border-width:     2px;
-    fx-effect: dropshadow(gaussian, rgba(79,140,255,0.4), 12, 0.4, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(79,140,255,0.4), 12, 0.4, 0, 0);
 }
 
-/*
-   Preview panel
-   */
+/* ═══════════════════════════════════════════════════════════════
+   PREVIEW PANEL
+   ═══════════════════════════════════════════════════════════════ */
+
 .preview {
     -fx-background-color:  -wl-surface-card;
     -fx-border-color:      -wl-border;
@@ -506,9 +658,10 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 16, 0, 0, 4);
 }
 
-/*
-   Tables
-   */
+/* ═══════════════════════════════════════════════════════════════
+   TABLES
+   ═══════════════════════════════════════════════════════════════ */
+
 .table-row-cell:hover {
     -fx-background-color: -wl-surface-hover;
 }
@@ -516,70 +669,5 @@
     -fx-background-color: -wl-accent-subtle;
 }
 .table-row-cell:selected .label {
-
     -fx-text-fill: -wl-text-main;
-}
-
-/* Dashboard toolbar*/
-/* Applied to the top HBox in EmployeeDashboard    */
-.dashboard-toolbar {
-    /* Subtle elevation vs page background */
-    -fx-background-color: -wl-surface-card;
-    -fx-padding:  6 12;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 1);
-}
-
-/* ── Content panels ─────────────────────────────────────── */
-
-.panel {
-    -fx-background-color: -wl-surface;
-    /* 3px scale: 12px = 4 × 3px */
-    -fx-padding: 12;
-}
-
-.panel-title {
-    -fx-font-weight: 600;
-    -fxl-font-size:  15px;
-    -fx-text-fill:   -wl-text-main;
-}
-
-/* Documents panel (left split)  */
-.documents-panel {
-    -fx-background-color: -wl-surface;
-    -fx-padding:          6;
-    -fx-spacing:          6;
-}
-
-/* Files panel (right split)*/
-.files-panel {
-    -fx-background-color: -wl-surface;
-    -fx-padding:          6;
-    -fx-spacing:          6;
-}
-
-/* ScrollPane — transparent viewport */
-
-.transparent-scroll,
-.transparent-scroll > .viewport {
-    -fx-background-color: transparent;
-    -fx-background:       transparent;
-    -fx-border-color:     transparent;
-}
-
-/* SplitPane divider */
-.split-pane > .split-pane-divider {
-    -fx-background-color: -wl-border;
-    -fx-padding: 0 0.5; /* 1px wide */
-}
-
-.action-btn {
-    -fx-padding: 6;
-    -fx-border-color: transparent;
-    -fx-background-color: #33A9EE;
-    -fx-text-fill: black;
-}
-
-.action-btn:hover {
-    -fx-background-color: #0094EA; ;
-    -fx-text-fill: white;
 }
