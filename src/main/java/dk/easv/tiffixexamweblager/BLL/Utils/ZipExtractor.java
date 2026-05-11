@@ -1,4 +1,4 @@
-package dk.easv.tiffixexamweblager.DAL.API;
+package dk.easv.tiffixexamweblager.BLL.Utils;
 
 import java.io.*;
 import java.util.*;

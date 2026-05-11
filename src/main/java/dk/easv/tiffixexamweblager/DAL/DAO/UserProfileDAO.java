@@ -4,7 +4,7 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.UserProfile;
 import dk.easv.tiffixexamweblager.DAL.IUserProfileDataAccess;
-import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
+import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
 
 // Java imports
 import java.sql.*;

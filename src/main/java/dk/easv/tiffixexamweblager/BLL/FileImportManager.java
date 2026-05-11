@@ -2,7 +2,7 @@ package dk.easv.tiffixexamweblager.BLL;
 
 import dk.easv.tiffixexamweblager.BE.ScanResult;
 import dk.easv.tiffixexamweblager.DAL.API.FileApiClient;
-import dk.easv.tiffixexamweblager.DAL.API.ZipExtractor;
+import dk.easv.tiffixexamweblager.BLL.Utils.ZipExtractor;
 
 import java.util.ArrayList;
 import java.util.List;

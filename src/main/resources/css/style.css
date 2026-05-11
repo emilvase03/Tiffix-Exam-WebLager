@@ -458,13 +458,14 @@
 .file-tile {
     -fx-background-color:  -wl-surface-card;
     -fx-border-color:      -wl-border;
+    -fx-border-width:      1px;
     -fx-border-radius:     10px;
     -fx-background-radius: 10px;
     -fx-padding:           8;
-    -fx-min-width:   90px;
-    -fx-pref-width:  90px;
-    -fx-min-height:  110px;
-    -fx-pref-height: 110px;
+    -fx-min-width:   140px;
+    -fx-pref-width:  140px;
+    -fx-min-height:  200px;
+    -fx-pref-height: 200px;
     -fx-alignment:   center;
     -fx-cursor:      hand;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 4, 0, 0, 1);
@@ -555,4 +556,16 @@
 .split-pane > .split-pane-divider {
     -fx-background-color: -wl-border;
     -fx-padding: 0 0.5; /* 1px wide */
+}
+
+.action-btn {
+    -fx-padding: 6;
+    -fx-border-color: transparent;
+    -fx-background-color: #33A9EE;
+    -fx-text-fill: black;
+}
+
+.action-btn:hover {
+    -fx-background-color: #0094EA; ;
+    -fx-text-fill: white;
 }

@@ -18,7 +18,7 @@
         <VBox maxHeight="520" maxWidth="420" prefHeight="520" prefWidth="420" spacing="0" styleClass="card">
 
             <HBox alignment="CENTER_LEFT" spacing="8" styleClass="modal-header">
-                <Label styleClass="title" text="Select Profile &amp; Box" />
+                <Label styleClass="title" text="Select Box &amp; Profile" />
                 <Region HBox.hgrow="ALWAYS" />
                 <padding>
                     <Insets bottom="16" left="16" right="16" top="16" />
@@ -27,11 +27,22 @@
 
             <Separator />
 
+            <VBox spacing="8">
+                <padding>
+                    <Insets bottom="12" left="20" right="20" top="12" />
+                </padding>
+
+                <Label styleClass="modal-subtitle" text="1. Choose the box to work on:" />
+                <ComboBox fx:id="boxComboBox" maxWidth="Infinity" promptText="Select a box" styleClass="combo-box-base" />
+            </VBox>
+
+            <Separator />
+
             <VBox spacing="12" VBox.vgrow="ALWAYS">
                 <padding>
                     <Insets bottom="12" left="20" right="20" top="16" />
                 </padding>
-                <Label styleClass="modal-subtitle" text="1. Choose your profile:" wrapText="true" />
+                <Label styleClass="modal-subtitle" text="2. Choose your profile:" wrapText="true" />
             <TextField fx:id="txtfieldSearchbar" promptText="Search profiles" />
                 <ScrollPane fitToWidth="true" prefHeight="180" styleClass="profile-scroll">
                     <content>
@@ -42,17 +53,6 @@
                         </VBox>
                     </content>
                 </ScrollPane>
-            </VBox>
-
-            <Separator />
-
-            <VBox spacing="8">
-                <padding>
-                    <Insets bottom="12" left="20" right="20" top="12" />
-                </padding>
-
-                <Label styleClass="modal-subtitle" text="2. Choose the box to work on:" />
-                <ComboBox fx:id="boxComboBox" maxWidth="Infinity" promptText="Select a box..." styleClass="combo-box-base" />
             </VBox>
 
             <Separator />

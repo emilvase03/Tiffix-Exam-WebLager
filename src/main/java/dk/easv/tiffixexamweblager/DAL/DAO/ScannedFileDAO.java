@@ -2,7 +2,7 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
-import dk.easv.tiffixexamweblager.DAL.DB.DBConnector;
+import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
 import dk.easv.tiffixexamweblager.DAL.IScannedFileDataAccess;
 
 // Java imports
@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
-import java.sql.*;
 
 public class ScannedFileDAO implements IScannedFileDataAccess {
 
