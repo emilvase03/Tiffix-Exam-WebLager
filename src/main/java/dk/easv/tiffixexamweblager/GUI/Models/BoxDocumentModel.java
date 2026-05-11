@@ -35,17 +35,27 @@ public class BoxDocumentModel {
 
     public Box createBox(Box box) throws Exception {
         Box created = boxManager.createBox(box);
-        int i = 0;
-        while (i < allBoxes.size() && allBoxes.get(i).getNumber() < created.getNumber()) {
-            i++;
-        }
-        allBoxes.add(i, created);
+        insertSorted(created);
         return created;
+    }
+
+    public void updateBox(Box box) throws Exception {
+        boxManager.updateBox(box);
+        allBoxes.remove(box);
+        insertSorted(box);
     }
 
     public void deleteBox(Box box) throws Exception {
         boxManager.deleteBox(box);
         allBoxes.remove(box);
+    }
+
+    private void insertSorted(Box box) {
+        int i = 0;
+        while (i < allBoxes.size() && allBoxes.get(i).getNumber() < box.getNumber()) {
+            i++;
+        }
+        allBoxes.add(i, box);
     }
 
     // DocumentManager

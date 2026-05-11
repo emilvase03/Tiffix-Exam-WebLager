@@ -24,6 +24,10 @@ public class BoxManager {
         return dataAccess.create(box);
     }
 
+    public void updateBox(Box box) throws Exception {
+        dataAccess.update(box);
+    }
+
     public void deleteBox(Box box) throws Exception {
         dataAccess.delete(box);
     }

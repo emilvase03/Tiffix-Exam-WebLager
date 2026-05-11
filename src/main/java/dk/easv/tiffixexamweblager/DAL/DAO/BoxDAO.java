@@ -85,8 +85,17 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
     }
 
     @Override
-    public void update(Box entity) throws Exception {
-        return;
+    public void update(Box box) throws Exception {
+        String sql = "UPDATE Box SET Number = ?, Title = ? WHERE Id = ?";
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, box.getNumber());
+            stmt.setString(2, box.getTitle());
+            stmt.setInt(3, box.getId());
+            stmt.executeUpdate();
+        }
     }
 
     @Override
