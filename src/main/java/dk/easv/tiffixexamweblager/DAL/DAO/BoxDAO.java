@@ -25,7 +25,7 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
         String sql = """
                 SELECT b.Id, b.Number, b.Title, b.CreatedAt,
                        u.Username AS CreatedByUsername,
-                       b.DocumentsAmount, b.PagesAmount
+                       b.DocumentsAmount, b.PagesAmount, b.ProfileId
                 FROM Box b
                 LEFT JOIN [User] u ON u.Id = b.CreatedByUserId
                 WHERE b.IsDeleted = 0
@@ -37,7 +37,7 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                boxes.add(new Box(
+                Box b = new Box(
                         rs.getInt("Id"),
                         rs.getInt("Number"),
                         rs.getString("Title"),
@@ -45,7 +45,12 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
                         rs.getString("CreatedByUsername"),   // read constructor
                         rs.getInt("DocumentsAmount"),
                         rs.getInt("PagesAmount")
-                ));
+                );
+                int profileId = rs.getInt("ProfileId");
+                Integer boxProfileId = rs.wasNull() ? null : profileId;
+                b.setProfileId(boxProfileId);
+
+                boxes.add(b);
             }
         }
         return boxes;

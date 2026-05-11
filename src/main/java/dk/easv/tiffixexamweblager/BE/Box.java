@@ -11,6 +11,7 @@ public class Box {
     private String createdByUsername;
     private int documentsAmount;
     private int pagesAmount;
+    private Integer profileId;
 
     public Box(int id, int number, String title, LocalDateTime createdAt,
                String createdByUsername, int documentsAmount, int pagesAmount) {
@@ -89,6 +90,9 @@ public class Box {
     public void setPagesAmount(int pagesAmount) {
         this.pagesAmount = pagesAmount;
     }
+
+    public Integer getProfileId() { return profileId; }
+    public void setProfileId(Integer profileId) { this.profileId = profileId; }
 
     @Override
     public String toString() {
