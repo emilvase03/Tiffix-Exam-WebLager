@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-        <?import javafx.scene.control.Label?>
-        <?import javafx.scene.image.ImageView?>
-        <?import javafx.scene.layout.StackPane?>
-        <?import javafx.scene.layout.VBox?>
-
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<!--
+  DocumentTileView.fxml
+  ─────────────────────
+  Sizing is driven entirely by .document-tile in style.css (100×130px).
+
+  Layout (top to bottom inside the 100×130px tile):
+    ┌────────────────────────────────┐
+    │  thumbArea (StackPane)         │  ← grows to fill space above labels
+    │   ├─ iconPlaceholder (VBox)    │
+    │   │   ├─ 📁 FontIcon (30px)   │
+    │   │   └─ lblIconSubtitle (9px)│
+    │   └─ imgThumbnail (hidden)     │
+    │  lblDocumentTitle  (11px bold) │
+    │  lblFileCount      (9px muted) │
+    └────────────────────────────────┘
+
+  The old #thumbArea { min-height: 150 } rule has been removed from CSS —
+  that was forcing 150px inside a 100px tile and clipping the labels.
+-->
+
 <VBox fx:id="root"
+      alignment="CENTER"
       spacing="4"
       stylesheets="@../css/style.css"
       styleClass="document-tile"
@@ -14,35 +35,53 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.DocumentTileController">
 
+    <!--
+      thumbArea: VBox.vgrow="ALWAYS" so the icon area expands to fill
+      whatever vertical space the tile provides after the labels claim theirs.
+    -->
+    <StackPane fx:id="thumbArea" VBox.vgrow="ALWAYS">
 
-<StackPane fx:id="thumbArea" VBox.vgrow="ALWAYS">
+        <!--
+          Icon placeholder — shown when no thumbnail has been set.
+          styleClass references .doc-icon-placeholder and .doc-icon-subtitle from CSS.
+        -->
+        <VBox fx:id="iconPlaceholder"
+              alignment="CENTER"
+              spacing="2"
+              styleClass="doc-icon-placeholder">
 
-   <VBox fx:id="iconPlaceholder"
-         alignment="CENTER"
-         spacing="2"
-         styleClass="doc-icon-placeholder">
+            <FontIcon fx:id="icon"
+                      iconLiteral="bi-folder-fill"
+                      styleClass="doc-folder-icon"/>
 
-      <FontIcon fx:id="icon"
-                iconLiteral="bi-folder-fill"
-                styleClass="doc-folder-icon"/>
+            <Label fx:id="lblIconSubtitle"
+                   styleClass="doc-icon-subtitle"/>
 
-      <Label fx:id="lblIconSubtitle"
-             styleClass="doc-icon-subtitle"/>
+        </VBox>
 
-   </VBox>
+        <!--
+          Thumbnail — starts hidden; shown by DocumentTileController.setThumbnail().
+          fit dimensions are bound to thumbArea in the controller so the image
+          always fills the available space regardless of tile size.
+        -->
+        <ImageView fx:id="imgThumbnail"
+                   preserveRatio="false"
+                   visible="false"
+                   managed="false"/>
 
-   <ImageView fx:id="imgThumbnail"
-              preserveRatio="false"
-              visible="false"
-              managed="false"/>
+    </StackPane>
 
-</StackPane>
+    <!-- "Document 1" — .document-title in CSS (11px bold, centred) -->
+    <Label fx:id="lblDocumentTitle"
+           maxWidth="Infinity"
+           alignment="CENTER"
+           wrapText="false"
+           styleClass="document-title"/>
 
-<Label fx:id="lblDocumentTitle"
-       wrapText="false"
-       styleClass="document-title"/>
-
-<Label fx:id="lblFileCount"
-       styleClass="doc-count-label"/>
+    <!-- "3 pages" — .doc-count-label in CSS (9px muted, centred) -->
+    <Label fx:id="lblFileCount"
+           maxWidth="Infinity"
+           alignment="CENTER"
+           styleClass="doc-count-label"/>
 
 </VBox>

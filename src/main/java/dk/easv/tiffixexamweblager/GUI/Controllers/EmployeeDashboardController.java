@@ -19,7 +19,7 @@ import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 // AtlantaFX
 import atlantafx.base.controls.ModalPane;
 
-// Java imports
+// Java / JavaFX
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -31,10 +31,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
@@ -64,36 +60,33 @@ public class EmployeeDashboardController {
     @FXML private BorderPane topOverview;
     @FXML private ImageView  previewImageView;
     @FXML private Button     btnFetch;
+    @FXML private Button     btnRescan;
     @FXML private ScrollPane previewScrollPane;
-
-
 
     private BoxDocumentModel boxDocumentModel;
     private FileImportModel  fileImportModel;
     private ProfileRuleModel profileRuleModel;
 
-
-    private Document                         activeDocument   = null;
-    private final List<ScannedFile>          currentFiles     = new ArrayList<>();
+    private Document activeDocument = null;
+    private final List<ScannedFile> currentFiles = new ArrayList<>();
     private final LinkedHashMap<Document, List<ScannedFile>> sessionData = new LinkedHashMap<>();
     private int nextDocSortOrder = 1;
-    private int previewIndex     = 0;
 
+    private int nextCreationNumber = 1;
 
-    private List<Rule> activeRules = new ArrayList<>();
+    private int previewIndex = 0;
+    private final List<Rule> activeRules = new ArrayList<>();
 
-
-
-    private final IdentityHashMap<ScannedFile, ScannedFileTileController> tileControllers =
+    private final IdentityHashMap<Document, DocumentTileController> documentTileControllers =
+            new IdentityHashMap<>();
+    private final IdentityHashMap<ScannedFile, ScannedFileTileController> fileTileControllers =
             new IdentityHashMap<>();
 
+     //When the user drags "Document 1" to position 3, its label stays "Document 1"
+
+    private final IdentityHashMap<Document, String> documentLabels = new IdentityHashMap<>();
+
     private Path scanTempDir;
-    public static final DataFormat FILE_FORMAT =
-            new DataFormat("application/x-scanned-file");
-
-    public static final DataFormat DOC_FORMAT =
-            new DataFormat("application/x-document");
-
 
 
     @FXML
@@ -114,12 +107,18 @@ public class EmployeeDashboardController {
 
     @FXML
     private void onBtnFetch(ActionEvent event) {
-        if (btnFetch != null) btnFetch.setDisable(true);
+        runFetch(); }
+
+    @FXML
+    private void onBtnRescan(ActionEvent event) {
+        runFetch(); }
+
+    private void runFetch() {
+        setFetchButtonsDisabled(true);
 
         final int modelSizeBefore = fileImportModel.getScanResults().size();
         final int fileSizeBefore  = currentFiles.size();
-        // Snapshot rules for safe use on the background thread
-        final List<Rule> rules = List.copyOf(activeRules);
+        final List<Rule> rules    = List.copyOf(activeRules);
 
         Task<List<ScannedFile>> task = new Task<>() {
             @Override
@@ -128,27 +127,19 @@ public class EmployeeDashboardController {
 
                 List<ScannedFile> newFiles = new ArrayList<>();
                 var allResults = fileImportModel.getScanResults();
-                int order = fileSizeBefore + 1;
+                int scanOrder  = fileSizeBefore + 1;
 
                 for (int i = modelSizeBefore; i < allResults.size(); i++) {
                     var scan = allResults.get(i);
-
-                    // Write bytes to a temp file so BarcodeDetector can read the File
                     Path dest = writeTempFile(scan.fileName(), scan.fileBytes());
+                    ScannedFile sf = ScannedFile.unsaved(scanOrder++, dest.toString(), scan.fileBytes());
 
-                    // Build ScannedFile with raw bytes for later export
-                    ScannedFile sf = ScannedFile.unsaved(order++, dest.toString(), scan.fileBytes());
-
-                    // Decode image and apply profile rules immediately on the background thread
-                    // so the UI thread never blocks on pixel processing
                     try (ByteArrayInputStream stream = new ByteArrayInputStream(scan.fileBytes())) {
                         BufferedImage raw = ImageIO.read(stream);
                         if (raw != null) {
                             sf.setProcessedImage(ImageTransformations.applyRules(raw, rules));
                         }
-                    } catch (IOException ignored) {
-                        // Image unreadable — tile will show blank placeholder
-                    }
+                    } catch (IOException ignored) { }
 
                     newFiles.add(sf);
                 }
@@ -158,15 +149,16 @@ public class EmployeeDashboardController {
 
         task.setOnSucceeded(e -> {
             List<ScannedFile> newFiles = task.getValue();
+            int firstNewIndex = -1;
 
             for (ScannedFile f : newFiles) {
-                File tiffFile = new File(f.getFilePath());
+                File tiffFile  = new File(f.getFilePath());
                 boolean isBarcode = BarcodeDetector.hasBarcode(tiffFile);
 
                 if (isBarcode) {
                     createNewDocument();
                     currentFiles.clear();
-                    tileControllers.clear();
+                    fileTileControllers.clear();
                     filesTilePane.getChildren().clear();
                 } else if (activeDocument == null) {
                     AlertHelper.showError("No document selected",
@@ -177,13 +169,15 @@ public class EmployeeDashboardController {
                 sessionData.get(activeDocument).add(f);
                 currentFiles.add(f);
                 filesTilePane.getChildren().add(createFileTile(f));
+                f.setSortOrder(currentFiles.size());
+
+                if (firstNewIndex == -1) firstNewIndex = currentFiles.size() - 1;
+                refreshDocumentTile(activeDocument);
             }
 
-            lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
-            if (!newFiles.isEmpty()) {
-                openPreviewAt(currentFiles.indexOf(newFiles.get(0)));
-            }
-            if (btnFetch != null) btnFetch.setDisable(false);
+            updateDocumentFileCountLabels();
+            if (firstNewIndex != -1) openPreviewAt(firstNewIndex);
+            setFetchButtonsDisabled(false);
         });
 
         task.setOnFailed(e -> {
@@ -191,14 +185,13 @@ public class EmployeeDashboardController {
             AlertHelper.showError("Fetch failed",
                     "Could not retrieve files from the scanner API.\n"
                             + (cause != null ? cause.getMessage() : "Unknown error"));
-            if (btnFetch != null) btnFetch.setDisable(false);
+            setFetchButtonsDisabled(false);
         });
 
         Thread t = new Thread(task);
         t.setDaemon(true);
         t.start();
     }
-
 
 
     private void showChooseProfileModal() {
@@ -221,11 +214,7 @@ public class EmployeeDashboardController {
             lblBoxID.setText(String.valueOf(box.getNumber()));
 
             var documents = boxDocumentModel.loadDocumentsForBox(box);
-            populateDocumentTilePane(documents);
-            lblTotalDocInBox.setText(String.valueOf(documents.size()));
 
-            //  Load rules for every active profile
-            // These are stored here and applied to each image at fetch time.
             activeRules.clear();
             for (var profile : UserSession.getInstance().getActiveProfiles()) {
                 try {
@@ -236,15 +225,22 @@ public class EmployeeDashboardController {
                 }
             }
 
-            activeDocument   = null;
-            nextDocSortOrder = documents.size() + 1;
+            // Full reset
+            activeDocument     = null;
+            nextDocSortOrder   = documents.size() + 1;
+            nextCreationNumber = 1;
             sessionData.clear();
             currentFiles.clear();
-            tileControllers.clear();
+            fileTileControllers.clear();
+            documentTileControllers.clear();
+            documentLabels.clear();
             fileImportModel.clear();
             filesTilePane.getChildren().clear();
             lblTotalFilesInDoc.setText("0");
             topOverview.setVisible(false);
+
+            populateDocumentTilePane(documents);
+            lblTotalDocInBox.setText(String.valueOf(documents.size()));
             setTotalsVisible(true);
 
         } catch (Exception e) {
@@ -253,13 +249,16 @@ public class EmployeeDashboardController {
         }
     }
 
-
     private void populateDocumentTilePane(Iterable<Document> documents) {
         documentsTilePane.getChildren().clear();
+        documentTileControllers.clear();
         for (Document doc : documents) {
+            // Assign a creation label for each DB document in load order
+            documentLabels.put(doc, "Document " + nextCreationNumber++);
             documentsTilePane.getChildren().add(createDocumentTile(doc));
         }
     }
+
 
     private Node createDocumentTile(Document doc) {
         try {
@@ -267,22 +266,51 @@ public class EmployeeDashboardController {
                     getClass().getResource("/views/DocumentTileView.fxml"));
             Node tile = loader.load();
             DocumentTileController ctrl = loader.getController();
-            ctrl.setDocument(doc);
+
             ctrl.setDashboardController(this);
+            ctrl.setDocument(doc);
+
+            // Apply the immutable creation label
+            String label = documentLabels.getOrDefault(doc, "Document ?");
+            ctrl.setLabel(label);
+
+            documentTileControllers.put(doc, ctrl);
+
+            List<ScannedFile> existing = sessionData.get(doc);
+            if (existing != null && !existing.isEmpty()) {
+                ctrl.setFileCount(existing.size());
+            }
+
             tile.setOnMouseClicked(e -> onDocumentSelected(doc));
             return tile;
+
         } catch (Exception e) {
             AlertHelper.showError("Display error", "A document tile could not be shown.");
             return new VBox();
         }
     }
 
+    //Refreshes the file-count label on a document tile.
+
+    private void refreshDocumentTile(Document doc) {
+        DocumentTileController ctrl = documentTileControllers.get(doc);
+        if (ctrl == null) return;
+        List<ScannedFile> files = sessionData.getOrDefault(doc, Collections.emptyList());
+        ctrl.setFileCount(files.size());
+        // No setLabel() call here — creation label never changes after first assignment
+    }
+
     private void onDocumentSelected(Document doc) {
+        // Highlight selected tile, clear all others
+        documentTileControllers.forEach((d, ctrl) -> ctrl.setSelected(false));
+        DocumentTileController selected = documentTileControllers.get(doc);
+        if (selected != null) selected.setSelected(true);
+
         activeDocument = doc;
-        lblDocumentNr.setText(String.valueOf(doc.getSortOrder()));
+        lblDocumentNr.setText(documentLabels.getOrDefault(doc, String.valueOf(doc.getSortOrder())));
 
         currentFiles.clear();
-        tileControllers.clear();
+        fileTileControllers.clear();
         filesTilePane.getChildren().clear();
 
         if (!doc.isUnsaved()) {
@@ -300,7 +328,7 @@ public class EmployeeDashboardController {
             filesTilePane.getChildren().add(createFileTile(f));
         }
 
-        lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
+        updateDocumentFileCountLabels();
         topOverview.setVisible(false);
     }
 
@@ -309,10 +337,13 @@ public class EmployeeDashboardController {
         Document doc = new Document(-1, box.getId(), nextDocSortOrder++);
         activeDocument = doc;
         sessionData.put(doc, new ArrayList<>());
+
+        // Assign the next creation label before the tile is created
+        documentLabels.put(doc, "Document " + nextCreationNumber++);
+
         documentsTilePane.getChildren().add(createDocumentTile(doc));
         lblTotalDocInBox.setText(String.valueOf(documentsTilePane.getChildren().size()));
     }
-
 
     private Node createFileTile(ScannedFile file) {
         try {
@@ -320,18 +351,19 @@ public class EmployeeDashboardController {
                     getClass().getResource("/views/ScannedFileTileView.fxml"));
             Node tile = loader.load();
             ScannedFileTileController ctrl = loader.getController();
+
             ctrl.setScannedFile(file);
-            tileControllers.put(file, ctrl);   // store so we can refresh later
+            ctrl.setDashboardController(this);
+            fileTileControllers.put(file, ctrl);
 
             tile.setOnMouseClicked(e -> openPreviewAt(currentFiles.indexOf(file)));
-            enableDragReorder(tile, file);
             return tile;
+
         } catch (Exception e) {
             AlertHelper.showError("Display error", "A file tile could not be shown.");
             return new VBox();
         }
     }
-
 
     private void openPreviewAt(int index) {
         if (currentFiles.isEmpty()) return;
@@ -340,43 +372,30 @@ public class EmployeeDashboardController {
         topOverview.setVisible(true);
     }
 
-
     private void loadPreviewImage(ScannedFile file) {
         BufferedImage base = getOrLoadProcessedImage(file);
-        if (base == null) {
-            previewImageView.setImage(null);
-            return;
-        }
-
+        if (base == null) { previewImageView.setImage(null); return; }
         BufferedImage display = ImageTransformations.applyAll(
                 base, file.getUserRotation(), file.getUserBrightness());
         previewImageView.setImage(SwingFXUtils.toFXImage(display, null));
         previewImageView.setRotate(0);
     }
 
-
     private BufferedImage getOrLoadProcessedImage(ScannedFile file) {
         if (file.getProcessedImage() != null) return file.getProcessedImage();
-
         String path = file.getFilePath();
         if (path == null || path.isBlank()) return null;
-
         try {
             BufferedImage raw = ImageIO.read(new File(path));
             if (raw != null) {
-                // Apply active rules and cache — same treatment as freshly fetched files
-                BufferedImage processed = ImageTransformations.applyRules(raw, activeRules);
-                file.setProcessedImage(processed);
+                file.setProcessedImage(ImageTransformations.applyRules(raw, activeRules));
             }
-        } catch (IOException ignored) {
-
-        }
+        } catch (IOException ignored) { }
         return file.getProcessedImage();
     }
 
-
     @FXML
-    private void onBtnPreviousPage(ActionEvent actionEvent) {
+    private void onBtnPreviousPage(ActionEvent event) {
         if (!currentFiles.isEmpty() && previewIndex > 0) openPreviewAt(previewIndex - 1);
     }
 
@@ -391,90 +410,160 @@ public class EmployeeDashboardController {
         if (currentFiles.isEmpty()) return;
         ScannedFile current = currentFiles.get(previewIndex);
         current.setUserRotation((current.getUserRotation() + 90) % 360);
-        loadPreviewImage(current);      // refresh large preview
-        refreshTile(current);           // refresh thumbnail in the tile strip
+        loadPreviewImage(current);
+        refreshFileTile(current);
     }
 
-
-    private void refreshTile(ScannedFile file) {
-        ScannedFileTileController ctrl = tileControllers.get(file);
+    private void refreshFileTile(ScannedFile file) {
+        ScannedFileTileController ctrl = fileTileControllers.get(file);
         if (ctrl != null) ctrl.refresh();
     }
 
-    @FXML
-    private void onBtnCloseOverview(ActionEvent event) {
-        topOverview.setVisible(false);
-    }
+    @FXML private void onBtnCloseOverview(ActionEvent event) { topOverview.setVisible(false); }
+
 
     @FXML
-    public void onLogout(ActionEvent actionEvent) {
+    public void onLogout(ActionEvent event) {
         UserSession.getInstance().clear();
         ViewHandler.EMPLOYEE_DASHBOARD.close();
         ViewHandler.EMPLOYEE_DASHBOARD.reset();
         ViewHandler.LOGIN.show(false);
     }
 
-    @FXML
-    private void onBtnStartScanningSession(ActionEvent actionEvent) {
-        showChooseProfileModal();
-    }
+    @FXML private void onBtnStartScanningSession(ActionEvent event) { showChooseProfileModal(); }
 
     @FXML
     private void onBtnExport(ActionEvent event) {
-        updateSortOrders();
+        rebuildAllSortOrders();
 
     }
 
-    private void enableDragReorder(Node tile, ScannedFile file) {
-        tile.setOnDragDetected(e -> {
-            Dragboard db = tile.startDragAndDrop(TransferMode.MOVE);
-            ClipboardContent content = new ClipboardContent();
-            content.putString(file.getFilePath());
-            db.setContent(content);
-            tile.setOpacity(0.5);
-            e.consume();
-        });
 
-        tile.setOnDragOver(e -> {
-            if (e.getGestureSource() != tile && e.getDragboard().hasString()) {
-                e.acceptTransferModes(TransferMode.MOVE);
-            }
-            e.consume();
-        });
+    public void reorderFiles(int draggedScanOrder, ScannedFile target) {
+        if (target == null) return;
 
-        tile.setOnDragDropped(e -> {
-            boolean success = false;
-            if (e.getDragboard().hasString()) {
-                Node draggedTile  = (Node) e.getGestureSource();
-                int draggedIndex  = filesTilePane.getChildren().indexOf(draggedTile);
-                int targetIndex   = filesTilePane.getChildren().indexOf(tile);
+        ScannedFile dragged = currentFiles.stream()
+                .filter(f -> f.getScanOrder() == draggedScanOrder)
+                .findFirst().orElse(null);
 
-                if (draggedIndex != targetIndex) {
-                    filesTilePane.getChildren().remove(draggedTile);
-                    filesTilePane.getChildren().add(targetIndex, draggedTile);
+        if (dragged == null || dragged == target) return;
 
-                    ScannedFile moved = currentFiles.remove(draggedIndex);
-                    currentFiles.add(targetIndex, moved);
+        int from = currentFiles.indexOf(dragged);
+        int to   = currentFiles.indexOf(target);
+        if (from == -1 || to == -1) return;
 
-                    sessionData.put(activeDocument, new ArrayList<>(currentFiles));
-                    updateSortOrders();
-                }
-                success = true;
-            }
-            e.setDropCompleted(success);
-            e.consume();
-        });
-
-        tile.setOnDragDone(e -> tile.setOpacity(1));
+        currentFiles.remove(from);
+        currentFiles.add(to, dragged);
+        sessionData.put(activeDocument, new ArrayList<>(currentFiles));
+        updateFileSortOrders(currentFiles);
+        refreshFilePanel();
     }
 
+
+    public void moveFileToDocument(int draggedScanOrder, Document target) {
+        if (target == null || activeDocument == null) return;
+        if (target == activeDocument) return;
+
+        ScannedFile file = currentFiles.stream()
+                .filter(f -> f.getScanOrder() == draggedScanOrder)
+                .findFirst().orElse(null);
+        if (file == null) return;
+
+        Document source = activeDocument;
+
+        List<ScannedFile> sourceFiles = sessionData.get(source);
+        if (sourceFiles != null) sourceFiles.remove(file);
+        currentFiles.remove(file);
+        updateFileSortOrders(currentFiles);
+
+        List<ScannedFile> targetFiles = sessionData.computeIfAbsent(target, d -> new ArrayList<>());
+        targetFiles.add(file);
+        file.setSortOrder(targetFiles.size());
+
+        refreshDocumentTile(source);
+        refreshDocumentTile(target);
+        refreshFilePanel();
+        updateDocumentFileCountLabels();
+    }
+
+    public void swapDocuments(int draggedSortOrder, Document target) {
+        Document dragged = sessionData.keySet().stream()
+                .filter(d -> d.getSortOrder() == draggedSortOrder)
+                .findFirst().orElse(null);
+
+        if (dragged == null || target == null || dragged == target) return;
+
+        // Swap visual positions only — labels stay fixed
+        int tmp = dragged.getSortOrder();
+        dragged.setSortOrder(target.getSortOrder());
+        target.setSortOrder(tmp);
+
+        // Rebuild the panel in the new sort order; labels come from documentLabels, not sortOrder
+        refreshDocumentPanel();
+    }
+
+    private void refreshFilePanel() {
+        filesTilePane.getChildren().clear();
+        fileTileControllers.clear();
+        for (ScannedFile f : currentFiles) {
+            filesTilePane.getChildren().add(createFileTile(f));
+        }
+        updateDocumentFileCountLabels();
+    }
+
+    private void refreshDocumentPanel() {
+        documentsTilePane.getChildren().clear();
+        documentTileControllers.clear();
+
+        sessionData.keySet().stream()
+                .sorted(Comparator.comparingInt(Document::getSortOrder))
+                .forEach(doc -> documentsTilePane.getChildren().add(createDocumentTile(doc)));
+
+        lblTotalDocInBox.setText(String.valueOf(sessionData.size()));
+    }
+
+    private void updateFileSortOrders(List<ScannedFile> files) {
+        for (int i = 0; i < files.size(); i++) files.get(i).setSortOrder(i + 1);
+    }
+
+    private void rebuildAllSortOrders() {
+        int docOrder = 1;
+        for (Map.Entry<Document, List<ScannedFile>> entry : sessionData.entrySet()) {
+            entry.getKey().setSortOrder(docOrder++);
+            updateFileSortOrders(entry.getValue());
+            refreshDocumentTile(entry.getKey());
+        }
+    }
+
+    private void updateDocumentFileCountLabels() {
+        lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
+    }
+
+    private void setFetchButtonsDisabled(boolean disabled) {
+        if (btnFetch  != null) btnFetch.setDisable(disabled);
+        if (btnRescan != null) btnRescan.setDisable(disabled);
+    }
+
+    private void setTotalsVisible(boolean visible) {
+        lblTotalDocText.setVisible(visible);    lblTotalDocText.setManaged(visible);
+        lblTotalDocInBox.setVisible(visible);   lblTotalDocInBox.setManaged(visible);
+        lblTotalFilesText.setVisible(visible);  lblTotalFilesText.setManaged(visible);
+        lblTotalFilesInDoc.setVisible(visible); lblTotalFilesInDoc.setManaged(visible);
+    }
+
+    public void setupPreview() {
+        previewScrollPane.viewportBoundsProperty().addListener((obs, old, bounds) -> {
+            previewImageView.setFitWidth(bounds.getWidth());
+            previewImageView.setFitHeight(bounds.getHeight());
+        });
+    }
 
     private Path writeTempFile(String fileName, byte[] bytes) throws IOException {
         if (scanTempDir == null || !Files.exists(scanTempDir)) {
             scanTempDir = Files.createTempDirectory("tiffix-scans-");
         }
-        Path dest   = scanTempDir.resolve(fileName);
-        int  suffix = 1;
+        Path dest  = scanTempDir.resolve(fileName);
+        int suffix = 1;
         String base = fileName;
         while (Files.exists(dest)) {
             int dot = base.lastIndexOf('.');
@@ -487,120 +576,4 @@ public class EmployeeDashboardController {
         Files.write(dest, bytes);
         return dest;
     }
-
-
-    private void updateSortOrders() {
-        for (int i = 0; i < currentFiles.size(); i++) {
-            currentFiles.get(i).setSortOrder(i + 1);
-        }
-    }
-    private void updateDocumentSortOrders() {
-        int order = 1;
-        for (Document doc : sessionData.keySet()) {
-            doc.setSortOrder(order++);
-            refreshDocumentTile(doc);
-        }
-        lblTotalDocInBox.setText(String.valueOf(sessionData.size()));
-    }
-    private void refreshDocumentTile(Document document) {
-
-        for (Node node : documentsTilePane.getChildren()) {
-
-            // Each tile is a VBox controlled by DocumentTileController
-            Object controller = node.getUserData();
-
-            if (controller instanceof DocumentTileController tileController) {
-
-                if (tileController.getDocument().equals(document)) {
-
-                    // Re-bind the same document to force UI refresh
-                    tileController.setDocument(document);
-                    return;
-                }
-            }
-        }
-    }
-    private void setTotalsVisible(boolean visible) {
-        lblTotalDocText.setVisible(visible);    lblTotalDocText.setManaged(visible);
-        lblTotalDocInBox.setVisible(visible);   lblTotalDocInBox.setManaged(visible);
-        lblTotalFilesText.setVisible(visible);  lblTotalFilesText.setManaged(visible);
-        lblTotalFilesInDoc.setVisible(visible); lblTotalFilesInDoc.setManaged(visible);
-    }
-
-    public void setupPreview() {
-        previewScrollPane.viewportBoundsProperty().addListener((obs, oldVal, bounds) -> {
-            previewImageView.setFitWidth(bounds.getWidth());
-            previewImageView.setFitHeight(bounds.getHeight());
-        });
-    }
-    public void removeFileFromCurrentDoc(ScannedFile file) {
-
-        if (file == null || activeDocument == null) return;
-
-        List<ScannedFile> files = sessionData.get(activeDocument);
-        if (files != null) {
-            files.remove(file);
-        }
-
-        currentFiles.remove(file);
-
-        refreshDocumentTile(activeDocument);
-        refreshFilePanel();
-    }
-
-    public void addFileToDocument(ScannedFile file, Document targetDoc) {
-
-        if (file == null || targetDoc == null) return;
-
-
-        // Remove from current document first
-        removeFileFromCurrentDoc(file);
-
-        sessionData
-                .computeIfAbsent(targetDoc, d -> new ArrayList<>())
-                .add(file);
-
-        refreshDocumentTile(targetDoc);
-    }
-    public void swapDocuments(Document dragged, Document target) {
-        if (dragged == null || target == null || dragged == target) return;
-
-        int tmp = dragged.getSortOrder();
-        dragged.setSortOrder(target.getSortOrder());
-        target.setSortOrder(tmp);
-
-        refreshDocumentPanel();
-    }
-    private void refreshFilePanel() {
-        filesTilePane.getChildren().clear();
-
-        for (ScannedFile f : currentFiles) {
-            filesTilePane.getChildren().add(createFileTile(f));
-        }
-
-        lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
-    }
-    private void refreshDocumentPanel() {
-        documentsTilePane.getChildren().clear();
-
-        sessionData.keySet().stream()
-                .sorted(Comparator.comparingInt(Document::getSortOrder))
-                .forEach(doc ->
-                        documentsTilePane.getChildren().add(createDocumentTile(doc))
-                );
-    }
-    public void reorderFiles(ScannedFile dragged, ScannedFile target) {
-        if (dragged == null || target == null || dragged == target) return;
-
-        int from = currentFiles.indexOf(dragged);
-        int to   = currentFiles.indexOf(target);
-
-        if (from == -1 || to == -1) return;
-
-        currentFiles.remove(from);
-        currentFiles.add(to, dragged);
-
-        refreshFilePanel();
-    }
-
 }

@@ -12,61 +12,83 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane alignment="CENTER" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.ChooseScanSettingsController">
 
-    <children>
-        <VBox maxHeight="520" maxWidth="420" prefHeight="520" prefWidth="420" spacing="0" styleClass="card">
 
-            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="modal-header">
-                <Label styleClass="title" text="Select Box &amp; Profile" />
-                <Region HBox.hgrow="ALWAYS" />
-                <padding>
-                    <Insets bottom="16" left="16" right="16" top="16" />
-                </padding>
-            </HBox>
+<StackPane alignment="CENTER"
+           stylesheets="@../css/style.css"
+           xmlns="http://javafx.com/javafx/24.0.1"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.ChooseScanSettingsController">
 
-            <Separator />
+    <VBox maxHeight="520" maxWidth="420"
+          prefHeight="520" prefWidth="420"
+          spacing="0"
+          styleClass="card">
 
-            <VBox spacing="8">
-                <padding>
-                    <Insets bottom="12" left="20" right="20" top="12" />
-                </padding>
+        <HBox alignment="CENTER_LEFT" spacing="8" styleClass="modal-header">
+            <Label styleClass="title" text="Select Box &amp; Profile"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <padding>
+                <Insets bottom="16" left="16" right="16" top="16"/>
+            </padding>
+        </HBox>
 
-                <Label styleClass="modal-subtitle" text="1. Choose the box to work on:" />
-                <ComboBox fx:id="boxComboBox" maxWidth="Infinity" promptText="Select a box" styleClass="combo-box-base" />
-            </VBox>
+        <Separator/>
 
-            <Separator />
-
-            <VBox spacing="12" VBox.vgrow="ALWAYS">
-                <padding>
-                    <Insets bottom="12" left="20" right="20" top="16" />
-                </padding>
-                <Label styleClass="modal-subtitle" text="2. Choose your profile:" wrapText="true" />
-            <TextField fx:id="txtfieldSearchbar" promptText="Search profiles" />
-                <ScrollPane fitToWidth="true" prefHeight="180" styleClass="profile-scroll">
-                    <content>
-                        <VBox fx:id="profileList" spacing="8" styleClass="profile-list">
-                            <padding>
-                                <Insets bottom="4" left="4" right="4" top="4" />
-                            </padding>
-                        </VBox>
-                    </content>
-                </ScrollPane>
-            </VBox>
-
-            <Separator />
-
-            <HBox alignment="CENTER_RIGHT" spacing="10">
-                <padding>
-                    <Insets bottom="14" left="20" right="20" top="14" />
-                </padding>
-
-                <Button mnemonicParsing="false" onAction="#onBtnClose" styleClass="button neutral" text="Cancel" />
-
-                <Button fx:id="btnStartSession" defaultButton="true" mnemonicParsing="false" onAction="#onBtnStartSession" styleClass="button primary" text="Start Session" />
-            </HBox>
-
+        <VBox spacing="8">
+            <padding>
+                <Insets bottom="12" left="20" right="20" top="12"/>
+            </padding>
+            <Label styleClass="modal-subtitle" text="1. Choose the box to work on:"/>
+            <ComboBox fx:id="boxComboBox"
+                      maxWidth="Infinity"
+                      promptText="Select a box"
+                      styleClass="combo-box-base"/>
         </VBox>
-    </children>
+
+        <Separator/>
+
+        <VBox spacing="12" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets bottom="12" left="20" right="20" top="16"/>
+            </padding>
+            <Label styleClass="modal-subtitle"
+                   text="2. Choose your profile:"
+                   wrapText="true"/>
+            <TextField fx:id="txtfieldSearchbar"
+                       promptText="Search profiles"
+                       styleClass="text-field"/>
+            <ScrollPane fitToWidth="true"
+                        prefHeight="180"
+                        styleClass="profile-scroll">
+                <content>
+                    <VBox fx:id="profileList" spacing="8" styleClass="profile-list">
+                        <padding>
+                            <Insets bottom="4" left="4" right="4" top="4"/>
+                        </padding>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </VBox>
+
+        <Separator/>
+
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <padding>
+                <Insets bottom="14" left="20" right="20" top="14"/>
+            </padding>
+
+            <Button mnemonicParsing="false"
+                    onAction="#onBtnClose"
+                    styleClass="action-btn"
+                    text="Cancel"/>
+            <Button fx:id="btnStartSession"
+                    defaultButton="true"
+                    mnemonicParsing="false"
+                    onAction="#onBtnStartSession"
+                    styleClass="action-btn"
+                    text="Start Session"/>
+        </HBox>
+
+    </VBox>
 </StackPane>

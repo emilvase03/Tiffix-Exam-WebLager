@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+
 <StackPane xmlns="http://javafx.com/javafx/24.0.1"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EmployeesTabController"
@@ -19,30 +20,31 @@
 
     <BorderPane prefHeight="322.0" prefWidth="390.0">
         <StackPane.margin>
-            <Insets left="50.0" right="50.0" />
+            <Insets left="50.0" right="50.0"/>
         </StackPane.margin>
 
         <top>
-            <VBox prefHeight="18.0" prefWidth="390.0" BorderPane.alignment="CENTER" />
+            <VBox prefHeight="18.0" prefWidth="390.0" BorderPane.alignment="CENTER"/>
         </top>
 
         <center>
-            <VBox prefHeight="241.0" prefWidth="390.0" spacing="5.0"
+            <VBox prefHeight="241.0" prefWidth="390.0"
+                  spacing="5.0"
                   BorderPane.alignment="CENTER">
 
                 <BorderPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" />
+                    <Insets bottom="10.0" left="10.0" right="10.0"/>
                 </BorderPane.margin>
 
                 <HBox prefHeight="38.0" prefWidth="390.0"
                       spacing="5.0" alignment="CENTER_LEFT">
                     <padding>
-                        <Insets left="5.0" top="5.0" />
+                        <Insets left="5.0" top="5.0"/>
                     </padding>
 
-                    <Label styleClass="h2" text="Employees" />
+                    <Label styleClass="h2" text="Employees"/>
 
-                    <Region HBox.hgrow="ALWAYS" />
+                    <Region HBox.hgrow="ALWAYS"/>
 
                     <Button fx:id="btnCreate"
                             alignment="CENTER"
@@ -53,7 +55,7 @@
                             prefWidth="138.0"
                             text="Create Employee">
                         <HBox.margin>
-                            <Insets right="5.0" />
+                            <Insets right="5.0"/>
                         </HBox.margin>
                     </Button>
                 </HBox>
@@ -62,16 +64,16 @@
                            prefHeight="243.0" prefWidth="390.0"
                            VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colFirstName" prefWidth="114.0" text="First name" />
-                        <TableColumn fx:id="colLastName"  prefWidth="72.0"  text="Last Name" />
-                        <TableColumn fx:id="colUsername"  prefWidth="90.0"  text="Username" />
-                        <TableColumn fx:id="colManage"    prefWidth="140.0" resizable="false" text="Manage" />
+                        <TableColumn fx:id="colFirstName" prefWidth="114.0" text="First name"/>
+                        <TableColumn fx:id="colLastName"  prefWidth="72.0"  text="Last Name"/>
+                        <TableColumn fx:id="colUsername"  prefWidth="90.0"  text="Username"/>
+                        <TableColumn fx:id="colManage"    prefWidth="140.0" resizable="false" text="Manage"/>
                     </columns>
                     <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                     </columnResizePolicy>
                     <VBox.margin>
-                        <Insets left="5.0" right="5.0" />
+                        <Insets left="5.0" right="5.0"/>
                     </VBox.margin>
                 </TableView>
 
@@ -79,6 +81,6 @@
         </center>
     </BorderPane>
 
-    <ModalPane fx:id="modalPane" />
+    <ModalPane fx:id="modalPane"/>
 
 </StackPane>

@@ -3,6 +3,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
 import dk.easv.tiffixexamweblager.BLL.Utils.ImageTransformations;
+import dk.easv.tiffixexamweblager.GUI.Controllers.EmployeeDashboardController;
 
 // Java imports
 import java.awt.image.BufferedImage;
@@ -18,6 +19,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 
 import javax.imageio.ImageIO;
@@ -28,10 +32,11 @@ public class ScannedFileTileController {
     private static final double THUMB_H = 160;
 
     @FXML private ImageView imgThumbnail;
-    @FXML private VBox root;
-    @FXML private Label lblFileTitle;
+    @FXML private VBox      root;
+    @FXML private Label     lblFileTitle;
 
-    private ScannedFile file;
+    private ScannedFile                  file;
+    private EmployeeDashboardController  dashboardController;
 
     public void setFile(ScannedFile file) {
         this.file = file;
@@ -43,14 +48,58 @@ public class ScannedFileTileController {
         setFile(file);
     }
 
-    public ScannedFile getFile() {
-        return file;
-    }
+    public ScannedFile getFile() { return file; }
 
+    public void setDashboardController(EmployeeDashboardController controller) {
+        this.dashboardController = controller;
+    }
 
     public void refresh() {
         if (file != null) renderThumbnail();
     }
+
+    @FXML
+    private void initialize() {
+
+        root.setOnDragDetected(e -> {
+            if (file == null) return;
+
+            Dragboard db = root.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
+            // scanOrder is the stable
+            content.putString("FILE_ID:" + file.getScanOrder());
+            db.setContent(content);
+            root.setOpacity(0.5);
+            e.consume();
+        });
+
+        root.setOnDragDone(e -> root.setOpacity(1.0));
+
+        // reorder within the same document
+        root.setOnDragOver(e -> {
+            String token = e.getDragboard().getString();
+            if (e.getDragboard().hasString() && token.startsWith("FILE_ID:")) {
+                e.acceptTransferModes(TransferMode.MOVE);
+            }
+            e.consume();
+        });
+
+        root.setOnDragDropped(e -> {
+            Dragboard db = e.getDragboard();
+            if (db.hasString() && db.getString().startsWith("FILE_ID:")) {
+                int draggedScanOrder = Integer.parseInt(db.getString().substring(8));
+
+                if (dashboardController != null) {
+                    dashboardController.reorderFiles(draggedScanOrder, file);
+                }
+                e.setDropCompleted(true);
+            } else {
+                e.setDropCompleted(false);
+            }
+            e.consume();
+        });
+    }
+
 
     private void renderThumbnail() {
         BufferedImage base = resolveBaseImage();
@@ -59,8 +108,7 @@ public class ScannedFileTileController {
             return;
         }
 
-        // Composite user-level adjustments on top of the already-rule-processed image.
-        // This is fast because the heavy profile-rule processing was done at fetch time.
+        // Composite user-level adjustments on top of the profile-rule-processed image
         BufferedImage display = ImageTransformations.applyAll(
                 base, file.getUserRotation(), file.getUserBrightness());
 
@@ -72,7 +120,6 @@ public class ScannedFileTileController {
         applyCenterCrop(imgThumbnail);
     }
 
-
     private BufferedImage resolveBaseImage() {
         if (file.getProcessedImage() != null) return file.getProcessedImage();
 
@@ -81,13 +128,9 @@ public class ScannedFileTileController {
 
         try {
             BufferedImage raw = ImageIO.read(new File(path));
-            if (raw != null) {
+            if (raw != null) file.setProcessedImage(raw);
+        } catch (IOException ignored) { }
 
-                file.setProcessedImage(raw);
-            }
-        } catch (IOException ignored) {
-
-        }
         return file.getProcessedImage();
     }
 
@@ -95,7 +138,6 @@ public class ScannedFileTileController {
         return Path.of(file.getFilePath()).getFileName().toString();
     }
 
-    //crop the image so the thumbnail is fully filled while losing as
     private void applyCenterCrop(ImageView iv) {
         Image img = iv.getImage();
         if (img == null) return;
@@ -105,16 +147,17 @@ public class ScannedFileTileController {
         Rectangle2D viewport;
 
         if (imageRatio > thumbRatio) {
-            // Image too wide → crop left/right
+            // Image too wide → crop left / right
             double newWidth = img.getHeight() * thumbRatio;
             double x = (img.getWidth() - newWidth) / 2;
             viewport = new Rectangle2D(x, 0, newWidth, img.getHeight());
         } else {
-            // Image too tall → crop top/bottom
+            // Image too tall → crop top / bottom
             double newHeight = img.getWidth() / thumbRatio;
             double y = (img.getHeight() - newHeight) / 2;
             viewport = new Rectangle2D(0, y, img.getWidth(), newHeight);
         }
+
         iv.setViewport(viewport);
     }
 }

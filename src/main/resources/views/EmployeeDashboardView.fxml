@@ -15,128 +15,219 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane fx:id="root" prefHeight="574.0" prefWidth="687.0" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EmployeeDashboardController">
+<StackPane fx:id="root"
+           prefHeight="574.0" prefWidth="687.0"
+           stylesheets="@/css/style.css"
+           xmlns="http://javafx.com/javafx/24.0.1"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EmployeeDashboardController">
 
-    <BorderPane fx:id="dashboardContent" prefHeight="448.0" prefWidth="550.0" styleClass="dashboard">
+    <BorderPane fx:id="dashboardContent"
+                prefHeight="448.0" prefWidth="550.0"
+                styleClass="dashboard">
 
+        <!-- Toolbar -->
         <top>
-            <VBox BorderPane.alignment="CENTER">
-                <children>
-                    <HBox prefHeight="26.0" prefWidth="687.0" />
-                    <HBox fx:id="topToolBar" prefHeight="37.0" prefWidth="473.0" spacing="5.0">
-                        <children>
-                            <Button fx:id="btnLogout" onAction="#onLogout" prefHeight="25.0" prefWidth="76.0" styleClass="action-btn">
-                                <graphic><FontIcon iconLiteral="bi-box-arrow-right" /></graphic>
-                            </Button>
-                            <Button fx:id="StartScanningSession" mnemonicParsing="false" onAction="#onBtnStartScanningSession" prefHeight="25.0" prefWidth="179.0" styleClass="action-btn" text="Start scanning session" />
-                            <Button fx:id="btnFetch" mnemonicParsing="false" onAction="#onBtnFetch" prefHeight="25.0" prefWidth="80.0" styleClass="action-btn" text="Fetch" />
-                            <Region prefHeight="32.0" prefWidth="153.0" HBox.hgrow="ALWAYS" />
-                            <Label prefHeight="17.0" prefWidth="112.0" text="Current Box" />
-                            <Label fx:id="lblBoxID" prefHeight="17.0" prefWidth="46.0" text="ID" />
-                            <Label prefHeight="17.0" prefWidth="115.0" text="Document Nr" />
-                            <Label fx:id="lblDocumentNr" text="0" />
-                        </children>
-                        <padding><Insets left="5.0" right="5.0" top="5.0" /></padding>
-                    </HBox>
-                </children>
-            </VBox>
+            <HBox fx:id="topToolBar"
+                  prefHeight="48.0"
+                  spacing="8.0"
+                  alignment="CENTER_LEFT"
+                  styleClass="dashboard-toolbar"
+                  BorderPane.alignment="CENTER">
+
+                <Button fx:id="btnLogout"
+                        onAction="#onLogout"
+                        styleClass="action-btn">
+                    <graphic><FontIcon iconLiteral="bi-box-arrow-right"/></graphic>
+                </Button>
+
+                <Button fx:id="StartScanningSession"
+                        mnemonicParsing="false"
+                        onAction="#onBtnStartScanningSession"
+                        styleClass="action-btn"
+                        text="Start scanning session"/>
+
+                <Button fx:id="btnFetch"
+                        mnemonicParsing="false"
+                        onAction="#onBtnFetch"
+                        styleClass="action-btn"
+                        text="Fetch"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label styleClass="text-muted" text="Current Box"/>
+                <!-- lblBoxID text is set by controller; empty string avoids any encoding issue -->
+                <Label fx:id="lblBoxID" styleClass="h3" text=""/>
+
+                <Label styleClass="text-muted" text="Document Nr"/>
+                <!-- lblDocumentNr text is set by controller -->
+                <Label fx:id="lblDocumentNr" styleClass="h3" text="0"/>
+
+                <padding><Insets left="8.0" right="8.0"/></padding>
+            </HBox>
         </top>
 
+        <!-- Main split area -->
         <center>
-            <SplitPane dividerPositions="0.5" BorderPane.alignment="CENTER">
+            <SplitPane dividerPositions="0.45" BorderPane.alignment="CENTER">
                 <items>
 
-                    <VBox fx:id="documentsPanel" prefHeight="511.0" prefWidth="360.0" spacing="5.0">
-                        <children>
-                            <HBox spacing="5.0">
-                                <children>
-                                    <Label fx:id="lblTotalDocText" text="Total documents in the box:" />
-                                    <Label fx:id="lblTotalDocInBox" text="0" />
-                                </children>
-                            </HBox>
-                            <ScrollPane fx:id="documentsScrollPane" fitToWidth="true" prefHeight="474.0" prefWidth="355.0">
+                    <!-- Documents panel (left half) -->
+                    <VBox fx:id="documentsPanel"
+                          styleClass="documents-panel"
+                          VBox.vgrow="ALWAYS">
+
+                        <!-- Total document count header -->
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
+                            <Label fx:id="lblTotalDocText"
+                                   styleClass="text-muted"
+                                   text="Total documents in the box:"/>
+                            <Label fx:id="lblTotalDocInBox"
+                                   styleClass="h3"
+                                   text="0"/>
+                        </HBox>
+
+                        <ScrollPane fx:id="documentsScrollPane"
+                                    fitToWidth="true"
+                                    styleClass="transparent-scroll"
+                                    VBox.vgrow="ALWAYS">
+                            <content>
+                                <TilePane fx:id="documentsTilePane"
+                                          hgap="14.0"
+                                          vgap="14.0"
+                                          prefColumns="3">
+                                    <padding>
+                                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
+                                    </padding>
+                                </TilePane>
+                            </content>
+                        </ScrollPane>
+
+                        <Button mnemonicParsing="false"
+                                onAction="#onBtnExport"
+                                styleClass="action-btn"
+                                text="Export"/>
+
+                        <padding>
+                            <Insets bottom="8.0" left="8.0" right="8.0"/>
+                        </padding>
+                    </VBox>
+
+                    <!-- Files panel (right half) -->
+                    <VBox fx:id="filesPanel"
+                          styleClass="files-panel"
+                          VBox.vgrow="ALWAYS">
+
+                        <!-- Total files count header -->
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
+                            <Label fx:id="lblTotalFilesText"
+                                   styleClass="text-muted"
+                                   text="Files in document:"/>
+                            <Label fx:id="lblTotalFilesInDoc"
+                                   styleClass="h3"
+                                   text="0"/>
+                        </HBox>
+
+                        <StackPane VBox.vgrow="ALWAYS">
+
+                            <!-- File tile strip -->
+                            <ScrollPane fx:id="filesScrollPane"
+                                        fitToWidth="true"
+                                        styleClass="filesView">
                                 <content>
-                                    <TilePane fx:id="documentsTilePane" hgap="10.0" prefColumns="4" prefHeight="437.0" prefWidth="353.0" vgap="10.0">
-                                        <padding><Insets bottom="5.0" left="5.0" right="5.0" top="5.0" /></padding>
+                                    <TilePane fx:id="filesTilePane"
+                                              hgap="16.0"
+                                              vgap="16.0"
+                                              prefColumns="3">
+                                        <padding>
+                                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                        </padding>
                                     </TilePane>
                                 </content>
                             </ScrollPane>
-                            <Button mnemonicParsing="false" onAction="#onBtnExport" text="Export" />
-                        </children>
-                        <padding><Insets bottom="5.0" left="5.0" /></padding>
-                    </VBox>
 
-                    <VBox fx:id="filesPanel">
-                        <children>
-                            <HBox alignment="CENTER_LEFT" spacing="5.0">
-                                <children>
-                                    <Label fx:id="lblTotalFilesText" text="Files in document:" />
-                                    <Label fx:id="lblTotalFilesInDoc" text="0" />
-                                </children>
-                            </HBox>
+                            <!-- Preview overlay (sits on top of file strip) -->
+                            <BorderPane fx:id="topOverview"
+                                        styleClass="preview"
+                                        visible="false"
+                                        StackPane.alignment="CENTER">
 
-                            <StackPane VBox.vgrow="ALWAYS">
-                                <children>
+                                <top>
+                                    <HBox prefHeight="40.0"
+                                          alignment="CENTER_LEFT"
+                                          spacing="8.0"
+                                          BorderPane.alignment="CENTER">
+                                        <Label styleClass="panel-title" text="Preview"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button mnemonicParsing="false"
+                                                onAction="#onBtnCloseOverview"
+                                                styleClass="action-btn"
+                                                text="Close"/>
+                                        <padding>
+                                            <Insets left="10.0" right="10.0" top="8.0"/>
+                                        </padding>
+                                    </HBox>
+                                </top>
 
-                                    <ScrollPane fx:id="filesScrollPane" fitToWidth="true" prefHeight="466.0" prefWidth="314.0" styleClass="filesView">
+                                <center>
+                                    <ScrollPane fx:id="previewScrollPane"
+                                                fitToHeight="true"
+                                                fitToWidth="true"
+                                                pannable="true"
+                                                styleClass="transparent-scroll"
+                                                BorderPane.alignment="CENTER">
                                         <content>
-                                            <TilePane fx:id="filesTilePane" hgap="16.0" prefColumns="3" vgap="16.0">
-                                                <padding><Insets bottom="10.0" left="10.0" right="10.0" top="10.0" /></padding>
-                                            </TilePane>
+                                            <BorderPane>
+                                                <center>
+                                                    <ImageView fx:id="previewImageView"
+                                                               preserveRatio="true"
+                                                               smooth="true"/>
+                                                </center>
+                                            </BorderPane>
                                         </content>
                                     </ScrollPane>
+                                </center>
 
-                                    <BorderPane fx:id="topOverview" styleClass="preview" visible="false" StackPane.alignment="CENTER">
-                                        <top>
-                                            <HBox prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                                <children>
-                                                    <Label prefHeight="17.0" prefWidth="66.0" text="Preview" />
-                                                    <Region prefHeight="40.0" HBox.hgrow="ALWAYS" />
-                                                    <Button mnemonicParsing="false" onAction="#onBtnCloseOverview" text="X" />
-                                                </children>
-                                            </HBox>
-                                        </top>
-                                        <center>
-                                            <ScrollPane fx:id="previewScrollPane"
-                                                        fitToHeight="true"
-                                                        fitToWidth="true"
-                                                        pannable="true"
-                                                        BorderPane.alignment="CENTER">
+                                <bottom>
+                                    <HBox alignment="CENTER"
+                                          prefHeight="50.0"
+                                          spacing="10.0"
+                                          BorderPane.alignment="CENTER">
+                                        <Button mnemonicParsing="false"
+                                                onAction="#onBtnPreviousPage"
+                                                styleClass="action-btn"
+                                                text="Previous"/>
+                                        <Button mnemonicParsing="false"
+                                                onAction="#onBtnRotate"
+                                                styleClass="action-btn"
+                                                text="Rotate"/>
+                                        <Button fx:id="btnRescan"
+                                                mnemonicParsing="false"
+                                                onAction="#onBtnRescan"
+                                                styleClass="action-btn"
+                                                text="Rescan"/>
+                                        <Button mnemonicParsing="false"
+                                                onAction="#onBtnNext"
+                                                styleClass="action-btn"
+                                                text="Next"/>
+                                        <padding>
+                                            <Insets bottom="10.0" top="8.0"/>
+                                        </padding>
+                                    </HBox>
+                                </bottom>
 
-                                                <content>
-                                                    <BorderPane>
-                                                        <center>
-                                                            <ImageView fx:id="previewImageView"
-                                                                       preserveRatio="true"
-                                                                       smooth="true"/>
-                                                        </center>
-                                                    </BorderPane>
-                                                </content>
+                            </BorderPane>
+                        </StackPane>
 
-                                            </ScrollPane>
-
-                                        </center>
-                                        <bottom>
-                                            <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
-                                                <children>
-                                                    <Button mnemonicParsing="false" onAction="#onBtnPreviousPage" text="Previous" />
-                                                    <Button mnemonicParsing="false" onAction="#onBtnRotate" text="Rotate" />
-                                                    <Button mnemonicParsing="false" onAction="#onBtnNext" text="Next" />
-                                                </children>
-                                            </HBox>
-                                        </bottom>
-                                    </BorderPane>
-
-                                </children>
-                            </StackPane>
-                        </children>
-                        <padding><Insets right="5.0" /></padding>
+                        <padding><Insets right="8.0"/></padding>
                     </VBox>
 
                 </items>
             </SplitPane>
         </center>
+
     </BorderPane>
 
-    <ModalPane fx:id="modalPane" prefHeight="412.0" prefWidth="515.0" />
+    <ModalPane fx:id="modalPane" prefHeight="412.0" prefWidth="515.0"/>
+
 </StackPane>

@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="root" alignment="CENTER" spacing="4" styleClass="file-tile" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController">
+<VBox fx:id="root"
+      alignment="CENTER"
+      spacing="4"
+      styleClass="file-tile"
+      stylesheets="@/css/style.css"
+      xmlns="http://javafx.com/javafx/24.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController">
 
-    <padding>
-        <Insets bottom="6" left="6" right="6" top="6" />
-    </padding>
-   <ImageView fx:id="imgThumbnail" fitHeight="160.0" fitWidth="120.0" pickOnBounds="true" />
+    <ImageView fx:id="imgThumbnail"
+               fitHeight="160.0"
+               fitWidth="120.0"
+               pickOnBounds="true"
+               preserveRatio="false"/>
 
-    <Label fx:id="lblFileTitle" alignment="CENTER" text="File" wrapText="true" />
+    <Label fx:id="lblFileTitle"
+           alignment="CENTER"
+           maxWidth="Infinity"
+           text="File"
+           wrapText="true"
+           styleClass="text-muted"/>
 
 </VBox>
+
