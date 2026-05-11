@@ -60,8 +60,8 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
     public Box create(Box box) throws Exception {
         String sql = """
                 INSERT INTO Box (Number, Title, CreatedAt, CreatedByUserId,
-                                 DocumentsAmount, PagesAmount, IsDeleted)
-                VALUES (?, ?, ?, ?, ?, ?, 0)
+                                 DocumentsAmount, PagesAmount, ProfileId)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection conn = dbConnector.getConnection();
@@ -73,6 +73,7 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
             stmt.setInt(4, box.getCreatedByUserId());
             stmt.setInt(5, box.getDocumentsAmount());
             stmt.setInt(6, box.getPagesAmount());
+            stmt.setObject(7, box.getProfileId(), Types.INTEGER);
             stmt.executeUpdate();
 
             try (ResultSet keys = stmt.getGeneratedKeys()) {
