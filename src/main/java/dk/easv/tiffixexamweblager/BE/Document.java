@@ -32,4 +32,7 @@ public class Document {
         return sortOrder; }
 
 
+    public void setSortOrder(int sortOrder) {
+        this.sortOrder=sortOrder;
+    }
 }

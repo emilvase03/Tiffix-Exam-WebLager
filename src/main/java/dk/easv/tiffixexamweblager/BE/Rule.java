@@ -35,6 +35,10 @@ public class Rule {
         this.amount = amount;
     }
 
+    public RuleType getType() {
+        return RuleType.fromDatabase(Name);
+    }
+
     @Override
     public String toString() {
         return getName();

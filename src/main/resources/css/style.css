@@ -442,6 +442,7 @@
     -fx-background-color: -wl-accent-subtle;
     -fx-border-color:     -wl-accent;
     -fx-border-width:     2px;
+    -fx-border-radius: 6;
 }
 
 /* Label inside document tile  */
@@ -450,6 +451,19 @@
     -fx-font-weight: 600;
     -fx-text-fill:   -wl-text-main;
     -fx-wrap-text:   true;
+}
+.doc-folder-icon {
+    -fx-icon-size: 72px;
+    -fx-icon-color: #2f80ed;
+}
+
+.doc-icon-placeholder {
+    -fx-alignment: center;
+    -fx-padding: 40 0 5 0;
+}
+
+#thumbArea {
+    -fx-min-height: 150;
 }
 
 /*

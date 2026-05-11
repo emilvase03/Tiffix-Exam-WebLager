@@ -1,15 +1,16 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
-//Project imports
+// Project imports
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
+import dk.easv.tiffixexamweblager.BLL.Utils.ImageTransformations;
 
-//Java imports
+// Java imports
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.awt.image.BufferedImage;
 
-//JavaFX imports
+// JavaFX imports
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
@@ -20,6 +21,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
 
 import javax.imageio.ImageIO;
+
 public class ScannedFileTileController {
 
     private static final double THUMB_W = 120;
@@ -31,14 +33,12 @@ public class ScannedFileTileController {
 
     private ScannedFile file;
 
-    // Called for both DB and newly scanned files
     public void setFile(ScannedFile file) {
         this.file = file;
         lblFileTitle.setText(extractDisplayName(file));
-        loadThumbnail(file.getFilePath());
+        renderThumbnail();
     }
 
-    //  for fetched ,unsaved files
     public void setScannedFile(ScannedFile file) {
         setFile(file);
     }
@@ -47,44 +47,61 @@ public class ScannedFileTileController {
         return file;
     }
 
+
+    public void refresh() {
+        if (file != null) renderThumbnail();
+    }
+
+    private void renderThumbnail() {
+        BufferedImage base = resolveBaseImage();
+        if (base == null) {
+            imgThumbnail.setImage(null);
+            return;
+        }
+
+        // Composite user-level adjustments on top of the already-rule-processed image.
+        // This is fast because the heavy profile-rule processing was done at fetch time.
+        BufferedImage display = ImageTransformations.applyAll(
+                base, file.getUserRotation(), file.getUserBrightness());
+
+        WritableImage fxImage = SwingFXUtils.toFXImage(display, null);
+        imgThumbnail.setImage(fxImage);
+        imgThumbnail.setFitWidth(THUMB_W);
+        imgThumbnail.setFitHeight(THUMB_H);
+        imgThumbnail.setPreserveRatio(false);
+        applyCenterCrop(imgThumbnail);
+    }
+
+
+    private BufferedImage resolveBaseImage() {
+        if (file.getProcessedImage() != null) return file.getProcessedImage();
+
+        String path = file.getFilePath();
+        if (path == null || path.isBlank()) return null;
+
+        try {
+            BufferedImage raw = ImageIO.read(new File(path));
+            if (raw != null) {
+
+                file.setProcessedImage(raw);
+            }
+        } catch (IOException ignored) {
+
+        }
+        return file.getProcessedImage();
+    }
+
     private String extractDisplayName(ScannedFile file) {
         return Path.of(file.getFilePath()).getFileName().toString();
     }
 
-    private void loadThumbnail(String filePath) {
-        try {
-            BufferedImage buffered = ImageIO.read(new File(filePath));
-            if (buffered == null) {
-                imgThumbnail.setImage(null);
-                return;
-            }
-
-            WritableImage fxImage = SwingFXUtils.toFXImage(buffered, null);
-            imgThumbnail.setImage(fxImage);
-
-            // Thumbnail size
-            imgThumbnail.setFitWidth(THUMB_W);
-            imgThumbnail.setFitHeight(THUMB_H);
-            imgThumbnail.setPreserveRatio(false);
-
-            applyCenterCrop(imgThumbnail);
-
-        } catch (IOException e) {
-            imgThumbnail.setImage(null);
-        }
-    }
-
-    /**
-     * Crops the image so the thumbnail is fully filled
-     * while losing as little content as possible.
-     */
+    //crop the image so the thumbnail is fully filled while losing as
     private void applyCenterCrop(ImageView iv) {
         Image img = iv.getImage();
         if (img == null) return;
 
         double imageRatio = img.getWidth() / img.getHeight();
         double thumbRatio = THUMB_W / THUMB_H;
-
         Rectangle2D viewport;
 
         if (imageRatio > thumbRatio) {
@@ -98,7 +115,6 @@ public class ScannedFileTileController {
             double y = (img.getHeight() - newHeight) / 2;
             viewport = new Rectangle2D(0, y, img.getWidth(), newHeight);
         }
-
         iv.setViewport(viewport);
     }
 }
