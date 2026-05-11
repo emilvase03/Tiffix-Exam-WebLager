@@ -100,6 +100,14 @@ public class ChooseScanSettingsController {
 
         cb.selectedProperty().addListener((obs, oldVal, selected) -> {
             if (selected) {
+                for (Node node : profileList.getChildren()) {
+                    HBox hbox = (HBox) node;
+                    CheckBox other = (CheckBox) hbox.getChildren().getFirst();
+                    if (other != cb) {
+                        other.setSelected(false);
+                    }
+                }
+                selectedProfiles.clear();
                 selectedProfiles.add(profile);
             } else {
                 selectedProfiles.remove(profile);
