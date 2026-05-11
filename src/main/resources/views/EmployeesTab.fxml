@@ -42,10 +42,12 @@
                     <Region HBox.hgrow="ALWAYS" />
 
                     <Button fx:id="btnCreate"
-                            alignment="CENTER_RIGHT"
+                            alignment="CENTER"
                             mnemonicParsing="false"
                             onAction="#onBtnCreateEmployee"
-                            styleClass="button, accent"
+                            styleClass="action-btn"
+                            prefHeight="32.0"
+                            prefWidth="138.0"
                             text="Create Employee">
                         <HBox.margin>
                             <Insets right="5.0" />
