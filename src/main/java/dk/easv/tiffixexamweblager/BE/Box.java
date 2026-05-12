@@ -12,9 +12,10 @@ public class Box {
     private int documentsAmount;
     private int pagesAmount;
     private Integer profileId;
+    private int customerId;
 
     public Box(int id, int number, String title, LocalDateTime createdAt,
-               String createdByUsername, int documentsAmount, int pagesAmount) {
+               String createdByUsername, int documentsAmount, int pagesAmount, int customerId) {
         this.id                = id;
         this.number            = number;
         this.title             = title;
@@ -22,10 +23,11 @@ public class Box {
         this.createdByUsername = createdByUsername;
         this.documentsAmount   = documentsAmount;
         this.pagesAmount       = pagesAmount;
+        this.customerId = customerId;
     }
 
     public Box(int id, int number, String title, LocalDateTime createdAt,
-               int createdByUserId, int documentsAmount, int pagesAmount) {
+               int createdByUserId, int documentsAmount, int pagesAmount, int customerId) {
         this.id              = id;
         this.number          = number;
         this.title           = title;
@@ -33,6 +35,7 @@ public class Box {
         this.createdByUserId = createdByUserId;
         this.documentsAmount = documentsAmount;
         this.pagesAmount     = pagesAmount;
+        this.customerId = customerId;
     }
 
     public int getId() {
@@ -93,6 +96,9 @@ public class Box {
 
     public Integer getProfileId() { return profileId; }
     public void setProfileId(Integer profileId) { this.profileId = profileId; }
+
+    public int getCustomerId() { return customerId; }
+    public void setCustomerId(int customerId) { this.customerId = customerId; }
 
     @Override
     public String toString() {

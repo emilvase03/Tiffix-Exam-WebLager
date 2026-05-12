@@ -25,7 +25,7 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
         String sql = """
                 SELECT b.Id, b.Number, b.Title, b.CreatedAt,
                        u.Username AS CreatedByUsername,
-                       b.DocumentsAmount, b.PagesAmount, b.ProfileId
+                       b.DocumentsAmount, b.PagesAmount, b.ProfileId, b.CustomerId
                 FROM Box b
                 LEFT JOIN [User] u ON u.Id = b.CreatedByUserId
                 WHERE b.IsDeleted = 0
@@ -44,7 +44,8 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
                         rs.getObject("CreatedAt", LocalDateTime.class),
                         rs.getString("CreatedByUsername"),   // read constructor
                         rs.getInt("DocumentsAmount"),
-                        rs.getInt("PagesAmount")
+                        rs.getInt("PagesAmount"),
+                        rs.getInt("CustomerId")
                 );
                 int profileId = rs.getInt("ProfileId");
                 Integer boxProfileId = rs.wasNull() ? null : profileId;
@@ -60,8 +61,8 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
     public Box create(Box box) throws Exception {
         String sql = """
                 INSERT INTO Box (Number, Title, CreatedAt, CreatedByUserId,
-                                 DocumentsAmount, PagesAmount, ProfileId)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                                 DocumentsAmount, PagesAmount, ProfileId, CustomerId)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection conn = dbConnector.getConnection();
@@ -74,6 +75,7 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
             stmt.setInt(5, box.getDocumentsAmount());
             stmt.setInt(6, box.getPagesAmount());
             stmt.setObject(7, box.getProfileId(), Types.INTEGER);
+            stmt.setInt(8, box.getCustomerId());
             stmt.executeUpdate();
 
             try (ResultSet keys = stmt.getGeneratedKeys()) {
