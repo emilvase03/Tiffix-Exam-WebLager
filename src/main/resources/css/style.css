@@ -667,6 +667,12 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 6, 0, 0, 2);
 }
 .document-tile:hover    { -fx-background-color: -wl-surface-hover; -fx-border-color: -wl-accent-hover; }
+.document-tile.drag-over {
+    -fx-background-color: -wl-accent-subtle;
+    -fx-border-color:     -wl-accent;
+    -fx-border-width:     2px;
+    -fx-effect: dropshadow(gaussian, rgba(79,140,255,0.35), 10, 0.3, 0, 0);
+}
 .document-tile.selected {
     -fx-background-color: -wl-accent-subtle; -fx-border-color: -wl-accent; -fx-border-width: 2px;
 }
@@ -690,6 +696,12 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 6, 0, 0, 2);
 }
 .file-tile:hover    { -fx-background-color: -wl-surface-hover; -fx-border-color: -wl-accent-hover; }
+.file-tile.drag-over {
+    -fx-background-color: -wl-accent-subtle;
+    -fx-border-color:     -wl-accent;
+    -fx-border-width:     2px;
+    -fx-effect: dropshadow(gaussian, rgba(79,140,255,0.35), 10, 0.3, 0, 0);
+}
 .file-tile.selected {
     -fx-background-color: -wl-accent-subtle; -fx-border-color: -wl-accent; -fx-border-width: 2px;
     -fx-effect: dropshadow(gaussian, rgba(79,140,255,0.4), 12, 0.4, 0, 0);
