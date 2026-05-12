@@ -26,7 +26,6 @@
                 prefHeight="448.0" prefWidth="550.0"
                 styleClass="dashboard">
 
-        <!-- Toolbar -->
         <top>
             <HBox fx:id="topToolBar"
                   prefHeight="48.0"
@@ -55,29 +54,39 @@
 
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <Label styleClass="text-muted" text="Current Box"/>
-                <!-- lblBoxID text is set by controller; empty string avoids any encoding issue -->
-                <Label fx:id="lblBoxID" styleClass="h3" text=""/>
+                <HBox alignment="CENTER" spacing="6">
 
-                <Label styleClass="text-muted" text="Document Nr"/>
-                <!-- lblDocumentNr text is set by controller -->
-                <Label fx:id="lblDocumentNr" styleClass="h3" text="0"/>
+                    <Label text="Box" styleClass="text"/>
+
+                    <Label fx:id="lblBoxID"
+                           styleClass="h3"
+                           text=""/>
+
+                    <Label text="|"
+                           styleClass="text-muted separator"/>
+
+                    <Label text=""
+                           styleClass="text-muted"/>
+
+                    <Label fx:id="lblDocumentNr"
+                           styleClass="h3"
+                           text=""/>
+
+                </HBox>
+
 
                 <padding><Insets left="8.0" right="8.0"/></padding>
             </HBox>
         </top>
 
-        <!-- Main split area -->
         <center>
             <SplitPane dividerPositions="0.45" BorderPane.alignment="CENTER">
                 <items>
 
-                    <!-- Documents panel (left half) -->
                     <VBox fx:id="documentsPanel"
                           styleClass="documents-panel"
                           VBox.vgrow="ALWAYS">
 
-                        <!-- Total document count header -->
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
                             <Label fx:id="lblTotalDocText"
                                    styleClass="text-muted"
@@ -113,12 +122,10 @@
                         </padding>
                     </VBox>
 
-                    <!-- Files panel (right half) -->
                     <VBox fx:id="filesPanel"
                           styleClass="files-panel"
                           VBox.vgrow="ALWAYS">
 
-                        <!-- Total files count header -->
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
                             <Label fx:id="lblTotalFilesText"
                                    styleClass="text-muted"
@@ -130,7 +137,6 @@
 
                         <StackPane VBox.vgrow="ALWAYS">
 
-                            <!-- File tile strip -->
                             <ScrollPane fx:id="filesScrollPane"
                                         fitToWidth="true"
                                         styleClass="filesView">
@@ -146,7 +152,6 @@
                                 </content>
                             </ScrollPane>
 
-                            <!-- Preview overlay (sits on top of file strip) -->
                             <BorderPane fx:id="topOverview"
                                         styleClass="preview"
                                         visible="false"

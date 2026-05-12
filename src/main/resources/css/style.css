@@ -575,7 +575,7 @@
 
 /* Folder icon inside the tile — 30px is readable without eating all the vertical space */
 .doc-folder-icon {
-    -fx-icon-size:  30px;
+    -fx-icon-size:  85px;
     -fx-icon-color: #2f80ed;
 }
 
