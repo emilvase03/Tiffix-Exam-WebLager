@@ -27,7 +27,7 @@ public class ScannedFileDAO implements IScannedFileDataAccess {
         String sql = """
                 SELECT Id, DocumentId, TiffFile, ScanOrder, SortOrder
                 FROM ScannedFile
-                WHERE DocumentId = ?
+                WHERE DocumentId = ? AND IsDeleted = 0
                 ORDER BY SortOrder
                 """;
 
