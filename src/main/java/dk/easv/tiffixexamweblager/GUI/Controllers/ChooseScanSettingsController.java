@@ -153,6 +153,8 @@ public class ChooseScanSettingsController {
     @FXML
     private void onBtnStartSession(ActionEvent actionEvent) {
         Box selectedBox;
+        if (selectedProfiles.isEmpty())
+            return;
 
         if (toggleCreate.isSelected()) {
             if (txtfieldTitle.getText().isBlank())
@@ -186,7 +188,7 @@ public class ChooseScanSettingsController {
             selectedBox = boxComboBox.getValue();
         }
 
-        if (selectedProfiles.isEmpty() || selectedBox == null)
+        if (selectedBox == null)
             return;
 
         // store choices in the session
