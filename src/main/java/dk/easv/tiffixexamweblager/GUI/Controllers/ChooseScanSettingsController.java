@@ -2,10 +2,12 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
+import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
+import dk.easv.tiffixexamweblager.GUI.Models.CustomerProfileModel;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
@@ -34,11 +36,15 @@ public class ChooseScanSettingsController {
     @FXML private ToggleButton toggleSelect;
     @FXML private ToggleButton toggleCreate;
     @FXML private TextField txtfieldSearchbar;
+    @FXML private TextField txtfieldTitle;
+    @FXML private TextField txtfieldNumber;
     @FXML private ComboBox<Box> boxComboBox;
+    @FXML private ComboBox<Customer> customerCombobox;
 
     private ModalPane modalPane;
     private ProfileRuleModel profileRuleModel;
     private BoxDocumentModel boxDocumentModel;
+    private CustomerProfileModel customerProfileModel;
     private UserModel userModel;
     private List<Profile> profiles = new ArrayList<>();
     private final List<Profile> selectedProfiles = new ArrayList<>();
@@ -68,6 +74,11 @@ public class ChooseScanSettingsController {
             AlertHelper.showError("Error", "Failed to instantiate UserModel.");
         }
         try {
+            customerProfileModel = new CustomerProfileModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate CustomerProfileModel.");
+        }
+        try {
             loadAssignedProfiles();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to load profiles.");
@@ -77,6 +88,7 @@ public class ChooseScanSettingsController {
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to load boxes.");
         }
+        loadCustomers();
     }
 
     private void loadAssignedProfiles() throws Exception {
@@ -92,6 +104,14 @@ public class ChooseScanSettingsController {
 
         for (Profile profile : profiles) {
             profileList.getChildren().add(createProfileRow(profile));
+        }
+    }
+
+    private void loadCustomers() {
+        try {
+            customerCombobox.getItems().setAll(customerProfileModel.getAllCustomers());
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to load customers.");
         }
     }
 
@@ -132,25 +152,42 @@ public class ChooseScanSettingsController {
 
     @FXML
     private void onBtnStartSession(ActionEvent actionEvent) {
-        Box selectedBox = boxComboBox.getValue();
-        if (selectedProfiles.isEmpty() || selectedBox == null)
-            return;
+        Box selectedBox;
 
-        boolean isNew = !boxComboBox.getItems().contains(selectedBox);
+        if (toggleCreate.isSelected()) {
+            if (txtfieldTitle.getText().isBlank())
+                return;
+            if(txtfieldNumber.getText().isBlank())
+                return;
 
-        if (isNew) {
-            String[] parts = selectedBox.getTitle().split(" ", 2);
-            String number = parts[1];
+            Customer customer = customerCombobox.getSelectionModel().getSelectedItem();
 
-            Box newBox = new Box(-1, Integer.parseInt(number), selectedBox.getTitle(), LocalDateTime.now(), UserSession.getInstance().getCurrentUser().getId(), 0, 0);
+            if (customer == null)
+                return;
+
+            Box newBox = new Box(
+                    -1,
+                    Integer.parseInt(txtfieldNumber.getText().trim()),
+                    txtfieldTitle.getText().trim(),
+                    LocalDateTime.now(),
+                    UserSession.getInstance().getCurrentUser().getId(),
+                    0,
+                    0,
+                    customer.getId());
+
             newBox.setProfileId(selectedProfiles.getFirst().getId());
             try {
                 selectedBox = boxDocumentModel.createBox(newBox);
             } catch (Exception e) {
-                AlertHelper.showError("Error", "Failed to create " + selectedBox.getTitle());
+                AlertHelper.showError("Error", "Failed to create " + newBox.getTitle());
                 return;
             }
+        } else {
+            selectedBox = boxComboBox.getValue();
         }
+
+        if (selectedProfiles.isEmpty() || selectedBox == null)
+            return;
 
         // store choices in the session
         UserSession.getInstance().setActiveProfiles(selectedProfiles);
@@ -212,7 +249,7 @@ public class ChooseScanSettingsController {
                 return boxComboBox.getItems().stream()
                         .filter(b -> b.getTitle().equalsIgnoreCase(text.trim()))
                         .findFirst()
-                        .orElse(new Box(-1, -1, text.trim(), null, null, -1, -1));
+                        .orElse(new Box(-1, -1, text.trim(), null, null, -1, -1, -1));
             }
         });
 

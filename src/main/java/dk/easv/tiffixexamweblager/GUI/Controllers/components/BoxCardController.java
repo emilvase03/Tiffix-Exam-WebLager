@@ -1,15 +1,21 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
+import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.GUI.Controllers.BoxesTabController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
+import dk.easv.tiffixexamweblager.GUI.Models.CustomerProfileModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// Java imports
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-
 import java.time.LocalDateTime;
 
 public class BoxCardController {
@@ -17,6 +23,7 @@ public class BoxCardController {
     @FXML private Label lblHeader;
     @FXML private TextField txtNumber;
     @FXML private TextField txtTitle;
+    @FXML private ComboBox<Customer> customerCombobox;
 
     private VBox overlay;
     private BoxesTabController boxesTabController;
@@ -26,6 +33,7 @@ public class BoxCardController {
 
     private boolean updateBox = false;
     private Box boxToBeUpdated;
+    private CustomerProfileModel customerProfileModel;
 
     public void setOverlay(VBox overlay) {
         this.overlay = overlay;
@@ -50,6 +58,18 @@ public class BoxCardController {
         boxToBeUpdated = null;
         txtNumber.clear();
         txtTitle.clear();
+        customerCombobox.setVisible(true);
+        customerCombobox.setManaged(true);
+        try {
+            customerProfileModel = new CustomerProfileModel();
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to instantiate CustomerProfileModel.");
+        }
+        try {
+            customerCombobox.getItems().setAll(customerProfileModel.getAllCustomers());
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to load customers.");
+        }
     }
 
     public void preloadEditWindow(Box box) {
@@ -58,6 +78,8 @@ public class BoxCardController {
         boxToBeUpdated = box;
         txtNumber.setText(String.valueOf(box.getNumber()));
         txtTitle.setText(box.getTitle());
+        customerCombobox.setVisible(false);
+        customerCombobox.setManaged(false);
     }
 
     @FXML
@@ -88,8 +110,13 @@ public class BoxCardController {
                 return;
             }
         } else {
+            Customer customer = customerCombobox.getSelectionModel().getSelectedItem();
+
+            if (customer == null)
+                return;
+
             Box newBox = new Box(0, number, title, LocalDateTime.now(),
-                    loggedInUserId, 0, 0);
+                    loggedInUserId, 0, 0, customer.getId());
             newBox.setCreatedByUsername(loggedInUsername);
 
             try {

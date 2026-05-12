@@ -50,9 +50,9 @@
          </VBox>
          <VBox fx:id="vboxCreateToggle" spacing="8.0">
             <children>
-               <TextField promptText="Title" />
-               <TextField promptText="Number" />
-               <ComboBox maxWidth="1.7976931348623157E308" promptText="Select customer" />
+               <TextField fx:id="txtfieldTitle" promptText="Title" />
+               <TextField fx:id="txtfieldNumber" promptText="Number" />
+               <ComboBox fx:id="customerCombobox" maxWidth="1.7976931348623157E308" promptText="Select customer" />
             </children>
          </VBox>
         </VBox>
