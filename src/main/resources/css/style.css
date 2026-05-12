@@ -1,673 +1,727 @@
 /*
-   WEBLAGER BRAND → ATLANTAFX VARIABLE MAPPING
-   ─────────────────────────────────────────────────────────────────
-   Style-guide token         Hex         AtlantaFX variable
-   ─────────────────────────────────────────────────────────────────
-   Page background           #F5F5F5  →  -color-bg-default
-   Surface / card            #FFFFFF  →  -color-bg-subtle
-   Card content bg           #F9F9F9  →  -color-bg-inset
-   Primary / nav bg          #2D3D4F  →  -color-accent-emphasis
-   Primary nav btn hover     #415060  →  -color-accent-muted
-   Sidebar (secondary nav)   #24C79F  →  -wl-brand-green (brand fixed, always green)
-   Secondary action          #64748B  →  -color-neutral-emphasis
-   Destructive               #EF4444  →  -color-danger-emphasis
-   Border                    #E2E4E8  →  -color-border-default
-   Surface hover             #F1F5F9  →  -color-border-muted
-   Success                   #4CD07D  →  -color-success-emphasis
-   Placeholder               #BFBFBF  →  -color-fg-subtle
-   ─────────────────────────────────────────────────────────────────
+   WEBLAGER DESIGN SYSTEM — single CSS source of truth
+   ─────────────────────────────────────────────────────────────────────────────
+   Themes:  AtlantaFX NordLight (default) / NordDark
+   Toggled: ThemeManager adds  .nord-dark  to the scene root when dark mode.
+
+   BUTTON COLOUR MECHANISM
+   ───────────────────────
+   Token overrides in .nord-dark { } only work if ThemeManager.register(scene)
+   has been called for every scene.  To be safe, this file ALSO adds explicit
+   descendant selectors (.nord-dark .action-btn etc.) that work in JavaFX CSS
+   as long as the nord-dark class is anywhere above the node in the scene graph.
+
+   Make sure ViewHandler calls:
+       ThemeManager.getInstance().register(scene)
+   immediately after loading each scene.
+
+   STYLE-GUIDE COLOURS (from WebLager® Styleguide PDF)
+   ──────────────────────────────────────────────────────
+   Light mode
+     Background          #F5F5F5    Surface/card bg    #FFFFFF
+     Card content bg     #F9F9F9    Primary nav bg     #2D3D4F
+     Secondary nav bg    #24C79F    Primary action     #2D3D4F
+     Secondary action    #64748B    Destructive        #EF4444
+     Border              #E2E4E8    Surface hover      #F1F5F9
+
+   Dark mode
+     Background          #465160    Surface bg         #354556
+     Card bg             #2D3D4F    Primary nav bg     #0094EA
+     Primary nav btn     #33A9EE    Secondary nav bg   #2D3D4F
+     Primary color       #008FF7    Border/Hover       #2B3B4C
+     Input bg            #465160
 */
 
-/* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS  (all CSS variables live here on .root)
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+   ═══════════════════════════════════════════════════════════════════════════ */
 .root {
-    /* Brand green — WebLager signature sidebar color */
+    /* ── Fixed brand colours (never change) ─────────────────────────────── */
     -wl-brand-green:        #24C79F;
     -wl-brand-green-hover:  derive(#24C79F, -12%);
     -wl-brand-green-active: derive(#24C79F, -20%);
     -wl-brand-green-text:   #FFFFFF;
+    -wl-brand-dark:         #2D3D4F;
+    -wl-brand-dark-hover:   #1C252F;
+    -wl-brand-danger:       #EF4444;
+    -wl-brand-success:      #4CD07D;
 
-    /* Primary dark navy */
-    -wl-brand-dark:       #2D3D4F;
-    -wl-brand-dark-hover: #1C252F;
+    /* ── Action button (light default = green per screenshots) ──────────── */
+    -wl-action-bg:          #24C79F;
+    -wl-action-bg-hover:    derive(#24C79F, -12%);
+    -wl-action-text:        #FFFFFF;
 
-    /* Semantic */
-    -wl-brand-danger:  #EF4444;
-    -wl-brand-success: #4CD07D;
+    /* ── Table row card colours (light mode, style guide) ───────────────── */
+    -wl-row-bg:             #FFFFFF;        /* surface/card bg */
+    -wl-row-bg-alt:         #F9F9F9;        /* card content bg */
+    -wl-row-bg-hover:       #F1F5F9;        /* surface hover */
+    -wl-row-select:         #E8F0FE;
+    -wl-hdr-bg:             #F5F5F5;        /* page background = header strip */
 
-    /* Surfaces */
-    -wl-surface:       -color-bg-default;
-    -wl-surface-card:  -color-bg-subtle;
-    -wl-surface-inset: -color-bg-inset;
-    -wl-surface-hover: -color-border-muted;
+    /* ── AtlantaFX semantic aliases ─────────────────────────────────────── */
+    -wl-surface:            -color-bg-default;
+    -wl-surface-card:       -color-bg-subtle;
+    -wl-surface-inset:      -color-bg-inset;
+    -wl-surface-hover:      -color-border-muted;
+    -wl-text-main:          -color-fg-default;
+    -wl-text-muted:         -color-fg-muted;
+    -wl-text-subtle:        -color-fg-subtle;
+    -wl-text-on-emphasis:   -color-fg-on-emphasis;
+    -wl-border:             -color-border-default;
+    -wl-border-subtle:      -color-border-muted;
+    -wl-accent:             -color-accent-emphasis;
+    -wl-accent-hover:       -color-accent-muted;
+    -wl-accent-subtle:      -color-accent-subtle;
+    -wl-danger:             -color-danger-emphasis;
+    -wl-danger-text:        -color-danger-fg;
+    -wl-danger-subtle:      -color-danger-subtle;
+    -wl-success:            -color-success-emphasis;
+    -wl-success-subtle:     -color-success-subtle;
+    -wl-neutral:            -color-neutral-emphasis;
 
-    /* Text */
-    -wl-text-main:        -color-fg-default;
-    -wl-text-muted:       -color-fg-muted;
-    -wl-text-subtle:      -color-fg-subtle;
-    -wl-text-on-emphasis: -color-fg-on-emphasis;
-
-    /* Borders */
-    -wl-border:        -color-border-default;
-    -wl-border-subtle: -color-border-muted;
-
-    /* Accent */
-    -wl-accent:        -color-accent-emphasis;
-    -wl-accent-hover:  -color-accent-muted;
-    -wl-accent-subtle: -color-accent-subtle;
-
-    /* Danger */
-    -wl-danger:        -color-danger-emphasis;
-    -wl-danger-text:   -color-danger-fg;
-    -wl-danger-subtle: -color-danger-subtle;
-
-    /* Success */
-    -wl-success:        -color-success-emphasis;
-    -wl-success-subtle: -color-success-subtle;
-
-    /* Neutral / secondary */
-    -wl-neutral: -color-neutral-emphasis;
-
-    /* Base */
-    -fx-font-size:        12px;
-    -fx-background-color: -wl-surface;
+    -fx-font-size:          12px;
+    -fx-background-color:   -wl-surface;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ── Dark mode token overrides (requires ThemeManager.register(scene)) ─────
+   ThemeManager adds .nord-dark to the scene root node; these rules override
+   the looked-up colour tokens so every child that references them sees the
+   dark values.  Exact colours from WebLager Styleguide dark mode page.      */
+.nord-dark {
+    /* Action button: Primary navigation btn #33A9EE per dark mode style guide */
+    -wl-action-bg:       #33A9EE;
+    -wl-action-bg-hover: #0094EA;
+
+    /* Table rows: exact dark mode surface colours from style guide */
+    -wl-row-bg:          #354556;   /* surface background */
+    -wl-row-bg-alt:      #2D3D4F;   /* card background */
+    -wl-row-bg-hover:    #2B3B4C;   /* hover */
+    -wl-row-select:      #1a3a5c;
+    -wl-hdr-bg:          #2D3D4F;   /* header strip */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
    TYPOGRAPHY
-   ═══════════════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-.h1 {
-    -fx-font-size:   21px;
-    -fx-font-weight: 700;
-    -fx-text-fill:   -wl-text-main;
-}
+.h1 { -fx-font-size: 21px; -fx-font-weight: 700; -fx-text-fill: -wl-text-main; }
+.h2 { -fx-font-size: 18px; -fx-font-weight: 600; -fx-text-fill: -wl-text-main; }
+.h3 { -fx-font-size: 15px; -fx-font-weight: 600; -fx-text-fill: -wl-text-main; }
+.title       { -fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: -wl-text-main; }
+.label       { -fx-text-fill: -wl-text-main; }
+.text-muted  { -fx-text-fill: -wl-text-muted; -fx-font-size: 12px; }
+.helper-text { -fx-font-size: 10px; -fx-text-fill: -wl-text-muted; }
+.error-label { -fx-font-size: 11px; -fx-text-fill: -wl-danger-text; }
 
-.h2 {
-    -fx-font-size:   18px;
-    -fx-font-weight: 600;
-    -fx-text-fill:   -wl-text-main;
-}
 
-.h3 {
-    -fx-font-size:   15px;
-    -fx-font-weight: 600;
-    -fx-text-fill:   -wl-text-main;
-}
-
-/* Generic modal / card title (used as styleClass="title" in modals) */
-.title {
-    -fx-font-size:   16px;
-    -fx-font-weight: 700;
-    -fx-text-fill:   -wl-text-main;
-}
-
-.label {
-    -fx-text-fill: -wl-text-main;
-}
-
-.text-muted {
-    -fx-text-fill: -wl-text-muted;
-    -fx-font-size: 12px;
-}
-
-.helper-text {
-    -fx-font-size: 10px;
-    -fx-text-fill: -wl-text-muted;
-}
-
-.error-label {
-    -fx-font-size: 11px;
-    -fx-text-fill: -wl-danger-text;
-}
-
-/* ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════
    BUTTONS
-   ═══════════════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .button {
-    -fx-pref-height:       20px;
-    -fx-font-size:         12px;
-    -fx-font-weight:       500;
+    -fx-pref-height: 30px; -fx-font-size: 12px; -fx-font-weight: 500;
+    -fx-background-radius: 6px; -fx-border-radius: 6px; -fx-cursor: hand;
+}
+.button.accent, .button.primary {
+    -fx-background-color: #2D3D4F; -fx-text-fill: white;
+}
+.button.accent:hover, .button.primary:hover { -fx-background-color: #1C252F; }
+.button.secondary, .button.neutral {
+    -fx-background-color: #64748B; -fx-text-fill: white;
+}
+.button.secondary:hover, .button.neutral:hover { -fx-background-color: #354556; }
+.button.tertiary {
+    -fx-background-color: #F9F9F9; -fx-text-fill: -wl-text-main;
+    -fx-border-color: #E2E4E8; -fx-border-width: 1px;
+}
+.button.tertiary:hover { -fx-background-color: #F1F5F9; }
+.button.danger, .dangerBtn {
+    -fx-background-color: #EF4444; -fx-text-fill: white; -fx-background-radius: 6px;
+}
+.button.danger:hover, .dangerBtn:hover { -fx-background-color: derive(#EF4444, -10%); }
+.button-lg { -fx-pref-height: 33px; }
+
+/* ── Button dark-mode overrides ──────────────────────────────────────────────
+   Without these, .button.primary stays dark navy and .button.neutral stays grey
+   in dark mode — neither reads well on the dark surface.
+   Style guide dark mode: primary = #008FF7, secondary/neutral = #697489.     */
+.nord-dark .button.primary,
+.nord-dark .button.accent {
+    -fx-background-color: #008FF7;
+    -fx-text-fill: #FFFFFF;
+}
+.nord-dark .button.primary:hover,
+.nord-dark .button.accent:hover {
+    -fx-background-color: #0094EA;
+}
+.nord-dark .button.neutral,
+.nord-dark .button.secondary {
+    -fx-background-color: #697489;
+    -fx-text-fill: #FFFFFF;
+}
+.nord-dark .button.neutral:hover,
+.nord-dark .button.secondary:hover {
+    -fx-background-color: #556070;
+}
+.nord-dark .button.tertiary {
+    -fx-background-color: #465160;
+    -fx-text-fill: rgba(255,255,255,0.80);
+    -fx-border-color: #2B3B4C;
+}
+
+/* ── ACTION BUTTON ─────────────────────────────────────────────────────────
+   Light: #24C79F (green)  →  Dark: #33A9EE (sky blue per style guide).
+   PRIMARY MECHANISM: -wl-action-bg token (works when register() is called).
+   FALLBACK/EXPLICIT:  .nord-dark .action-btn selector below (always works).  */
+.action-btn {
+    -fx-padding: 6 12;
+    -fx-border-color:      transparent;
+    -fx-background-color:  -wl-action-bg;
+    -fx-text-fill:         -wl-action-text;
     -fx-background-radius: 6px;
     -fx-border-radius:     6px;
     -fx-cursor:            hand;
+    -fx-font-weight:       500;
+    -fx-font-size:         12px;
 }
+.action-btn:hover    { -fx-background-color: -wl-action-bg-hover; }
+.action-btn:disabled { -fx-opacity: 0.55; -fx-cursor: default; }
 
-/* Primary / accent — dark navy fill */
-.button.accent,
-.button.primary {
-    -fx-background-color: -wl-brand-dark;
-    -fx-text-fill:        white;
-}
-.button.accent:hover,
-.button.primary:hover {
-    -fx-background-color: -wl-brand-dark-hover;
-}
-
-/* Secondary / neutral — grey fill */
-.button.secondary,
-.button.neutral {
-    -fx-background-color: -wl-neutral;
-    -fx-text-fill:        -wl-text-on-emphasis;
-}
-.button.secondary:hover,
-.button.neutral:hover {
-    -fx-background-color: derive(-wl-neutral, -10%);
-}
-
-/* Tertiary — outlined */
-.button.tertiary {
-    -fx-background-color: -wl-surface-card;
-    -fx-text-fill:        -wl-text-main;
-    -fx-border-color:     -wl-border;
-    -fx-border-width:     1px;
-}
-.button.tertiary:hover {
-    -fx-background-color: -wl-surface-hover;
-}
-
-/* Danger */
-.button.danger {
-    -fx-background-color: -wl-brand-danger;
-    -fx-text-fill:        white;
-}
-.button.danger:hover {
-    -fx-background-color: derive(-wl-brand-danger, -10%);
-}
-
-/* Large variant for page-header buttons */
-.button-lg {
-    -fx-pref-height: 33px;
-}
-
-/* Action button — teal inline toolbar button */
-.action-btn {
-    -fx-padding:          6;
-    -fx-border-color:     transparent;
+/* EXPLICIT dark-mode override — descendant selector.
+   Works in JavaFX CSS: matches .action-btn nodes inside any node
+   that has .nord-dark, which ThemeManager adds to the scene root. */
+.nord-dark .action-btn {
     -fx-background-color: #33A9EE;
-    -fx-text-fill:        black;
-    -fx-background-radius: 6px;
-    -fx-border-radius:    6px;
-    -fx-cursor:           hand;
+    -fx-text-fill:        #FFFFFF;
 }
-.action-btn:hover {
+.nord-dark .action-btn:hover {
     -fx-background-color: #0094EA;
-    -fx-text-fill:        white;
 }
-.action-btn:disabled {
+.nord-dark .action-btn:disabled {
     -fx-opacity: 0.55;
-    -fx-cursor:  default;
 }
 
-/* Hamburger menu button (☰) in AdminDashboard top bar */
+/*
+  Hamburger / open-sidebar button.
+  Bordered card style so it reads as a clickable control, not plain text.
+  Light: white card with border.  Dark: #354556 card with dark border.
+  Hover flips to brand dark (#2D3D4F) with white text/icon for strong emphasis.
+*/
 .hamburger-btn {
-    -fx-background-color: transparent;
-    -fx-font-size:        16px;
-    -fx-cursor:           hand;
-    -fx-background-radius: 6px;
-    -fx-padding:          4 8;
+    -fx-background-color:  #FFFFFF;
+    -fx-font-size:         16px;
+    -fx-font-weight:       600;
+    -fx-text-fill:         #2D3D4F;
+    -fx-cursor:            hand;
+    -fx-background-radius: 8px;
+    -fx-border-color:      #E2E4E8;
+    -fx-border-radius:     8px;
+    -fx-border-width:      1.5px;
+    -fx-padding:           6 12;
+    -fx-min-width:         36px;
+    -fx-min-height:        36px;
+    -fx-effect:            dropshadow(gaussian, rgba(0,0,0,0.07), 4, 0, 0, 1);
 }
 .hamburger-btn:hover {
-    -fx-background-color: -wl-surface-hover;
+    -fx-background-color: #2D3D4F;
+    -fx-text-fill:        #FFFFFF;
+    -fx-border-color:     #2D3D4F;
+    -fx-effect:           dropshadow(gaussian, rgba(0,0,0,0.18), 6, 0, 0, 2);
+}
+.nord-dark .hamburger-btn {
+    -fx-background-color: #354556;
+    -fx-text-fill:        rgba(255,255,255,0.87);
+    -fx-border-color:     #2B3B4C;
+    -fx-effect:           dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0, 0, 1);
+}
+.nord-dark .hamburger-btn:hover {
+    -fx-background-color: #33A9EE;
+    -fx-text-fill:        #FFFFFF;
+    -fx-border-color:     #33A9EE;
 }
 
-/* Close / X button (transparent icon button) */
 .close-btn {
-    -fx-background-color: transparent;
-    -fx-padding:          0;
-    -fx-min-width:   32px;
-    -fx-min-height:  32px;
-    -fx-pref-width:  32px;
-    -fx-pref-height: 32px;
-    -fx-cursor:      hand;
+    -fx-background-color: transparent; -fx-padding: 0;
+    -fx-min-width: 32px; -fx-min-height: 32px;
+    -fx-pref-width: 32px; -fx-pref-height: 32px; -fx-cursor: hand;
 }
-.close-btn .ikonli-font-icon,
-.close-icon {
-    -fx-icon-size:  24px;
-    -fx-icon-color: -wl-text-main;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   INPUTS
-   ═══════════════════════════════════════════════════════════════ */
-
-.text-field {
-    -fx-pref-height: 30px;
-    -fx-font-size:   12px;
-}
-.text-field-lg {
-    -fx-pref-height: 33px;
-    -fx-font-size:   12px;
-}
-
-/* ComboBox — matches text-field height so forms align */
-.combo-box-base {
-    -fx-pref-height: 30px;
-    -fx-font-size:   12px;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   ICON BUTTONS  (edit / delete in table rows, toolbars)
-   styleClass="icon-button"  or  styleClass="icon-button, danger"
-   ═══════════════════════════════════════════════════════════════ */
+.close-btn .ikonli-font-icon, .close-icon { -fx-icon-size: 24px; -fx-icon-color: -wl-text-main; }
 
 .icon-button {
-    -fx-background-color:  -wl-accent-subtle;
-    -fx-background-radius: 6px;
-    -fx-border-color:      transparent;
-    -fx-pref-width:  30px;
-    -fx-pref-height: 30px;
-    -fx-cursor:      hand;
-    -fx-padding:     0;
+    -fx-background-color: -wl-accent-subtle; -fx-background-radius: 6px;
+    -fx-border-color: transparent; -fx-pref-width: 30px; -fx-pref-height: 30px;
+    -fx-cursor: hand; -fx-padding: 0;
 }
-.icon-button .ikonli-font-icon {
-    -fx-icon-size:  16px;
-    -fx-icon-color: -wl-text-main;
-}
-.icon-button:hover {
-    -fx-background-color: -wl-accent;
-}
-.icon-button:hover .ikonli-font-icon {
-    -fx-icon-color: -wl-text-on-emphasis;
-}
-.icon-button.danger {
-    -fx-background-color: -wl-danger-subtle;
-}
-.icon-button.danger .ikonli-font-icon {
-    -fx-icon-color: -wl-danger-text;
-}
-.icon-button.danger:hover {
-    -fx-background-color: -wl-danger;
-}
-.icon-button.danger:hover .ikonli-font-icon {
-    -fx-icon-color: white;
-}
-.icon-button:disabled {
-    -fx-opacity: 0.6;
-    -fx-cursor:  default;
-}
+.icon-button .ikonli-font-icon       { -fx-icon-size: 16px; -fx-icon-color: -wl-text-main; }
+.icon-button:hover                    { -fx-background-color: -wl-accent; }
+.icon-button:hover .ikonli-font-icon  { -fx-icon-color: -wl-text-on-emphasis; }
+.icon-button.danger                   { -fx-background-color: -wl-danger-subtle; }
+.icon-button.danger .ikonli-font-icon { -fx-icon-color: -wl-danger-text; }
+.icon-button.danger:hover             { -fx-background-color: -wl-danger; }
+.icon-button.danger:hover .ikonli-font-icon { -fx-icon-color: white; }
+.icon-button:disabled                 { -fx-opacity: 0.6; -fx-cursor: default; }
 
-/* ═══════════════════════════════════════════════════════════════
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INPUTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.text-field     { -fx-pref-height: 30px; -fx-font-size: 12px; }
+.text-field-lg  { -fx-pref-height: 33px; -fx-font-size: 12px; }
+.combo-box-base { -fx-pref-height: 30px; -fx-font-size: 12px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
    CARDS
-   ═══════════════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .card {
-    -fx-background-color:  -wl-surface-card;
-    -fx-background-radius: 10px;
-    -fx-border-radius:     10px;
+    -fx-background-color: -wl-surface-card; -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 12, 0, 0, 2);
     -fx-padding: 20;
 }
+.overlay { -fx-background-color: -color-bg-subtle; -fx-background-radius: 15px; }
 
-/* ═══════════════════════════════════════════════════════════════
+
+/* ═══════════════════════════════════════════════════════════════════════════
    MODALS
-   ═══════════════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .modal-card {
-    -fx-background-color:  -wl-surface-card;
-    -fx-background-radius: 10px;
-    -fx-border-radius:     10px;
+    -fx-background-color: -wl-surface-card; -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 24, 0.25, 0, 10);
 }
-
 .modal-header {
-    -fx-background-color:  -wl-surface-inset;
-    -fx-background-radius: 10 10 0 0;
-    -fx-border-radius:     10 10 0 0;
+    -fx-background-color: -wl-surface-inset;
+    -fx-background-radius: 10 10 0 0; -fx-border-radius: 10 10 0 0;
 }
+.modal-title    { -fx-font-size: 16px; -fx-font-weight: 700; -fx-text-fill: -wl-text-main; }
+.modal-subtitle { -fx-font-size: 13px; -fx-text-fill: -wl-text-muted; }
 
-.modal-title {
-    -fx-font-size:   16px;
-    -fx-font-weight: 700;
-    -fx-text-fill:   -wl-text-main;
+.profile-scroll, .profile-scroll > .viewport, .profile-list {
+    -fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;
 }
-
-.modal-subtitle {
-    -fx-font-size: 13px;
-    -fx-text-fill: -wl-text-muted;
+.profile-item {
+    -fx-padding: 9 12; -fx-background-color: -wl-surface-inset;
+    -fx-background-radius: 6px; -fx-cursor: hand;
 }
+.profile-item:hover { -fx-background-color: -wl-accent-subtle; }
 
-/* Profile-picker scroll area inside modal */
-.profile-scroll {
+
+/* ── MODALS & CARDS dark mode ────────────────────────────────────────────────
+   Covers: ChooseScanSettings, EditEmployee, NewEmployee, AssignEmployee, any
+   overlay that uses .card, .modal-card, or .overlay styleClass.               */
+.nord-dark .card {
+    -fx-background-color: #354556;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.40), 16, 0, 0, 4);
+}
+.nord-dark .modal-card {
+    -fx-background-color: #354556;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.50), 24, 0.25, 0, 10);
+}
+.nord-dark .modal-header {
+    -fx-background-color: #2D3D4F;
+}
+.nord-dark .modal-title    { -fx-text-fill: rgba(255,255,255,0.90); }
+.nord-dark .modal-subtitle { -fx-text-fill: rgba(255,255,255,0.55); }
+.nord-dark .overlay        { -fx-background-color: #354556; }
+
+/* Profile items inside modal profile picker */
+.nord-dark .profile-item { -fx-background-color: #2D3D4F; }
+.nord-dark .profile-item:hover { -fx-background-color: rgba(0,143,247,0.20); }
+
+/* Form labels and text inside modals */
+.nord-dark .title  { -fx-text-fill: rgba(255,255,255,0.90); }
+.nord-dark .h2     { -fx-text-fill: rgba(255,255,255,0.90); }
+.nord-dark .label  { -fx-text-fill: rgba(255,255,255,0.87); }
+
+/* Text fields inside modals */
+.nord-dark .text-field {
+    -fx-background-color: #465160;
+    -fx-text-fill:        rgba(255,255,255,0.87);
+    -fx-prompt-text-fill: rgba(255,255,255,0.35);
+    -fx-border-color:     #2B3B4C;
+    -fx-border-radius:    6px;
+    -fx-background-radius: 6px;
+}
+.nord-dark .combo-box-base {
+    -fx-background-color: #465160;
+    -fx-text-fill:        rgba(255,255,255,0.87);
+    -fx-border-color:     #2B3B4C;
+}
+.nord-dark .combo-box-base > .list-cell { -fx-text-fill: rgba(255,255,255,0.87); }
+
+/* Scroll pane inside modal (profile list) */
+.nord-dark .profile-scroll,
+.nord-dark .profile-scroll > .viewport,
+.nord-dark .profile-list {
     -fx-background-color: transparent;
-    -fx-background:       transparent;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TABLE — table-as-a-card
+   ─────────────────────────────────────────────────────────────────────────
+   The ENTIRE TableView is styled as a single card (background + radius + shadow).
+   Rows inside are flat alternating stripes — no individual rounded cards.
+   This matches the WebLager card pattern: a floating container with clean content.
+
+   Structure:
+     .table-view              ← the card (background, radius, shadow, border)
+     .column-header-background← sticky header inside the card, slightly tinted
+     .table-row-cell          ← flat rows: even = transparent, odd = subtle tint
+     .table-cell              ← transparent cells, text only
+
+   Light: white card (#FFFFFF), subtle grey odd rows (#F8F8FA)
+   Dark:  #354556 card, #2D3D4F odd rows  (style guide surfaces)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Outer card ─────────────────────────────────────────────────────────── */
+.table-view {
+    -fx-background-color:        #FFFFFF;       /* card surface */
+    -fx-background-radius:       10;
+    -fx-border-color:            #E2E4E8;       /* style guide border */
+    -fx-border-radius:           10;
+    -fx-border-width:            1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 2);
+    -fx-table-cell-border-color: transparent;
+    -fx-padding:                 0;
+}
+
+/* Make every container layer inside the card transparent so the card bg shows */
+.table-view .virtual-flow,
+.table-view > .virtual-flow > .clipped-container,
+.table-view > .virtual-flow > .clipped-container > .sheet {
+    -fx-background-color: transparent;
+}
+
+/* ── Column header ───────────────────────────────────────────────────────── */
+.table-view .column-header-background {
+    -fx-background-color:  #F5F5F5;             /* page bg from style guide */
+    -fx-background-radius: 10 10 0 0;           /* top corners match the card */
+    -fx-border-color:      transparent transparent #E2E4E8 transparent;
+    -fx-border-width:      0 0 1 0;
+}
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-color:     transparent;
+    -fx-font-weight:      600;
+    -fx-text-fill:        #64748B;              /* secondary action colour */
+    -fx-font-size:        11px;
+}
+
+/* ── Rows: flat stripes, no individual card shape ───────────────────────── */
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell {
+    -fx-background-color: transparent;          /* even rows = card bg shows through */
+    -fx-border-color:     transparent transparent #F0F0F2 transparent;
+    -fx-border-width:     0 0 1 0;             /* very subtle row separator */
+    -fx-padding:          0;
+    -fx-cell-size:        44px;
+}
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell:odd {
+    -fx-background-color: #F8F8FA;              /* subtle alternate tint */
+}
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell:hover {
+    -fx-background-color: #EEF2FF;              /* hover: cool blue tint */
+    -fx-cursor: hand;
+}
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell:selected {
+    -fx-background-color: #E8F0FE;
+}
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell:selected .label {
+    -fx-text-fill: #2D3D4F;
+}
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell:empty {
+    -fx-background-color: transparent;
     -fx-border-color:     transparent;
 }
-.profile-scroll > .viewport {
+
+/* ── Cells: transparent — text only ─────────────────────────────────────── */
+.table-view .table-row-cell .table-cell,
+.table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .table-cell {
     -fx-background-color: transparent;
+    -fx-border-color:     transparent;
+    -fx-padding:          0 12;
+    -fx-text-fill:        #2D3D4F;             /* primary dark text */
+    -fx-font-size:        12px;
+    -fx-alignment:        CENTER_LEFT;
 }
-.profile-list {
+
+/* Scroll bar */
+.table-view .scroll-bar:vertical .thumb,
+.table-view .scroll-bar:horizontal .thumb {
+    -fx-background-color: #E2E4E8; -fx-background-radius: 4px;
+}
+.table-view .scroll-bar .track,
+.table-view .scroll-bar .track-background { -fx-background-color: transparent; }
+
+
+/* ── DARK MODE ───────────────────────────────────────────────────────────── */
+
+/* Outer card */
+.nord-dark .table-view {
+    -fx-background-color: #354556;             /* style guide surface bg */
+    -fx-border-color:     #2B3B4C;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.30), 12, 0, 0, 2);
+}
+.nord-dark .table-view .virtual-flow,
+.nord-dark .table-view > .virtual-flow > .clipped-container,
+.nord-dark .table-view > .virtual-flow > .clipped-container > .sheet {
     -fx-background-color: transparent;
 }
 
-/* Individual profile row */
-.profile-item {
-    -fx-padding:           9 12;
-    -fx-background-color:  -wl-surface-inset;
-    -fx-background-radius: 6px;
-    -fx-cursor:            hand;
+/* Header */
+.nord-dark .table-view .column-header-background {
+    -fx-background-color: #2D3D4F;
+    -fx-border-color: transparent transparent #2B3B4C transparent;
 }
-.profile-item:hover {
-    -fx-background-color: -wl-accent-subtle;
+.nord-dark .table-view .column-header,
+.nord-dark .table-view .filler {
+    -fx-text-fill: rgba(255,255,255,0.55);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   TOP BAR  (AdminDashboard and similar full-width toolbar)
-   ═══════════════════════════════════════════════════════════════ */
+/* Rows */
+.nord-dark .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color:     transparent transparent #2B3B4C transparent;
+}
+.nord-dark .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell:odd {
+    -fx-background-color: #2D3D4F;
+}
+.nord-dark .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell:hover {
+    -fx-background-color: #2B3B4C;
+}
+.nord-dark .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell:selected {
+    -fx-background-color: #1a3a5c;
+}
+.nord-dark .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color:     transparent;
+}
+
+/* Cells */
+.nord-dark .table-view .table-row-cell .table-cell,
+.nord-dark .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .table-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill:        rgba(255,255,255,0.87);
+}
+
+/* Scroll bar dark */
+.nord-dark .table-view .scroll-bar:vertical .thumb,
+.nord-dark .table-view .scroll-bar:horizontal .thumb {
+    -fx-background-color: #2B3B4C;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOP BAR
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .top-bar {
-    -fx-background-color: -wl-surface-card;
-    -fx-padding:          0 16;
-    -fx-pref-height:      48px;
-    -fx-border-color: -wl-border transparent transparent transparent;
-    -fx-border-width: 0 0 1 0;
+    -fx-background-color: -wl-surface-card; -fx-padding: 0 16; -fx-pref-height: 48px;
+    -fx-border-color: -wl-border transparent transparent transparent; -fx-border-width: 0 0 1 0;
 }
+.top-bar-title { -fx-font-size: 15px; -fx-font-weight: 600; -fx-text-fill: -wl-text-main; }
+.top-bar-user  { -fx-font-size: 12px; -fx-text-fill: -wl-text-muted; }
+.content-area  { -fx-background-color: -wl-surface; -fx-padding: 16; }
 
-/* App title in AdminDashboard top bar */
-.top-bar-title {
-    -fx-font-size:   15px;
-    -fx-font-weight: 600;
-    -fx-text-fill:   -wl-text-main;
-}
 
-/* "Welcome, Admin" label */
-.top-bar-user {
-    -fx-font-size: 12px;
-    -fx-text-fill: -wl-text-muted;
-}
-
-/* Main content StackPane in AdminDashboard */
-.content-area {
-    -fx-background-color: -wl-surface;
-    -fx-padding:          16;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   SIDEBAR
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIDEBAR  (light = brand green; dark = dark navy per style guide)
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .sidebar {
     -fx-background-color: -wl-brand-green;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 12, 0, 0, 2);
 }
-
-.sidebar-topbar {
-    -fx-padding: 6;
-}
-
-.sidebar-header {
-    -fx-padding: 12 16;
-}
-
-.sidebar-app-name {
-    -fx-text-fill:   -wl-brand-green-text;
-    -fx-font-size:   15px;
-    -fx-font-weight: 600;
-}
-
-/* Navigation section of the sidebar */
-.sidebar-nav {
-    -fx-background-color: transparent;
-}
-
-/* Footer section (version + logout) */
+.sidebar-topbar   { -fx-padding: 6; }
+.sidebar-header   { -fx-padding: 12 16; }
+.sidebar-app-name { -fx-text-fill: -wl-brand-green-text; -fx-font-size: 15px; -fx-font-weight: 600; }
+.sidebar-nav      { -fx-background-color: transparent; }
 .sidebar-footer {
-    -fx-padding:          8 12;
-    -fx-border-color:     rgba(255,255,255,0.18) transparent transparent transparent;
-    -fx-border-width:     1 0 0 0;
+    -fx-padding: 8 12;
+    -fx-border-color: rgba(255,255,255,0.18) transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
 }
 
+/* Base nav button */
 .sidebar-btn {
-    -fx-background-color:  transparent;
-    -fx-text-fill:         -wl-brand-green-text;
-    -fx-alignment:         CENTER_LEFT;
-    -fx-padding:           8 12;
-    -fx-background-radius: 6px;
-    -fx-font-size:         12px;
-    -fx-font-weight:       500;
-    -fx-cursor:            hand;
-}
-.sidebar-btn .ikonli-font-icon {
-    -fx-icon-color: -wl-brand-dark;
-}
-.sidebar-btn:hover {
-    -fx-background-color: -wl-brand-green-hover;
-}
-
-.sidebar-btn-active {
-    -fx-background-color: -wl-brand-green-active;
+    -fx-background-color: transparent;
     -fx-text-fill:        -wl-brand-green-text;
-    -fx-font-weight:      600;
+    -fx-alignment:        CENTER_LEFT;
+    -fx-padding:          8 12;
+    -fx-background-radius: 6px;
+    -fx-font-size:        12px;
+    -fx-font-weight:      500;
+    -fx-cursor:           hand;
+}
+.sidebar-btn .ikonli-font-icon { -fx-icon-color: -wl-brand-dark; }
+.sidebar-btn:hover              { -fx-background-color: -wl-brand-green-hover; }
+
+/*
+  ACTIVE button — light mode: darker green.
+  The compound class .sidebar-btn.sidebar-btn-active has specificity (0,2,0)
+  which is higher than simple .sidebar-btn-active (0,1,0). We match the same
+  specificity here so dark-mode override can reliably win with (0,3,0).
+*/
+.sidebar-btn.sidebar-btn-active,
+.sidebar-btn-active {
+    -fx-background-color:  derive(-wl-brand-green, -18%);
+    -fx-text-fill:         #FFFFFF;
+    -fx-font-weight:       700;
+    /* Left accent strip for emphasis */
+    -fx-border-color:  rgba(255,255,255,0.55) transparent rgba(255,255,255,0.10) transparent;
+    -fx-border-width:  0 0 0 3;
+    -fx-padding:       8 12 8 9;
+    -fx-background-radius: 6px;
 }
 
 .sidebar-btn-logout {
-    -fx-background-color:  transparent;
+    -fx-background-color: transparent; -fx-background-radius: 6px;
+    -fx-pref-width: 30px; -fx-pref-height: 30px; -fx-cursor: hand;
+}
+.sidebar-btn-logout .ikonli-font-icon      { -fx-icon-size: 18px; -fx-icon-color: -wl-brand-green-text; }
+.sidebar-btn-logout:hover                   { -fx-background-color: rgba(239,68,68,0.25); }
+.sidebar-btn-logout:hover .ikonli-font-icon { -fx-icon-color: -wl-brand-danger; }
+.sidebar-version { -fx-text-fill: rgba(255,255,255,0.65); -fx-font-size: 10px; }
+
+
+/* ── SIDEBAR dark mode ────────────────────────────────────────────────────────
+   Style guide dark: secondary nav bg = #2D3D4F, active btn = #008FF7.
+
+   Specificity ladder (must be higher than base sidebar-btn.sidebar-btn-active):
+     .sidebar-btn.sidebar-btn-active               = (0,2,0)  → base light green
+     .nord-dark .sidebar-btn.sidebar-btn-active     = (0,3,0)  → dark blue  ✓ WINS
+   ─────────────────────────────────────────────────────────────────────────── */
+.nord-dark .sidebar {
+    -fx-background-color: #2D3D4F;
+}
+.nord-dark .sidebar-footer {
+    -fx-border-color: rgba(255,255,255,0.10) transparent transparent transparent;
+}
+/* Hover: subtle tint on dark navy — NOT green */
+.nord-dark .sidebar-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+}
+/* Icon on dark navy: lighter white */
+.nord-dark .sidebar-btn .ikonli-font-icon {
+    -fx-icon-color: rgba(255, 255, 255, 0.70);
+}
+
+/*
+  ACTIVE button dark mode.
+  Compound selector (.nord-dark .sidebar-btn.sidebar-btn-active) has specificity
+  (0,3,0) — guaranteed to beat the light-mode base rule at (0,2,0).
+  This is the definitive fix for the "green active in dark mode" bug.
+*/
+.nord-dark .sidebar-btn.sidebar-btn-active,
+.nord-dark .sidebar-btn-active {
+    -fx-background-color: #008FF7;              /* dark mode primary nav btn */
+    -fx-text-fill:        #FFFFFF;
+    -fx-font-weight:      700;
+    -fx-border-color:     #33A9EE transparent #33A9EE transparent;  /* brighter left strip */
+    -fx-border-width:     0 0 0 3;
+    -fx-padding:          8 12 8 9;
     -fx-background-radius: 6px;
-    -fx-pref-width:   30px;
-    -fx-pref-height:  30px;
-    -fx-cursor:       hand;
 }
-.sidebar-btn-logout .ikonli-font-icon {
-    -fx-icon-size:  18px;
-    -fx-icon-color: -wl-brand-green-text;
-}
-.sidebar-btn-logout:hover {
-    -fx-background-color: rgba(239, 68, 68, 0.25);
-}
-.sidebar-btn-logout:hover .ikonli-font-icon {
-    -fx-icon-color: -wl-brand-danger;
-}
+/* Close button stays white on dark bg */
+.nord-dark .sidebar .close-btn .ikonli-font-icon { -fx-icon-color: white; }
 
-.sidebar-version {
-    -fx-text-fill: rgba(255,255,255,0.65);
-    -fx-font-size: 10px;
-}
 
-/* ═══════════════════════════════════════════════════════════════
-   DASHBOARD  (EmployeeDashboard)
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   EMPLOYEE DASHBOARD
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Outer BorderPane wrapper */
-.dashboard {
-    -fx-background-color: -wl-surface;
-}
-
-/* Top toolbar strip inside the dashboard */
+.dashboard { -fx-background-color: -wl-surface; }
 .dashboard-toolbar {
-    -fx-background-color: -wl-surface-card;
-    -fx-padding:          6 12;
+    -fx-background-color: -wl-surface-card; -fx-padding: 6 12;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 1);
 }
+.panel       { -fx-background-color: -wl-surface; -fx-padding: 12; }
+.panel-title { -fx-font-weight: 600; -fx-font-size: 15px; -fx-text-fill: -wl-text-main; }
+.documents-panel { -fx-background-color: -wl-surface; -fx-padding: 6; -fx-spacing: 6; }
+.files-panel     { -fx-background-color: -wl-surface; -fx-padding: 6; -fx-spacing: 6; }
 
-/* ── Content panels ──────────────────────────────────────────── */
-
-.panel {
-    -fx-background-color: -wl-surface;
-    -fx-padding:          12;
+.transparent-scroll, .transparent-scroll > .viewport,
+.filesView,          .filesView > .viewport {
+    -fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;
 }
-.panel-title {
-    -fx-font-weight: 600;
-    -fx-font-size:   15px;
-    -fx-text-fill:   -wl-text-main;
-}
+.split-pane > .split-pane-divider { -fx-background-color: -wl-border; -fx-padding: 0 0.5; }
 
-/* Documents panel (left split pane half) */
-.documents-panel {
-    -fx-background-color: -wl-surface;
-    -fx-padding:          6;
-    -fx-spacing:          6;
-}
 
-/* Files panel (right split pane half) */
-.files-panel {
-    -fx-background-color: -wl-surface;
-    -fx-padding:          6;
-    -fx-spacing:          6;
-}
-
-/* ── ScrollPanes ─────────────────────────────────────────────── */
-
-/* Generic transparent scroll (applies to both panels) */
-.transparent-scroll,
-.transparent-scroll > .viewport {
-    -fx-background-color: transparent;
-    -fx-background:       transparent;
-    -fx-border-color:     transparent;
-}
-
-/* Files-panel scroll area alias (keeps backward compat with old styleClass="filesView") */
-.filesView,
-.filesView > .viewport {
-    -fx-background-color: transparent;
-    -fx-background:       transparent;
-    -fx-border-color:     transparent;
-}
-
-/* SplitPane divider */
-.split-pane > .split-pane-divider {
-    -fx-background-color: -wl-border;
-    -fx-padding: 0 0.5;
-}
-
-/* ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════
    DOCUMENT TILE
-   ─────────────────────────────────────────────────────────────
-   Width:  100px (leaves room for 4 columns with 14px gaps)
-   Height: 130px  folder icon (30px) + title (11px) + count (10px)
-                  + spacing + padding comfortably fits
-
-   BEFORE: 90×100px with 72px icon → title always clipped.
-   AFTER:  100×130px with 30px icon → all labels fully visible.
-   ═══════════════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .document-tile {
-    -fx-background-color:  -wl-surface-card;
-    -fx-border-color:      -wl-border;
-    -fx-border-width:      1px;
-    -fx-border-radius:     6px;
-    -fx-background-radius: 6px;
-    -fx-padding:           8;
-    -fx-min-width:   100px;
-    -fx-pref-width:  100px;
-    -fx-min-height:  130px;
-    -fx-pref-height: 130px;
-    -fx-alignment:   center;
-    -fx-cursor:      hand;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 4, 0, 0, 1);
+    -fx-background-color: -wl-surface-card; -fx-border-color: -wl-border;
+    -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;
+    -fx-padding: 8; -fx-min-width: 100px; -fx-pref-width: 100px;
+    -fx-min-height: 130px; -fx-pref-height: 130px;
+    -fx-alignment: center; -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 6, 0, 0, 2);
 }
-.document-tile:hover {
-    -fx-background-color: -wl-surface-hover;
-    -fx-border-color:     -wl-accent-hover;
-}
-
-/*
-  Selected state — toggled via DocumentTileController.setSelected()
-  using getStyleClass().add/remove("selected") so CSS stays in control.
-*/
+.document-tile:hover    { -fx-background-color: -wl-surface-hover; -fx-border-color: -wl-accent-hover; }
 .document-tile.selected {
-    -fx-background-color: -wl-accent-subtle;
-    -fx-border-color:     -wl-accent;
-    -fx-border-width:     2px;
-    -fx-border-radius:    6;
+    -fx-background-color: -wl-accent-subtle; -fx-border-color: -wl-accent; -fx-border-width: 2px;
 }
+.doc-folder-icon      { -fx-icon-size: 85px; -fx-icon-color: #2f80ed; }
+.doc-icon-placeholder { -fx-alignment: center; -fx-padding: 6 0 4 0; }
+.doc-icon-subtitle    { -fx-font-size: 9px;  -fx-text-fill: -wl-text-muted; -fx-alignment: CENTER; }
+.document-title       { -fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: -wl-text-main; -fx-alignment: CENTER; }
+.doc-count-label      { -fx-font-size: 9px;  -fx-text-fill: -wl-text-muted; -fx-alignment: CENTER; }
 
-/* Folder icon inside the tile — 30px is readable without eating all the vertical space */
-.doc-folder-icon {
-    -fx-icon-size:  85px;
-    -fx-icon-color: #2f80ed;
-}
 
-/* VBox wrapping the folder icon and subtitle — centre-aligned, minimal top padding */
-.doc-icon-placeholder {
-    -fx-alignment: center;
-    -fx-padding:   6 0 4 0;
-}
-
-/*
-  thumbArea StackPane — no fixed min-height here.
-  VBox.vgrow="ALWAYS" in the FXML lets it fill whatever space
-  remains after the labels claim their natural height.
-  Removing the old #thumbArea { -fx-min-height: 150 } rule that
-  forced 150px inside a 100px tile (that was the clip bug).
-*/
-
-/* Small "Document N" text rendered inside the icon placeholder */
-.doc-icon-subtitle {
-    -fx-font-size: 9px;
-    -fx-text-fill: -wl-text-muted;
-    -fx-alignment: CENTER;
-}
-
-/* Bold label below the thumb area: "Document 1" */
-.document-title {
-    -fx-font-size:   11px;
-    -fx-font-weight: 600;
-    -fx-text-fill:   -wl-text-main;
-    -fx-wrap-text:   false;
-    -fx-alignment:   CENTER;
-}
-
-/* Muted label below the title: "3 pages" */
-.doc-count-label {
-    -fx-font-size: 9px;
-    -fx-text-fill: -wl-text-muted;
-    -fx-alignment: CENTER;
-}
-
-/* ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════════
    FILE TILE
-   ═══════════════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .file-tile {
-    -fx-background-color:  -wl-surface-card;
-    -fx-border-color:      -wl-border;
-    -fx-border-width:      1px;
-    -fx-border-radius:     10px;
-    -fx-background-radius: 10px;
-    -fx-padding:           8;
-    -fx-min-width:   140px;
-    -fx-pref-width:  140px;
-    -fx-min-height:  200px;
-    -fx-pref-height: 200px;
-    -fx-alignment:   center;
-    -fx-cursor:      hand;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 4, 0, 0, 1);
+    -fx-background-color: -wl-surface-card; -fx-border-color: -wl-border;
+    -fx-border-width: 1px; -fx-border-radius: 10px; -fx-background-radius: 10px;
+    -fx-padding: 8; -fx-min-width: 140px; -fx-pref-width: 140px;
+    -fx-min-height: 200px; -fx-pref-height: 200px;
+    -fx-alignment: center; -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 6, 0, 0, 2);
 }
-.file-tile:hover {
-    -fx-background-color: -wl-surface-hover;
-    -fx-border-color:     -wl-accent-hover;
-}
+.file-tile:hover    { -fx-background-color: -wl-surface-hover; -fx-border-color: -wl-accent-hover; }
 .file-tile.selected {
-    -fx-background-color: -wl-accent-subtle;
-    -fx-border-color:     -wl-accent;
-    -fx-border-width:     2px;
+    -fx-background-color: -wl-accent-subtle; -fx-border-color: -wl-accent; -fx-border-width: 2px;
     -fx-effect: dropshadow(gaussian, rgba(79,140,255,0.4), 12, 0.4, 0, 0);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   PREVIEW PANEL
-   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PREVIEW
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .preview {
-    -fx-background-color:  -wl-surface-card;
-    -fx-border-color:      -wl-border;
-    -fx-border-radius:     10px;
-    -fx-background-radius: 10px;
+    -fx-background-color: -wl-surface-card; -fx-border-color: -wl-border;
+    -fx-border-radius: 10px; -fx-background-radius: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 16, 0, 0, 4);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   TABLES
-   ═══════════════════════════════════════════════════════════════ */
 
-.table-row-cell:hover {
-    -fx-background-color: -wl-surface-hover;
-}
-.table-row-cell:selected {
-    -fx-background-color: -wl-accent-subtle;
-}
-.table-row-cell:selected .label {
-    -fx-text-fill: -wl-text-main;
-}
+/* ═══════════════════════════════════════════════════════════════════════════
+   LOGIN  (merged from login.css)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.brand-panel   { -fx-background-color: -color-bg-subtle; -fx-border-color: -color-border-default; -fx-border-width: 0 1 0 0; }
+.app-name      { -fx-font-size: 34px; -fx-font-weight: 900; -fx-text-fill: -wl-text-main; }
+.brand-tagline { -fx-font-size: 14px; -fx-text-fill: -color-fg-muted; -fx-wrap-text: true; -fx-line-spacing: 4; -fx-padding: -15 0 0 0; }
+.brand-version { -fx-font-size: 11px; -fx-text-fill: -color-fg-subtle; }
+.form-panel    { -fx-background-color: -color-bg-default; }
+.form-heading  { -fx-font-size: 22px; -fx-font-weight: 700; -fx-text-fill: -color-fg-default; }
+.footer-note   { -fx-font-size: 11px; -fx-text-fill: -color-fg-subtle; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROFILES TAB  (merged from profilesTab.css)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#rulesList .list-cell { -fx-padding: 2px; -fx-font-size: 12px; }

@@ -110,7 +110,7 @@ public class DocumentTileController {
     // Updates the "N pages" sub-label.
 
     public void setFileCount(int count) {
-        lblFileCount.setText(count == 0 ? "" : count + (count == 1 ? " page" : " pages"));
+        lblFileCount.setText(count == 0 ? "" : count + (count == 1 ? " file" : " files"));
     }
 
 

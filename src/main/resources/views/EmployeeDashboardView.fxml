@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -20,34 +21,51 @@
     <BorderPane fx:id="dashboardContent" prefHeight="448.0" prefWidth="550.0" styleClass="dashboard">
 
         <top>
-            <HBox fx:id="topToolBar" alignment="CENTER_LEFT" prefHeight="48.0" spacing="8.0" styleClass="dashboard-toolbar" BorderPane.alignment="CENTER">
-
-                <Button fx:id="btnLogout" onAction="#onLogout" styleClass="action-btn">
-                    <graphic><FontIcon iconLiteral="bi-box-arrow-right" /></graphic>
-                </Button>
-
-                <Button fx:id="StartScanningSession" mnemonicParsing="false" onAction="#onBtnStartScanningSession" styleClass="action-btn" text="Start scanning session" />
-
-                <Button fx:id="btnFetch" mnemonicParsing="false" onAction="#onBtnFetch" styleClass="action-btn" text="Fetch" />
-
-                <Region HBox.hgrow="ALWAYS" />
-
-                <HBox alignment="CENTER" prefHeight="48.0" spacing="6">
-                    <Label styleClass="h3" text="Box" minWidth="-Infinity" />
-                    <Label fx:id="lblBoxID" styleClass="h3" text="" minWidth="-Infinity" />
-                    <Label styleClass="h3" text="|" minWidth="-Infinity" />
-                    <Label fx:id="lblDocumentNr" styleClass="h3" text="" minWidth="-Infinity" />
-                </HBox>
-
-                <Region HBox.hgrow="ALWAYS" />
-
-                <HBox alignment="CENTER" prefHeight="48.0" spacing="6">
-                    <Label styleClass="h3" text="Files in box" minWidth="-Infinity" />
-                    <Label fx:id="lblTotalFilesInBox" styleClass="h3" minWidth="-Infinity" />
-                </HBox>
-
-                <padding><Insets left="8.0" right="8.0" /></padding>
-            </HBox>
+         <VBox BorderPane.alignment="CENTER">
+            <children>
+               <HBox prefHeight="26.0" prefWidth="687.0">
+                  <children>
+                     <ImageView fitHeight="37.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../img/Tiffix.png" />
+                        </image>
+                     </ImageView>
+                  </children>
+               </HBox>
+                  <HBox fx:id="topToolBar" alignment="CENTER_LEFT" prefHeight="48.0" spacing="8.0" styleClass="dashboard-toolbar">
+      
+                      <Button fx:id="btnLogout" onAction="#onLogout" styleClass="action-btn">
+                          <graphic>
+                        <FontIcon iconLiteral="bi-box-arrow-right" />
+                     </graphic>
+                      </Button>
+      
+                      <Button fx:id="StartScanningSession" mnemonicParsing="false" onAction="#onBtnStartScanningSession" styleClass="action-btn" text="Start scanning session" />
+      
+                      <Button fx:id="btnFetch" mnemonicParsing="false" onAction="#onBtnFetch" styleClass="action-btn" text="Fetch" />
+      
+                      <Region HBox.hgrow="ALWAYS" />
+      
+                      <HBox alignment="CENTER" prefHeight="48.0" spacing="6">
+                          <Label minWidth="-Infinity" styleClass="h3" text="Box" />
+                          <Label fx:id="lblBoxID" minWidth="-Infinity" styleClass="h3" text="" />
+                          <Label minWidth="-Infinity" styleClass="h3" text="|" />
+                          <Label fx:id="lblDocumentNr" minWidth="-Infinity" styleClass="h3" text="" />
+                      </HBox>
+      
+                      <Region HBox.hgrow="ALWAYS" />
+      
+                      <HBox alignment="CENTER" prefHeight="48.0" spacing="6">
+                          <Label minWidth="-Infinity" styleClass="h3" text="Files in box" />
+                          <Label fx:id="lblTotalFilesInBox" minWidth="-Infinity" styleClass="h3" />
+                      </HBox>
+      
+                      <padding>
+                     <Insets left="8.0" right="8.0" />
+                  </padding>
+                  </HBox>
+            </children>
+         </VBox>
         </top>
 
         <center>
