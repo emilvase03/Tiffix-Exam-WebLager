@@ -85,6 +85,8 @@ public class EmployeeDashboardController {
     private final IdentityHashMap<Document, String>                       documentLabels          = new IdentityHashMap<>();
 
     private Path scanTempDir;
+    @FXML
+    private Label lblTotalFilesInBox;
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -175,6 +177,7 @@ public class EmployeeDashboardController {
             }
 
             updateDocumentFileCountLabels();
+            updateTotalFilesInBoxLabel();   // keep box-total in sync after each fetch
             if (firstNewIndex != -1) openPreviewAt(firstNewIndex);
             setFetchButtonsDisabled(false);
         });
@@ -332,6 +335,7 @@ public class EmployeeDashboardController {
                 }
             }
 
+            // Reset BEFORE reading counts — the old session's data must be gone first
             activeDocument     = null;
             nextDocSortOrder   = documents.size() + 1;
             nextCreationNumber = 1;
@@ -347,11 +351,35 @@ public class EmployeeDashboardController {
 
             populateDocumentTilePane(documents);
             lblTotalDocInBox.setText(String.valueOf(documents.size()));
+
+            for (Document doc : documents) {
+                try {
+                    List<ScannedFile> dbFiles = boxDocumentModel.loadFilesForDocument(doc);
+                    sessionData.put(doc, new ArrayList<>(dbFiles));
+                    refreshDocumentTile(doc);
+                } catch (Exception e) {
+                    sessionData.put(doc, new ArrayList<>());
+                }
+            }
+
             setTotalsVisible(true);
+            updateTotalFilesInBoxLabel();
 
         } catch (Exception e) {
             AlertHelper.showError("Load error",
                     "Could not load documents for the selected box.");
+        }
+    }
+    private int getTotalFilesInBox() {
+        return sessionData.values()
+                .stream()
+                .mapToInt(List::size)
+                .sum();
+    }
+
+    private void updateTotalFilesInBoxLabel() {
+        if (lblTotalFilesInBox != null) {
+            lblTotalFilesInBox.setText(String.valueOf(getTotalFilesInBox()));
         }
     }
 
@@ -588,6 +616,7 @@ public class EmployeeDashboardController {
         refreshDocumentTile(target);
         refreshFilePanel();
         updateDocumentFileCountLabels();
+        updateTotalFilesInBoxLabel();   // count across all documents is unchanged but stay consistent
     }
 
     public void swapDocuments(int draggedSortOrder, Document target) {
