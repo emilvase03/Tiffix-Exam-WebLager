@@ -43,7 +43,8 @@
             <ComboBox fx:id="boxComboBox"
                       maxWidth="Infinity"
                       promptText="Select a box"
-                      styleClass="combo-box-base"/>
+                      styleClass="combo-box-base"
+                      editable="true"/>
         </VBox>
 
         <Separator/>
