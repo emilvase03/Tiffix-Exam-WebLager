@@ -68,8 +68,8 @@ public class EmployeeDashboardController {
     private BoxDocumentModel   boxDocumentModel;
     private FileImportModel    fileImportModel;
     private ProfileRuleModel   profileRuleModel;
-    private DocumentManager    documentManager;     // for creating unsaved documents on export
-    private ScannedFileManager scannedFileManager;  // for saving files to DB on export
+    private DocumentManager    documentManager;
+    private ScannedFileManager scannedFileManager;
 
     private Document activeDocument = null;
     private final List<ScannedFile> currentFiles = new ArrayList<>();
@@ -130,8 +130,6 @@ public class EmployeeDashboardController {
                     var scan  = allResults.get(i);
                     byte[] bytes = scan.fileBytes();
 
-                    // Write a temp file so BarcodeDetector.hasBarcode(File) can run.
-                    // The path is stored transiently and is never persisted to the DB.
                     Path dest = writeTempFile(scan.fileName(), bytes);
                     ScannedFile sf = ScannedFile.unsaved(scanOrder++, dest.toString(), bytes);
 
@@ -232,19 +230,23 @@ public class EmployeeDashboardController {
         // 3. Rebuild sort orders so everything is consistent before saving
         rebuildAllSortOrders();
 
-        // Snapshot sessionData for the background task (IdentityHashMap is not thread-safe)
+        // Snapshot — shallow copy of the map so the background thread has a stable key set
         Map<Document, List<ScannedFile>> snapshot = new LinkedHashMap<>(sessionData);
 
-        // 4. Run save-to-DB + export on a background thread
-        Task<Path> exportTask = new Task<>() {
+        // 4. Save to DB + export on a background thread
+        Task<String> exportTask = new Task<>() {
             @Override
-            protected Path call() throws Exception {
+            protected String call() throws Exception {
                 TiffExportService exportService = new TiffExportService();
+                StringBuilder summary = new StringBuilder();
 
                 for (Map.Entry<Document, List<ScannedFile>> entry : snapshot.entrySet()) {
                     Document doc   = entry.getKey();
                     List<ScannedFile> files = entry.getValue();
                     if (files.isEmpty()) continue;
+
+                    String docLabel = documentLabels.getOrDefault(doc,
+                            "Document_" + doc.getSortOrder());
 
                     // ── Save document to DB if unsaved ────────────────────────
                     if (doc.isUnsaved()) {
@@ -257,27 +259,28 @@ public class EmployeeDashboardController {
                     scannedFileManager.saveFilesForDocument(doc.getId(), files);
 
                     // ── Export to disk ────────────────────────────────────────
-                    String docLabel = documentLabels.getOrDefault(doc,
-                            "Document_" + doc.getSortOrder());
-
                     if (multiPage) {
-                        String filename = docLabel.replace(" ", "_") + ".tiff";
-                        Path outFile = outputDir.resolve(filename);
-                        exportService.exportMultiPage(files, outFile);
+                        String filename = sanitizeLabel(docLabel) + ".tiff";
+                        Path   outFile  = outputDir.resolve(filename);
+                        int    written  = exportService.exportMultiPage(files, outFile);
+                        summary.append(docLabel)
+                                .append(": ").append(written).append(" page(s) written\n");
                     } else {
                         exportService.exportSinglePage(files, outputDir, docLabel);
+                        summary.append(docLabel)
+                                .append(": ").append(files.size()).append(" file(s) written\n");
                     }
                 }
 
-                return outputDir;
+                return summary.toString().trim();
             }
         };
 
         exportTask.setOnSucceeded(e -> {
             Alert done = new Alert(Alert.AlertType.INFORMATION);
             done.setTitle("Export complete");
-            done.setHeaderText(null);
-            done.setContentText("Files saved to:\n" + outputDir);
+            done.setHeaderText("Files saved to: " + outputDir);
+            done.setContentText(exportTask.getValue());
             done.showAndWait();
         });
 
@@ -290,6 +293,10 @@ public class EmployeeDashboardController {
         Thread t = new Thread(exportTask);
         t.setDaemon(true);
         t.start();
+    }
+
+    private String sanitizeLabel(String label) {
+        return label.replaceAll("[\\s/\\\\:*?\"<>|]", "_");
     }
 
     // ── Session ───────────────────────────────────────────────────────────────
@@ -474,15 +481,9 @@ public class EmployeeDashboardController {
         previewImageView.setRotate(0);
     }
 
-    /**
-     * Returns the processed image for preview, decoding it if not yet cached.
-     * Falls back to the TIFF bytes first (covers DB-loaded files that have no filePath),
-     * then to the temp file on disk (freshly scanned files during the session).
-     */
     private BufferedImage getOrLoadProcessedImage(ScannedFile file) {
         if (file.getProcessedImage() != null) return file.getProcessedImage();
 
-        // Try bytes first (DB-loaded files have bytes but no filePath)
         byte[] bytes = file.getTiffFile();
         if (bytes != null && bytes.length > 0) {
             try {
@@ -494,7 +495,6 @@ public class EmployeeDashboardController {
             } catch (IOException ignored) { }
         }
 
-        // Fallback: temp file (freshly scanned, bytes somehow null)
         String path = file.getFilePath();
         if (path != null && !path.isBlank()) {
             try {
@@ -508,7 +508,7 @@ public class EmployeeDashboardController {
         return file.getProcessedImage();
     }
 
-    // ── Navigation / interaction ──────────────────────────────────────────────
+    // ── Navigation ────────────────────────────────────────────────────────────
 
     @FXML
     private void onBtnPreviousPage(ActionEvent event) {
