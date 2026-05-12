@@ -36,11 +36,6 @@ public class ThemeManager {
         applyTheme(darkMode.get());
         applyClassToAll(darkMode.get());
 
-        // ── KEY FIX: watch for any window opened in the future ────────────────
-        // When a new Stage is created and shown AFTER dark mode has been set,
-        // this listener fires immediately and applies the correct theme to it.
-        // Without this, windows opened after toggling (e.g. Employee Dashboard)
-        // would not receive the nord-dark class.
         Window.getWindows().addListener((ListChangeListener<Window>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
