@@ -7,6 +7,7 @@ import dk.easv.tiffixexamweblager.GUI.Controllers.EmployeeDashboardController;
 
 // Java imports
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,15 +41,12 @@ public class ScannedFileTileController {
 
     public void setFile(ScannedFile file) {
         this.file = file;
-        lblFileTitle.setText(extractDisplayName(file));
+        lblFileTitle.setText(buildDisplayName(file));
         renderThumbnail();
     }
 
-    public void setScannedFile(ScannedFile file) {
-        setFile(file);
-    }
-
-    public ScannedFile getFile() { return file; }
+    public void setScannedFile(ScannedFile file) { setFile(file); }
+    public ScannedFile getFile()                 { return file; }
 
     public void setDashboardController(EmployeeDashboardController controller) {
         this.dashboardController = controller;
@@ -60,13 +58,10 @@ public class ScannedFileTileController {
 
     @FXML
     private void initialize() {
-
         root.setOnDragDetected(e -> {
             if (file == null) return;
-
             Dragboard db = root.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
-            // scanOrder is the stable
             content.putString("FILE_ID:" + file.getScanOrder());
             db.setContent(content);
             root.setOpacity(0.5);
@@ -75,7 +70,6 @@ public class ScannedFileTileController {
 
         root.setOnDragDone(e -> root.setOpacity(1.0));
 
-        // reorder within the same document
         root.setOnDragOver(e -> {
             String token = e.getDragboard().getString();
             if (e.getDragboard().hasString() && token.startsWith("FILE_ID:")) {
@@ -88,7 +82,6 @@ public class ScannedFileTileController {
             Dragboard db = e.getDragboard();
             if (db.hasString() && db.getString().startsWith("FILE_ID:")) {
                 int draggedScanOrder = Integer.parseInt(db.getString().substring(8));
-
                 if (dashboardController != null) {
                     dashboardController.reorderFiles(draggedScanOrder, file);
                 }
@@ -100,15 +93,12 @@ public class ScannedFileTileController {
         });
     }
 
+    // ── Rendering ─────────────────────────────────────────────────────────────
 
     private void renderThumbnail() {
         BufferedImage base = resolveBaseImage();
-        if (base == null) {
-            imgThumbnail.setImage(null);
-            return;
-        }
+        if (base == null) { imgThumbnail.setImage(null); return; }
 
-        // Composite user-level adjustments on top of the profile-rule-processed image
         BufferedImage display = ImageTransformations.applyAll(
                 base, file.getUserRotation(), file.getUserBrightness());
 
@@ -120,23 +110,49 @@ public class ScannedFileTileController {
         applyCenterCrop(imgThumbnail);
     }
 
+    /**
+     * Returns the processed image, decoding it if not yet cached.
+     * Prefers the in-memory processedImage, then falls back to the TIFF bytes
+     * (covers both freshly-scanned and DB-loaded files), then the temp file path
+     * as a last resort.
+     */
     private BufferedImage resolveBaseImage() {
         if (file.getProcessedImage() != null) return file.getProcessedImage();
 
+        // Primary source: raw TIFF bytes (always available for DB-loaded files)
+        byte[] bytes = file.getTiffFile();
+        if (bytes != null && bytes.length > 0) {
+            try {
+                BufferedImage raw = ImageIO.read(new ByteArrayInputStream(bytes));
+                if (raw != null) { file.setProcessedImage(raw); return raw; }
+            } catch (IOException ignored) { }
+        }
+
+        // Fallback: temp file on disk (freshly scanned, bytes somehow null)
         String path = file.getFilePath();
-        if (path == null || path.isBlank()) return null;
+        if (path != null && !path.isBlank()) {
+            try {
+                BufferedImage raw = ImageIO.read(new File(path));
+                if (raw != null) { file.setProcessedImage(raw); return raw; }
+            } catch (IOException ignored) { }
+        }
 
-        try {
-            BufferedImage raw = ImageIO.read(new File(path));
-            if (raw != null) file.setProcessedImage(raw);
-        } catch (IOException ignored) { }
-
-        return file.getProcessedImage();
+        return null;
     }
 
-    private String extractDisplayName(ScannedFile file) {
-        return Path.of(file.getFilePath()).getFileName().toString();
+    /**
+     * Shows the original file name when scanning (filePath is set),
+     * or "Page N" for DB-loaded files.
+     */
+    private String buildDisplayName(ScannedFile file) {
+        String path = file.getFilePath();
+        if (path != null && !path.isBlank()) {
+            return Path.of(path).getFileName().toString();
+        }
+        return "Page " + file.getScanOrder();
     }
+
+    // ── Center-crop ───────────────────────────────────────────────────────────
 
     private void applyCenterCrop(ImageView iv) {
         Image img = iv.getImage();
@@ -147,12 +163,10 @@ public class ScannedFileTileController {
         Rectangle2D viewport;
 
         if (imageRatio > thumbRatio) {
-            // Image too wide → crop left / right
             double newWidth = img.getHeight() * thumbRatio;
             double x = (img.getWidth() - newWidth) / 2;
             viewport = new Rectangle2D(x, 0, newWidth, img.getHeight());
         } else {
-            // Image too tall → crop top / bottom
             double newHeight = img.getWidth() / thumbRatio;
             double y = (img.getHeight() - newHeight) / 2;
             viewport = new Rectangle2D(0, y, img.getWidth(), newHeight);

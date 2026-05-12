@@ -4,76 +4,55 @@ import java.awt.image.BufferedImage;
 
 public class ScannedFile {
 
-    private int id;
-    private int documentId;
-    private int scanOrder;
-    private int sortOrder;
-    private String filePath;
-    private double rotationAngle;
+    // ── Persisted (match new DB columns) ──────────────────────────────────────
+    private int    id;
+    private int    documentId;
+    private byte[] tiffFile;      // VARBINARY(MAX) – the raw TIFF bytes
+    private int    scanOrder;
+    private int    sortOrder;
 
-    private byte[] rawBytes;
+    // ── Transient / in-session only (never written to DB) ─────────────────────
+    /** Absolute path of the temp file written during scanning.
+     *  Kept solely so BarcodeDetector.hasBarcode(File) can run.
+     *  Null for files loaded from the database. */
+    private String        filePath;
     private BufferedImage processedImage;
+    private int           userRotation;
+    private int           userBrightness;
 
-    private int userRotation;
-
-    private int userBrightness;
-
-    public ScannedFile(int id, int documentId,
-                       int scanOrder, int sortOrder,
-                       String filePath, double rotationAngle) {
-        this.id = id;
+    // ── Constructor (used when loading from DB) ────────────────────────────────
+    public ScannedFile(int id, int documentId, byte[] tiffFile, int scanOrder, int sortOrder) {
+        this.id         = id;
         this.documentId = documentId;
-        this.scanOrder = scanOrder;
-        this.sortOrder = sortOrder;
-        this.filePath = filePath;
-        this.rotationAngle = rotationAngle;
+        this.tiffFile   = tiffFile;
+        this.scanOrder  = scanOrder;
+        this.sortOrder  = sortOrder;
     }
 
-    //freshly scanned file that has not been saved to the database yet.
-    public static ScannedFile unsaved(int order, String filePath, byte[] rawBytes) {
-        ScannedFile f = new ScannedFile(0, 0, order, order, filePath, 0.0);
-        f.rawBytes = rawBytes;
+    // ── Factory methods ────────────────────────────────────────────────────────
+
+    /** Freshly scanned file not yet saved to the database. */
+    public static ScannedFile unsaved(int order, String filePath, byte[] tiffFile) {
+        ScannedFile f = new ScannedFile(0, 0, tiffFile, order, order);
+        f.filePath = filePath;
         return f;
     }
 
-   // files loaded from the database in a previous session).
-    public static ScannedFile unsaved(int order, String filePath) {
-        return new ScannedFile(0, 0, order, order, filePath, 0.0);
-    }
+    // ── Getters ───────────────────────────────────────────────────────────────
+    public int           getId()             { return id; }
+    public int           getDocumentId()     { return documentId; }
+    public byte[]        getTiffFile()       { return tiffFile; }
+    public int           getScanOrder()      { return scanOrder; }
+    public int           getSortOrder()      { return sortOrder; }
+    public String        getFilePath()       { return filePath; }
+    public BufferedImage getProcessedImage() { return processedImage; }
+    public int           getUserRotation()   { return userRotation; }
+    public int           getUserBrightness() { return userBrightness; }
 
-    public int    getScanOrder()       {
-        return scanOrder; }
-    public int    getSortOrder()       {
-        return sortOrder; }
-    public String getFilePath()        {
-        return filePath; }
-    public double getRotationAngle()   {
-        return rotationAngle; }
-
-    public byte[]        getRawBytes()       {
-        return rawBytes; }
-
-    public BufferedImage getProcessedImage() {
-        return processedImage; }
-
-    public int           getUserRotation()   {
-        return userRotation; }
-
-    public int           getUserBrightness() {
-        return userBrightness; }
-
-    public void setSortOrder(int sortOrder)            {
-        this.sortOrder = sortOrder; }
-
-    public void setRotationAngle(double rotationAngle) {
-        this.rotationAngle = rotationAngle; }
-
-    public void setProcessedImage(BufferedImage img)   {
-        this.processedImage = img; }
-
-    public void setUserRotation(int degrees)           {
-        this.userRotation = degrees; }
-
-    public void setUserBrightness(int brightness)      {
-        this.userBrightness = brightness; }
+    // ── Setters ───────────────────────────────────────────────────────────────
+    public void setId(int id)                        { this.id = id; }
+    public void setSortOrder(int sortOrder)          { this.sortOrder = sortOrder; }
+    public void setProcessedImage(BufferedImage img) { this.processedImage = img; }
+    public void setUserRotation(int degrees)         { this.userRotation = degrees; }
+    public void setUserBrightness(int brightness)    { this.userBrightness = brightness; }
 }
