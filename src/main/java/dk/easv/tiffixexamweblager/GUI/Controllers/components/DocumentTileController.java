@@ -1,47 +1,29 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
+//Project imports
 import dk.easv.tiffixexamweblager.BE.Document;
 import dk.easv.tiffixexamweblager.GUI.Controllers.EmployeeDashboardController;
 
-import java.awt.image.BufferedImage;
-
-import javafx.embed.swing.SwingFXUtils;
+//Java/JavaFX imports
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-/**
- * Controller for a document tile (folder) in the document strip.
- *
- * <p><b>Label vs sort-order</b>: The tile has two independent concepts:
- * <ul>
- *   <li>{@code label} — the human-visible name ("Document 1").
- *       Set once at creation by the dashboard via {@link #setLabel(String)}.
- *       <b>Never changes</b>, even when the tile is dragged to a different position.
- *   <li>{@code sortOrder} inside the {@link Document} object — the current visual
- *       position, updated by drag-reorder. Used only for drag tokens and
- *       sessionData lookups; never shown to the user.
- * </ul>
- */
 public class DocumentTileController {
-
-    // ── FXML ─────────────────────────────────────────────────────────────────
 
     @FXML private VBox       root;
     @FXML private StackPane  thumbArea;
     @FXML private VBox       iconPlaceholder;
     @FXML private Label      lblIconSubtitle;
     @FXML private ImageView  imgThumbnail;
-    @FXML private Label      lblDocumentTitle;   // shows the immutable creation label
+    @FXML private Label      lblDocumentTitle;
     @FXML private Label      lblFileCount;
 
-    // ── State ─────────────────────────────────────────────────────────────────
 
     private Document                    document;
     private EmployeeDashboardController dashboardController;
@@ -52,8 +34,6 @@ public class DocumentTileController {
      * Assigned once by {@link #setLabel(String)} and never derived from sortOrder.
      */
     private String label = "";
-
-    // ── Drag-drop ─────────────────────────────────────────────────────────────
 
     @FXML
     private void initialize() {
@@ -113,68 +93,29 @@ public class DocumentTileController {
         });
     }
 
-    // ── Public API ────────────────────────────────────────────────────────────
-
     public void setDashboardController(EmployeeDashboardController controller) {
         this.dashboardController = controller;
     }
 
-    /**
-     * Binds the document object to this tile.
-     *
-     * <p><b>This does NOT update the title label.</b> The title is set separately
-     * by {@link #setLabel(String)} so it reflects the creation order and never
-     * changes when the tile is dragged to a different position.
-     *
-     * @param document the document whose sortOrder is used for drag tokens
-     */
     public void setDocument(Document document) {
         this.document = document;
         lblIconSubtitle.setText(""); // keep placeholder clean
     }
 
-    /**
-     * Sets the immutable human-visible label for this tile ("Document 1").
-     *
-     * <p>Call this once after {@link #setDocument}, and do <b>not</b> call it again
-     * on drag-reorder. The label must not change when the tile moves.
-     *
-     * @param label the creation-order name, e.g. "Document 1"
-     */
     public void setLabel(String label) {
         this.label = label;
         lblDocumentTitle.setText(label);
     }
 
-    /**
-     * Updates the "N pages" sub-label.
-     */
+    // Updates the "N pages" sub-label.
+
     public void setFileCount(int count) {
         lblFileCount.setText(count == 0 ? "" : count + (count == 1 ? " page" : " pages"));
     }
 
-    /**
-     * Shows a first-page thumbnail. Pass {@code null} to revert to the folder icon.
-     */
-    public void setThumbnail(BufferedImage image) {
-        if (image == null) {
-            showPlaceholder();
-            return;
-        }
-        WritableImage fxImage = SwingFXUtils.toFXImage(image, null);
-        imgThumbnail.setImage(fxImage);
-        imgThumbnail.fitWidthProperty().bind(thumbArea.widthProperty());
-        imgThumbnail.fitHeightProperty().bind(thumbArea.heightProperty());
-        iconPlaceholder.setVisible(false);
-        iconPlaceholder.setManaged(false);
-        imgThumbnail.setVisible(true);
-        imgThumbnail.setManaged(true);
-    }
 
-    /**
-     * Highlights or un-highlights this tile.
-     * Uses CSS class toggling, not inline styles, so themes work correctly.
-     */
+    //Highlights or un-highlights this tile.
+
     public void setSelected(boolean selected) {
         this.selected = selected;
         if (selected) {
@@ -186,14 +127,17 @@ public class DocumentTileController {
         }
     }
 
-    // ── Accessors ─────────────────────────────────────────────────────────────
+    public Document getDocument() {
+        return document; }
 
-    public Document getDocument() { return document; }
-    public VBox     getRoot()     { return root; }
-    public String   getLabel()    { return label; }
-    public boolean  isSelected()  { return selected; }
+    public VBox     getRoot()     {
+        return root; }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    public String   getLabel()    {
+        return label; }
+
+    public boolean  isSelected()  {
+        return selected; }
 
     private void showPlaceholder() {
         imgThumbnail.setVisible(false);

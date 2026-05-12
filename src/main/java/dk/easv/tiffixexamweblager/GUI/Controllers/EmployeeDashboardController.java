@@ -365,6 +365,44 @@ public class EmployeeDashboardController {
         }
     }
 
+    private void refreshFileTile(ScannedFile file) {
+        ScannedFileTileController ctrl = fileTileControllers.get(file);
+        if (ctrl != null) ctrl.refresh();
+    }
+
+    public void reorderFiles(int draggedScanOrder, ScannedFile target) {
+        if (target == null) return;
+
+        ScannedFile dragged = currentFiles.stream()
+                .filter(f -> f.getScanOrder() == draggedScanOrder)
+                .findFirst().orElse(null);
+
+        if (dragged == null || dragged == target) return;
+
+        int from = currentFiles.indexOf(dragged);
+        int to   = currentFiles.indexOf(target);
+        if (from == -1 || to == -1) return;
+
+        currentFiles.remove(from);
+        currentFiles.add(to, dragged);
+        sessionData.put(activeDocument, new ArrayList<>(currentFiles));
+        updateFileSortOrders(currentFiles);
+        refreshFilePanel();
+    }
+
+    private void updateFileSortOrders(List<ScannedFile> files) {
+        for (int i = 0; i < files.size(); i++) files.get(i).setSortOrder(i + 1);
+    }
+
+    private void refreshFilePanel() {
+        filesTilePane.getChildren().clear();
+        fileTileControllers.clear();
+        for (ScannedFile f : currentFiles) {
+            filesTilePane.getChildren().add(createFileTile(f));
+        }
+        updateDocumentFileCountLabels();
+    }
+
     private void openPreviewAt(int index) {
         if (currentFiles.isEmpty()) return;
         previewIndex = Math.max(0, Math.min(index, currentFiles.size() - 1));
@@ -414,12 +452,10 @@ public class EmployeeDashboardController {
         refreshFileTile(current);
     }
 
-    private void refreshFileTile(ScannedFile file) {
-        ScannedFileTileController ctrl = fileTileControllers.get(file);
-        if (ctrl != null) ctrl.refresh();
-    }
 
-    @FXML private void onBtnCloseOverview(ActionEvent event) { topOverview.setVisible(false); }
+
+    @FXML private void onBtnCloseOverview(ActionEvent event) {
+        topOverview.setVisible(false); }
 
 
     @FXML
@@ -437,28 +473,6 @@ public class EmployeeDashboardController {
         rebuildAllSortOrders();
 
     }
-
-
-    public void reorderFiles(int draggedScanOrder, ScannedFile target) {
-        if (target == null) return;
-
-        ScannedFile dragged = currentFiles.stream()
-                .filter(f -> f.getScanOrder() == draggedScanOrder)
-                .findFirst().orElse(null);
-
-        if (dragged == null || dragged == target) return;
-
-        int from = currentFiles.indexOf(dragged);
-        int to   = currentFiles.indexOf(target);
-        if (from == -1 || to == -1) return;
-
-        currentFiles.remove(from);
-        currentFiles.add(to, dragged);
-        sessionData.put(activeDocument, new ArrayList<>(currentFiles));
-        updateFileSortOrders(currentFiles);
-        refreshFilePanel();
-    }
-
 
     public void moveFileToDocument(int draggedScanOrder, Document target) {
         if (target == null || activeDocument == null) return;
@@ -502,15 +516,6 @@ public class EmployeeDashboardController {
         refreshDocumentPanel();
     }
 
-    private void refreshFilePanel() {
-        filesTilePane.getChildren().clear();
-        fileTileControllers.clear();
-        for (ScannedFile f : currentFiles) {
-            filesTilePane.getChildren().add(createFileTile(f));
-        }
-        updateDocumentFileCountLabels();
-    }
-
     private void refreshDocumentPanel() {
         documentsTilePane.getChildren().clear();
         documentTileControllers.clear();
@@ -520,10 +525,6 @@ public class EmployeeDashboardController {
                 .forEach(doc -> documentsTilePane.getChildren().add(createDocumentTile(doc)));
 
         lblTotalDocInBox.setText(String.valueOf(sessionData.size()));
-    }
-
-    private void updateFileSortOrders(List<ScannedFile> files) {
-        for (int i = 0; i < files.size(); i++) files.get(i).setSortOrder(i + 1);
     }
 
     private void rebuildAllSortOrders() {
