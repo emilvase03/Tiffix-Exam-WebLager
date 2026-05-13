@@ -45,7 +45,7 @@
          </HBox>
          <VBox fx:id="vboxSelectToggle">
             <children>
-                  <ComboBox fx:id="boxComboBox" editable="true" maxWidth="Infinity" promptText="Select a box" styleClass="combo-box-base" />
+                  <ComboBox fx:id="boxComboBox" maxWidth="Infinity" promptText="Select a box" styleClass="combo-box-base" />
             </children>
          </VBox>
          <VBox fx:id="vboxCreateToggle" spacing="8.0">
