@@ -87,6 +87,8 @@ public class EmployeeDashboardController {
     private Path scanTempDir;
     @FXML
     private Label lblTotalFilesInBox;
+    private int selectedFileIndex = -1;
+
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -109,8 +111,11 @@ public class EmployeeDashboardController {
 
     // ── Scanning ──────────────────────────────────────────────────────────────
 
-    @FXML private void onBtnFetch(ActionEvent event)  { runFetch(); }
-    @FXML private void onBtnRescan(ActionEvent event) { runFetch(); }
+    @FXML private void onBtnFetch(ActionEvent event)  {
+        runFetch(); }
+
+    @FXML private void onBtnRescan(ActionEvent event) {
+        runFetch(); }
 
     private void runFetch() {
         setFetchButtonsDisabled(true);
@@ -152,7 +157,8 @@ public class EmployeeDashboardController {
             List<ScannedFile> newFiles = task.getValue();
             int firstNewIndex = -1;
 
-            for (ScannedFile f : newFiles) {
+            if (!newFiles.isEmpty()) {
+                ScannedFile f = newFiles.get(0);
                 File tiffFile     = new File(f.getFilePath());
                 boolean isBarcode = BarcodeDetector.hasBarcode(tiffFile);
 
@@ -164,15 +170,32 @@ public class EmployeeDashboardController {
                 } else if (activeDocument == null) {
                     AlertHelper.showError("No document selected",
                             "Scan a barcode page first to start a new document.");
-                    break;
+                    return;
                 }
 
-                sessionData.get(activeDocument).add(f);
-                currentFiles.add(f);
-                filesTilePane.getChildren().add(createFileTile(f));
-                f.setSortOrder(currentFiles.size());
+                if (selectedFileIndex >= 0 && selectedFileIndex < currentFiles.size()) {
 
-                if (firstNewIndex == -1) firstNewIndex = currentFiles.size() - 1;
+                    sessionData.get(activeDocument).set(selectedFileIndex, f);
+                    currentFiles.set(selectedFileIndex, f);
+
+                    Node newTile = createFileTile(f);
+                    filesTilePane.getChildren().set(selectedFileIndex, newTile);
+
+                    f.setSortOrder(selectedFileIndex + 1);
+
+                    openPreviewAt(selectedFileIndex);
+
+                } else {
+
+                    sessionData.get(activeDocument).add(f);
+                    currentFiles.add(f);
+                    filesTilePane.getChildren().add(createFileTile(f));
+
+                    f.setSortOrder(currentFiles.size());
+
+                    if (firstNewIndex == -1) firstNewIndex = currentFiles.size() - 1;
+                }
+
                 refreshDocumentTile(activeDocument);
             }
 
@@ -477,7 +500,12 @@ public class EmployeeDashboardController {
             ctrl.setDashboardController(this);
             fileTileControllers.put(file, ctrl);
 
-            tile.setOnMouseClicked(e -> openPreviewAt(currentFiles.indexOf(file)));
+            tile.setOnMouseClicked(e -> {
+                int index = currentFiles.indexOf(file);
+                selectedFileIndex = index;
+                openPreviewAt(index);
+            });
+
             return tile;
 
         } catch (Exception e) {
