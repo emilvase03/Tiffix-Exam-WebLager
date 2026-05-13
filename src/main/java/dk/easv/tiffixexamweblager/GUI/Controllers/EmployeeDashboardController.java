@@ -88,6 +88,8 @@ public class EmployeeDashboardController {
     @FXML
     private Label lblTotalFilesInBox;
     private int selectedFileIndex = -1;
+    @FXML
+    private BorderPane dashboardContent;
 
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -107,6 +109,10 @@ public class EmployeeDashboardController {
                     "The documents could not be loaded now.");
         }
         setTotalsVisible(false);
+
+        // Bind BorderPane to always fill root — prevents layout shift on CSS repass
+        dashboardContent.prefWidthProperty().bind(root.widthProperty());
+        dashboardContent.prefHeightProperty().bind(root.heightProperty());
     }
 
     // ── Scanning ──────────────────────────────────────────────────────────────

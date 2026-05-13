@@ -23,43 +23,48 @@
         <top>
          <VBox BorderPane.alignment="CENTER">
             <children>
-               <HBox prefHeight="26.0" prefWidth="687.0">
-                  <children>
-                     <ImageView fitHeight="37.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                        <image>
-                           <Image url="@../img/Tiffix.png" />
-                        </image>
-                     </ImageView>
-                  </children>
-               </HBox>
+                <HBox prefHeight="26.0" prefWidth="687.0">
+                    <children>
+                        <ImageView fitHeight="37.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../img/Tiffix.png" />
+                            </image>
+                        </ImageView>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <fx:include source="../components/ThemeToggleButton.fxml" />
+                    </children>
+                    <padding>
+                        <Insets top="4.0" right="8.0" />
+                    </padding>
+                </HBox>
                   <HBox fx:id="topToolBar" alignment="CENTER_LEFT" prefHeight="48.0" spacing="8.0" styleClass="dashboard-toolbar">
-      
+
                       <Button fx:id="btnLogout" onAction="#onLogout" styleClass="action-btn">
                           <graphic>
                         <FontIcon iconLiteral="bi-box-arrow-right" />
                      </graphic>
                       </Button>
-      
+
                       <Button fx:id="StartScanningSession" mnemonicParsing="false" onAction="#onBtnStartScanningSession" styleClass="action-btn" text="Start scanning session" />
-      
+
                       <Button fx:id="btnFetch" mnemonicParsing="false" onAction="#onBtnFetch" styleClass="action-btn" text="Fetch" />
-      
+
                       <Region HBox.hgrow="ALWAYS" />
-      
+
                       <HBox alignment="CENTER" prefHeight="48.0" spacing="6">
                           <Label minWidth="-Infinity" styleClass="h3" text="Box" />
                           <Label fx:id="lblBoxID" minWidth="-Infinity" styleClass="h3" text="" />
                           <Label minWidth="-Infinity" styleClass="h3" text="|" />
                           <Label fx:id="lblDocumentNr" minWidth="-Infinity" styleClass="h3" text="" />
                       </HBox>
-      
+
                       <Region HBox.hgrow="ALWAYS" />
-      
+
                       <HBox alignment="CENTER" prefHeight="48.0" spacing="6">
                           <Label minWidth="-Infinity" styleClass="h3" text="Files in box" />
                           <Label fx:id="lblTotalFilesInBox" minWidth="-Infinity" styleClass="h3" />
                       </HBox>
-      
+
                       <padding>
                      <Insets left="8.0" right="8.0" />
                   </padding>
