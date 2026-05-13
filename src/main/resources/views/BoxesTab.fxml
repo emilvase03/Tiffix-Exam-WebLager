@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane stylesheets="@../css/profilesTab.css"
+<StackPane stylesheets="@../css/style.css"
            xmlns="http://javafx.com/javafx/24.0.1"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.BoxesTabController">
