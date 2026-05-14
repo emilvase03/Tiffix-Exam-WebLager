@@ -4,12 +4,13 @@ package dk.easv.tiffixexamweblager.BLL;
 import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.DAL.DAO.CustomerDAO;
 import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
+import dk.easv.tiffixexamweblager.DAL.ICustomerDataAccess;
 
 // Java imports
 import java.util.List;
 
 public class CustomerManager {
-    private ICRUDDataAccess<Customer> dataAccess;
+    private ICustomerDataAccess dataAccess;
 
     public CustomerManager() throws Exception{
         dataAccess = new CustomerDAO();
@@ -29,5 +30,9 @@ public class CustomerManager {
 
     public void deleteCustomer(Customer customer) throws Exception {
         dataAccess.delete(customer);
+    }
+
+    public List<Customer> getTrueAll() throws Exception {
+        return dataAccess.getTrueAll();
     }
 }

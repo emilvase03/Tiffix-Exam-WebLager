@@ -165,10 +165,12 @@ public class BoxesTabController implements Initializable {
                 });
 
                 btnDeactivate.setGraphic(new FontIcon("bi-dash-square"));
-                btnDeactivate.getStyleClass().addAll("icon-button");
+                btnDeactivate.getStyleClass().addAll("icon-button", "danger");
                 btnDeactivate.setOnAction(e -> {
                     // Not implemented yet
                 });
+
+                container.setAlignment(Pos.CENTER);
             }
 
             @Override

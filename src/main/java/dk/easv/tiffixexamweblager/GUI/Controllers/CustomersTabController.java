@@ -12,6 +12,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 // Java imports
 import javafx.fxml.Initializable;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -25,6 +26,7 @@ public class CustomersTabController implements Initializable {
     @FXML private TableView<Customer> tblCustomer;
     @FXML private TableColumn<Customer, String> colTitle;
     @FXML private TableColumn<Customer, Void> colManage;
+    @FXML private TableColumn<Customer, Boolean> colActive;
     @FXML private VBox customerCardOverlay;
     @FXML private CustomerCardController customerCardController;
 
@@ -41,6 +43,7 @@ public class CustomersTabController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
+        setupActiveColumn();
         setupManageColumn();
 
         customerCardController.setOverlay(customerCardOverlay);
@@ -51,7 +54,7 @@ public class CustomersTabController implements Initializable {
         colTitle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getName()));
 
         try {
-            tblCustomer.setItems(customerProfileModel.getAllCustomers());
+            tblCustomer.setItems(customerProfileModel.getTrueAll());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve customers from database.");
         }
@@ -105,6 +108,44 @@ public class CustomersTabController implements Initializable {
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : container);
+            }
+        });
+    }
+
+    private void setupActiveColumn() {
+        colActive.setCellValueFactory(data ->
+                new SimpleBooleanProperty(data.getValue().getIsDeleted())
+        );
+
+        colActive.setCellFactory(col -> new TableCell<>() {
+            final Button btnActive = new Button();
+            final Button btnDeactivate = new Button();
+            final HBox container = new HBox();
+            {
+                btnActive.setGraphic(new FontIcon("bi-check-square"));
+                btnActive.getStyleClass().addAll("icon-button");
+                btnActive.setOnAction(e -> {
+                    // Not implemented yet
+                });
+
+                btnDeactivate.setGraphic(new FontIcon("bi-dash-square"));
+                btnDeactivate.getStyleClass().addAll("icon-button", "danger");
+                btnDeactivate.setOnAction(e -> {
+                    // Not implemented yet
+                });
+
+                container.setAlignment(Pos.CENTER);
+            }
+
+            @Override
+            protected void updateItem(Boolean isDeleted, boolean empty) {
+                super.updateItem(isDeleted, empty);
+                if (empty || isDeleted == null) {
+                    setGraphic(null);
+                    return;
+                }
+                container.getChildren().setAll(isDeleted ? btnDeactivate : btnActive);
+                setGraphic(container);
             }
         });
     }

@@ -2,9 +2,8 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Customer;
-import dk.easv.tiffixexamweblager.DAL.ISoftDeleteDataAccess;
+import dk.easv.tiffixexamweblager.DAL.ICustomerDataAccess;
 import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
-import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
 // Java imports
 import java.sql.Connection;
@@ -14,7 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomerDAO implements ICRUDDataAccess<Customer>, ISoftDeleteDataAccess<Customer> {
+public class CustomerDAO implements ICustomerDataAccess {
 
         private final DBConnector databaseConnector;
 
@@ -100,7 +99,7 @@ public class CustomerDAO implements ICRUDDataAccess<Customer>, ISoftDeleteDataAc
     public List<Customer> getTrueAll() throws Exception {
         List<Customer> customers = new ArrayList<>();
 
-        String sql = "SELECT Id, Name FROM Customer;";
+        String sql = "SELECT Id, Name, IsDeleted FROM Customer;";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);

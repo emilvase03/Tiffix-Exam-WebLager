@@ -10,10 +10,13 @@ import dk.easv.tiffixexamweblager.BLL.CustomerProfileManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.List;
+
 public class CustomerProfileModel {
     private CustomerProfileManager customerProfileManager;
     private CustomerManager customerManager;
     private ObservableList<Customer> allCustomers = FXCollections.observableArrayList();
+    private ObservableList<Customer> allTrueCustomers = FXCollections.observableArrayList();
 
     public CustomerProfileModel() throws Exception {
         customerProfileManager = new CustomerProfileManager();
@@ -49,5 +52,10 @@ public class CustomerProfileModel {
 
     public void deleteCustomer(Customer customer) throws Exception {
         customerManager.deleteCustomer(customer);
+    }
+
+    public ObservableList<Customer> getTrueAll() throws Exception {
+        allTrueCustomers.setAll(customerManager.getTrueAll());
+        return allTrueCustomers;
     }
 }
