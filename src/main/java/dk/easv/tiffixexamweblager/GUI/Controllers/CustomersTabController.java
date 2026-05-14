@@ -91,8 +91,8 @@ public class CustomersTabController implements Initializable {
                 if (customer == null) return;
 
                 boolean confirmed = AlertHelper.showConfirmation(
-                        "Delete Customer",
-                        "Are you sure you want to delete \"" + customer.getName() + "\"?"
+                        "Deactivate Customer",
+                        "Are you sure you want to deactivate \"" + customer.getName() + "\"?"
                 );
                 if (!confirmed) return;
 
@@ -100,7 +100,7 @@ public class CustomersTabController implements Initializable {
                     customerProfileModel.deleteCustomer(customer);
                     tblCustomer.getItems().remove(customer);
                 } catch (Exception e) {
-                    AlertHelper.showError("Error", "Failed to delete customer.");
+                    AlertHelper.showError("Error", "Failed to deactivate customer.");
                 }
             }
 
