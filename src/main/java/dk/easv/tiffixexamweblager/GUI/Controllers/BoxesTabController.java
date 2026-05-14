@@ -113,8 +113,8 @@ public class BoxesTabController implements Initializable {
                 if (box == null) return;
 
                 boolean confirmed = AlertHelper.showConfirmation(
-                        "Delete Box",
-                        "Are you sure you want to delete box #" + box.getNumber()
+                        "Deactivate Box",
+                        "Are you sure you want to deactivate box #" + box.getNumber()
                                 + " \"" + box.getTitle() + "\"?"
                 );
                 if (!confirmed) return;
@@ -122,7 +122,7 @@ public class BoxesTabController implements Initializable {
                 try {
                     boxDocumentModel.deleteBox(box);
                 } catch (Exception e) {
-                    AlertHelper.showError("Error", "Failed to delete box.");
+                    AlertHelper.showError("Error", "Failed to deactivate box.");
                 }
             }
 

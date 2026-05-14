@@ -112,8 +112,8 @@ public class ProfilesTabController implements Initializable {
                 if (profile == null) return;
 
                 boolean confirmed = AlertHelper.showConfirmation(
-                        "Delete Profile",
-                        "Are you sure you want to delete \"" + profile.getTitle() + "\"?"
+                        "Deactivate Profile",
+                        "Are you sure you want to deactivate \"" + profile.getTitle() + "\"?"
                 );
                 if (!confirmed) return;
 
@@ -121,7 +121,7 @@ public class ProfilesTabController implements Initializable {
                     profileRuleModel.deleteProfile(profile);
                     tblProfiles.getItems().remove(profile);
                 } catch (Exception e) {
-                    AlertHelper.showError("Error", "Failed to delete profile.");
+                    AlertHelper.showError("Error", "Failed to deactivate profile.");
                 }
             }
 
