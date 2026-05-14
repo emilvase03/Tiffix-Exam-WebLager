@@ -28,8 +28,8 @@ public class BoxDocumentModel {
     }
 
     // BoxManager
-    public ObservableList<Box> getAllObservableBoxes() throws Exception {
-        allBoxes.setAll(boxManager.getAllBoxes());
+    public ObservableList<Box> getAllTrueObservableBoxes() throws Exception {
+        allBoxes.setAll(boxManager.getTrueAll());
         return allBoxes;
     }
 

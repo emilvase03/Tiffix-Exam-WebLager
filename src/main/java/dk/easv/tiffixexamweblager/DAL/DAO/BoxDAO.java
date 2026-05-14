@@ -2,9 +2,8 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
-import dk.easv.tiffixexamweblager.DAL.ISoftDeleteDataAccess;
+import dk.easv.tiffixexamweblager.DAL.IBoxDataAccess;
 import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
-import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
 // Java imports
 import java.sql.*;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BoxDAO implements ICRUDDataAccess<Box>, ISoftDeleteDataAccess<Box> {
+public class BoxDAO implements IBoxDataAccess {
 
     private final DBConnector dbConnector;
 
