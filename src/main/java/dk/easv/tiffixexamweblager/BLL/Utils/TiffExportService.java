@@ -1,6 +1,7 @@
 package dk.easv.tiffixexamweblager.BLL.Utils;
 
 // Project imports
+import dk.easv.tiffixexamweblager.BE.Rule;
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
 
 // Java imports
@@ -11,6 +12,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,63 +21,66 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Exports ScannedFile collections to disk as TIFF files.
+ * Exports ScannedFile collections to disk as TIFF files with ALL active
+ * transformations baked in.
  *
- * <p><b>Single-page</b> — writes each page's raw bytes directly to its own
- * {@code .tiff} file (lossless, no decode/re-encode).
+ * <p><b>Single-page</b> — one {@code .tiff} per page, named
+ * {@code {docLabel}_page_{sortOrder}.tiff}.
  *
- * <p><b>Multi-page</b> — decodes every page and writes them into one {@code .tiff}
- * using the standard {@code prepareWriteSequence} / {@code writeToSequence} /
- * {@code endWriteSequence} sequence with an explicit {@code ImageWriteParam}.
- * Returns the number of pages actually written so the caller can verify.
+ * <p><b>Multi-page</b> — all pages of a document in one {@code .tiff}, using
+ * {@code prepareWriteSequence} / {@code writeToSequence} / {@code endWriteSequence}
+ * with an explicit {@link ImageWriteParam} (passing {@code null} causes some
+ * JDK TIFF writers to commit only the first page).
+ * Returns the number of pages written so the caller can verify completeness.
  */
 public class TiffExportService {
 
-    // ── Single-page ───────────────────────────────────────────────────────────
+    // ── Single-page export ────────────────────────────────────────────────────
 
     /**
-     * Writes each page as a separate TIFF in {@code outputDir}.
-     * File names: {@code {docLabel}_page_{sortOrder}.tiff}
+     *   Writes each page as a separate TIFF in {@code outputDir}.
+     *   File names: {@code {docLabel}_page_{sortOrder}.tiff}
      */
-    public void exportSinglePage(List<ScannedFile> files, Path outputDir, String docLabel)
-            throws IOException {
+    public void exportSinglePage(List<ScannedFile> files,
+                                 Path outputDir,
+                                 String docLabel,
+                                 List<Rule> rules) throws IOException {
 
         String safeLabel = sanitize(docLabel);
 
         for (ScannedFile sf : files) {
-            byte[] bytes = sf.getTiffFile();
-            if (bytes == null || bytes.length == 0) continue;
+
+            BufferedImage final_ = resolveFullyTransformed(sf, rules);
+            if (final_ == null) continue;   // unreadable page — skip silently
 
             String filename    = safeLabel + "_page_" + sf.getSortOrder() + ".tiff";
             Path   destination = resolveUnique(outputDir, filename);
-            Files.write(destination, bytes);
+
+            ImageIO.write(final_, "TIFF", destination.toFile());
         }
     }
 
-    // ── Multi-page ────────────────────────────────────────────────────────────
+    // ── Multi-page export ─────────────────────────────────────────────────────
 
     /**
      * Combines all pages into a single multi-page TIFF at {@code outputFile}.
-     * Pages appear in the same order as {@code files} (by sort order).
+     * Pages appear in {@code files} order (by sort order).
      *
-     * <p>Uses {@code prepareWriteSequence} → {@code writeToSequence} → {@code endWriteSequence}
-     * with an explicit (default) {@link ImageWriteParam} — passing {@code null} for the param
-     * causes some JDK TIFF writers to only commit the first page.
-     *
-     * @return the number of pages written into the file
+     * @param files      pages to export
+     * @param outputFile destination file path (created or overwritten)
+     * @param rules      active profile rules — applied to any page whose
+     *                   {@code processedImage} is null (lazy load path)
+     * @return number of pages written
      */
-    public int exportMultiPage(List<ScannedFile> files, Path outputFile) throws Exception {
+    public int exportMultiPage(List<ScannedFile> files,
+                               Path outputFile,
+                               List<Rule> rules) throws Exception {
 
-        // Decode all pages up front; skip any that are unreadable
+        // Resolve and transform every page first; skip unreadable ones
         List<BufferedImage> pages = new ArrayList<>();
         for (ScannedFile sf : files) {
-            byte[] bytes = sf.getTiffFile();
-            if (bytes == null || bytes.length == 0) continue;
-
-            BufferedImage page = ImageIO.read(new ByteArrayInputStream(bytes));
-            if (page != null) {
-                pages.add(page);
-            }
+            BufferedImage img = resolveFullyTransformed(sf, rules);
+            if (img != null) pages.add(img);
         }
 
         if (pages.isEmpty()) return 0;
@@ -86,8 +91,8 @@ public class TiffExportService {
                     "No TIFF ImageWriter found. Requires Java 9+ (javax.imageio TIFF support).");
         }
 
-        ImageWriter    writer = writers.next();
-        ImageWriteParam param  = writer.getDefaultWriteParam(); // explicit param — not null
+        ImageWriter     writer = writers.next();
+        ImageWriteParam param  = writer.getDefaultWriteParam();   // must NOT be null
 
         try (ImageOutputStream ios = ImageIO.createImageOutputStream(outputFile.toFile())) {
             writer.setOutput(ios);
@@ -104,6 +109,54 @@ public class TiffExportService {
         }
 
         return pages.size();
+    }
+
+
+    /**
+     * Returns the fully-transformed image for {@code sf}, applying:
+     * <ol>
+     *   <li>Profile rules (ROTATE + BRIGHTNESS from the selected profile)
+     *   <li>User rotation accumulated during the session
+     *   <li>User brightness accumulated during the session
+     * </ol>
+     *
+     * <p>Step 1 is already done if {@code sf.getProcessedImage()} is non-null —
+     * that happens at fetch time via {@code ImageTransformations.applyRules()}.
+     * If {@code processedImage} is null (e.g. a DB-loaded file that was never
+     * previewed), this method decodes the raw bytes and applies the rules now
+     * so the exported result is identical to what the user would have seen in preview.
+     *
+     * @return transformed image, or {@code null} if the page cannot be decoded
+     */
+    private BufferedImage resolveFullyTransformed(ScannedFile sf, List<Rule> rules) {
+        BufferedImage base = sf.getProcessedImage();
+
+        if (base == null) {
+            byte[] bytes = sf.getTiffFile();
+            if (bytes != null && bytes.length > 0) {
+                try {
+                    BufferedImage raw = ImageIO.read(new ByteArrayInputStream(bytes));
+                    if (raw != null) {
+                        base = ImageTransformations.applyRules(raw, rules);
+                        sf.setProcessedImage(base);   // cache so preview is also consistent
+                    }
+                } catch (IOException ignored) { }
+            }
+
+            if (base == null && sf.getFilePath() != null && !sf.getFilePath().isBlank()) {
+                try {
+                    BufferedImage raw = ImageIO.read(new File(sf.getFilePath()));
+                    if (raw != null) {
+                        base = ImageTransformations.applyRules(raw, rules);
+                        sf.setProcessedImage(base);
+                    }
+                } catch (IOException ignored) { }
+            }
+        }
+
+        if (base == null) return null;
+
+        return ImageTransformations.applyAll(base, sf.getUserRotation(), sf.getUserBrightness());
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
