@@ -2,16 +2,15 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
-import dk.easv.tiffixexamweblager.DAL.ISoftDeleteDataAccess;
+import dk.easv.tiffixexamweblager.DAL.IProfileDataAccess;
 import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
-import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
 // Java imports
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileDAO implements ICRUDDataAccess<Profile>, ISoftDeleteDataAccess<Profile> {
+public class ProfileDAO implements IProfileDataAccess {
 
         private final DBConnector databaseConnector;
 
@@ -98,7 +97,7 @@ public class ProfileDAO implements ICRUDDataAccess<Profile>, ISoftDeleteDataAcce
     public List<Profile> getTrueAll() throws Exception {
         List<Profile> profiles = new ArrayList<>();
 
-        String sql = "SELECT Id, Title FROM Profile;";
+        String sql = "SELECT Id, Title, IsDeleted FROM Profile;";
 
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);

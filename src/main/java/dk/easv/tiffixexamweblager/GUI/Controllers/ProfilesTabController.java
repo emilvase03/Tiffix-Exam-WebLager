@@ -5,6 +5,7 @@ import dk.easv.tiffixexamweblager.GUI.Controllers.components.ProfileCardControll
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+import javafx.beans.property.SimpleBooleanProperty;
 import org.kordamp.ikonli.javafx.FontIcon;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -21,6 +22,7 @@ public class ProfilesTabController implements Initializable {
 
     @FXML private TableView<Profile> tblProfiles;
     @FXML private TableColumn<Profile, String> colTitle;
+    @FXML private TableColumn<Profile, Boolean> colActive;
     @FXML private TableColumn<Profile, Void> colManage;
 
     // Create overlay — already wired
@@ -46,6 +48,7 @@ public class ProfilesTabController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
+        setupActiveColumn();
         setupManageColumn();
 
         profileCardController.setOverlay(profileCardOverlay);
@@ -58,7 +61,7 @@ public class ProfilesTabController implements Initializable {
         colTitle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTitle()));
 
         try {
-            tblProfiles.setItems(profileRuleModel.getAllProfiles());
+            tblProfiles.setItems(profileRuleModel.getAllTrueObservableProfiles());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve profiles from database.");
         }
@@ -126,6 +129,44 @@ public class ProfilesTabController implements Initializable {
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : container);
+            }
+        });
+    }
+
+    private void setupActiveColumn() {
+        colActive.setCellValueFactory(data ->
+                new SimpleBooleanProperty(data.getValue().getIsDeleted())
+        );
+
+        colActive.setCellFactory(col -> new TableCell<>() {
+            final Button btnActive = new Button();
+            final Button btnDeactivate = new Button();
+            final HBox container = new HBox();
+            {
+                btnActive.setGraphic(new FontIcon("bi-check-square"));
+                btnActive.getStyleClass().addAll("icon-button");
+                btnActive.setOnAction(e -> {
+                    // Not implemented yet
+                });
+
+                btnDeactivate.setGraphic(new FontIcon("bi-dash-square"));
+                btnDeactivate.getStyleClass().addAll("icon-button", "danger");
+                btnDeactivate.setOnAction(e -> {
+                    // Not implemented yet
+                });
+
+                container.setAlignment(Pos.CENTER);
+            }
+
+            @Override
+            protected void updateItem(Boolean isDeleted, boolean empty) {
+                super.updateItem(isDeleted, empty);
+                if (empty || isDeleted == null) {
+                    setGraphic(null);
+                    return;
+                }
+                container.getChildren().setAll(isDeleted ? btnDeactivate : btnActive);
+                setGraphic(container);
             }
         });
     }
