@@ -3,6 +3,7 @@ package dk.easv.tiffixexamweblager.BE;
 public class Customer {
     private int id;
     private String name;
+    private boolean isDeleted;
 
     public Customer(String name) {
         setName(name);
@@ -24,6 +25,14 @@ public class Customer {
 
     public int getId() {
         return id;
+    }
+
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public boolean getIsDeleted() {
+        return isDeleted;
     }
 
     @Override

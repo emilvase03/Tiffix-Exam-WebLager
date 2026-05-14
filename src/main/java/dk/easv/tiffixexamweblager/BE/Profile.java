@@ -3,6 +3,7 @@ package dk.easv.tiffixexamweblager.BE;
 public class Profile {
     private int id;
     private String title;
+    private boolean isDeleted;
 
     public Profile(String title) {
         setTitle(title);
@@ -24,5 +25,13 @@ public class Profile {
     public void setTitle(String title) {
         if (!title.isBlank())
             this.title = title;
+    }
+
+    public boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

@@ -2,6 +2,7 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
+import dk.easv.tiffixexamweblager.DAL.ISoftDeleteDataAccess;
 import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
 import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BoxDAO implements ICRUDDataAccess<Box> {
+public class BoxDAO implements ICRUDDataAccess<Box>, ISoftDeleteDataAccess<Box> {
 
     private final DBConnector dbConnector;
 
@@ -111,5 +112,44 @@ public class BoxDAO implements ICRUDDataAccess<Box> {
             stmt.setInt(1, box.getId());
             stmt.executeUpdate();
         }
+    }
+
+    @Override
+    public List<Box> getTrueAll() throws Exception {
+        List<Box> boxes = new ArrayList<>();
+        String sql = """
+                SELECT b.Id, b.Number, b.Title, b.CreatedAt,
+                       u.Username AS CreatedByUsername,
+                       b.DocumentsAmount, b.PagesAmount, b.ProfileId, b.CustomerId, b.IsDeleted
+                FROM Box b
+                LEFT JOIN [User] u ON u.Id = b.CreatedByUserId
+                ORDER BY b.Number ASC
+                """;
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Box b = new Box(
+                        rs.getInt("Id"),
+                        rs.getInt("Number"),
+                        rs.getString("Title"),
+                        rs.getObject("CreatedAt", LocalDateTime.class),
+                        rs.getString("CreatedByUsername"),   // read constructor
+                        rs.getInt("DocumentsAmount"),
+                        rs.getInt("PagesAmount"),
+                        rs.getInt("CustomerId")
+                );
+                int profileId = rs.getInt("ProfileId");
+                Integer boxProfileId = rs.wasNull() ? null : profileId;
+                b.setProfileId(boxProfileId);
+
+                b.setIsDeleted(rs.getBoolean("IsDeleted"));
+
+                boxes.add(b);
+            }
+        }
+        return boxes;
     }
 }

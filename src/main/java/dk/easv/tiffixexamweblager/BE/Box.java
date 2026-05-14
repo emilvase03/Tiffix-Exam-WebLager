@@ -13,6 +13,7 @@ public class Box {
     private int pagesAmount;
     private Integer profileId;
     private int customerId;
+    private boolean isDeleted;
 
     public Box(int id, int number, String title, LocalDateTime createdAt,
                String createdByUsername, int documentsAmount, int pagesAmount, int customerId) {
@@ -99,6 +100,9 @@ public class Box {
 
     public int getCustomerId() { return customerId; }
     public void setCustomerId(int customerId) { this.customerId = customerId; }
+
+    public boolean getIsDeleted() { return isDeleted; }
+    public void setIsDeleted(boolean isDeleted) { this.isDeleted = isDeleted; }
 
     @Override
     public String toString() {

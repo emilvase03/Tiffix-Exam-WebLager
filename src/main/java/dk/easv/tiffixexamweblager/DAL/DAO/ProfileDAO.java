@@ -2,6 +2,7 @@ package dk.easv.tiffixexamweblager.DAL.DAO;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
+import dk.easv.tiffixexamweblager.DAL.ISoftDeleteDataAccess;
 import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
 import dk.easv.tiffixexamweblager.DAL.ICRUDDataAccess;
 
@@ -10,7 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileDAO implements ICRUDDataAccess<Profile> {
+public class ProfileDAO implements ICRUDDataAccess<Profile>, ISoftDeleteDataAccess<Profile> {
 
         private final DBConnector databaseConnector;
 
@@ -20,7 +21,6 @@ public class ProfileDAO implements ICRUDDataAccess<Profile> {
 
         @Override
         public List<Profile> getAll() throws Exception {
-
             List<Profile> profiles = new ArrayList<>();
 
             String sql = "SELECT Id, Title FROM Profile WHERE IsDeleted = 0";
@@ -39,7 +39,6 @@ public class ProfileDAO implements ICRUDDataAccess<Profile> {
             }
 
             return profiles;
-
         }
 
     @Override
@@ -95,4 +94,26 @@ public class ProfileDAO implements ICRUDDataAccess<Profile> {
         }
     }
 
+    @Override
+    public List<Profile> getTrueAll() throws Exception {
+        List<Profile> profiles = new ArrayList<>();
+
+        String sql = "SELECT Id, Title FROM Profile;";
+
+        try (Connection conn = databaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("Id");
+                String title = rs.getString("Title");
+                Profile p = new Profile(title);
+                p.setId(id);
+                p.setIsDeleted(rs.getBoolean("IsDeleted"));
+                profiles.add(p);
+            }
+        }
+
+        return profiles;
+    }
 }
