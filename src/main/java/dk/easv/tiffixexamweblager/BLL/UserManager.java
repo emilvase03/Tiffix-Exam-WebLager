@@ -74,6 +74,10 @@ public class UserManager {
         dataAccess.delete(user);
     }
 
+    public List<User> getTrueAll() throws Exception {
+        return dataAccess.getTrueAll();
+    }
+
     public static void main(String[] args) {
 
         try {

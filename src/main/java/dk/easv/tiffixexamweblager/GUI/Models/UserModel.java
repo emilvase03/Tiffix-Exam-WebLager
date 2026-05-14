@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import java.util.List;
 
 public class UserModel {
     private final UserManager userManager;
@@ -65,7 +66,7 @@ public class UserModel {
 
     public void loadEmployees(Runnable onLoaded) {
         BackgroundExecutor.execute(
-                () -> userManager.getEmployees(),
+                () -> userManager.getTrueAll(),
                 result -> {
                     employees.setAll(result);
                     if (onLoaded != null) onLoaded.run();
