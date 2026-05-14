@@ -27,8 +27,8 @@ public class ProfileRuleModel {
     }
 
     // ProfileManager
-    public ObservableList<Profile> getAllProfiles() throws Exception {
-        allProfiles.setAll(profileManager.getAllProfiles());
+    public ObservableList<Profile> getAllTrueObservableProfiles() throws Exception {
+        allProfiles.setAll(profileManager.getTrueAll());
         return allProfiles;
     };
 

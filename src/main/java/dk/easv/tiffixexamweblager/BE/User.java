@@ -7,6 +7,7 @@ public class User {
     private String username;
     private String password;
     private Role role;
+    private boolean isDeleted;
 
     public User(int id, String firstName, String lastName, String username, String password, Role role) {
         this.id = id;
@@ -45,6 +46,8 @@ public class User {
         return role;
     }
 
+    public boolean getIsDeleted() { return isDeleted; }
+
     private void setId(int id) {
         this.id = id;
     }
@@ -68,6 +71,8 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
+
+    public void setIsDeleted(boolean isDeleted) { this.isDeleted = isDeleted; }
 
     @Override
     public String toString() {

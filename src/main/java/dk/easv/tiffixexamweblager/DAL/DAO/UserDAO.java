@@ -154,7 +154,7 @@ public class UserDAO implements IUserDataAccess {
     }
 
     private User mapUser(ResultSet rs) throws SQLException {
-        return new User(
+        User u = new User(
                 rs.getInt("Id"),
                 rs.getString("FirstName"),
                 rs.getString("LastName"),
@@ -162,5 +162,37 @@ public class UserDAO implements IUserDataAccess {
                 rs.getString("Password"),
                 Role.fromId(rs.getInt("RoleId"))
         );
+        if (hasColumn(rs, "IsDeleted"))
+            u.setIsDeleted(rs.getBoolean("IsDeleted"));
+
+        return u;
+    }
+
+    public boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
+        ResultSetMetaData meta = rs.getMetaData();
+        int columnCount = meta.getColumnCount();
+        for (int i = 1; i <= columnCount; i++) {
+            if (meta.getColumnName(i).equalsIgnoreCase(columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public List<User> getTrueAll() throws Exception {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId, IsDeleted FROM [User]";
+
+        try (Connection conn = databaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                users.add(mapUser(rs));
+            }
+        }
+
+        return users;
     }
 }

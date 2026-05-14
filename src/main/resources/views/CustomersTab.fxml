@@ -38,7 +38,8 @@
                 </HBox>
                 <TableView fx:id="tblCustomer" prefHeight="505.0" prefWidth="752.0" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colTitle" prefWidth="602.3333740234375" text="Name" />
+                        <TableColumn fx:id="colTitle" prefWidth="538.0" text="Name" />
+                  <TableColumn fx:id="colActive" prefWidth="72.0" text="Active" />
                         <TableColumn fx:id="colManage" prefWidth="147.6666259765625" text="Manage" />
                     </columns>
                     <columnResizePolicy>

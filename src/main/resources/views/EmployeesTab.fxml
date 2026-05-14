@@ -67,6 +67,7 @@
                         <TableColumn fx:id="colFirstName" prefWidth="114.0" text="First name"/>
                         <TableColumn fx:id="colLastName"  prefWidth="72.0"  text="Last Name"/>
                         <TableColumn fx:id="colUsername"  prefWidth="90.0"  text="Username"/>
+                        <TableColumn fx:id="colActive" prefWidth="72.0" resizable="false" text="Active" />
                         <TableColumn fx:id="colManage"    prefWidth="140.0" resizable="false" text="Manage"/>
                     </columns>
                     <columnResizePolicy>
