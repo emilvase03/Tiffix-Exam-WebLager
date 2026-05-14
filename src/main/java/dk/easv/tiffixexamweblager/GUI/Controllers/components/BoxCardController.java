@@ -31,8 +31,6 @@ public class BoxCardController {
     private int loggedInUserId;
     private String loggedInUsername;
 
-    private boolean updateBox = false;
-    private Box boxToBeUpdated;
     private CustomerProfileModel customerProfileModel;
 
     public void setOverlay(VBox overlay) {
@@ -54,8 +52,6 @@ public class BoxCardController {
 
     public void preloadCreateWindow() {
         lblHeader.setText("Create a new box.");
-        updateBox = false;
-        boxToBeUpdated = null;
         txtNumber.clear();
         txtTitle.clear();
         customerCombobox.setVisible(true);
@@ -70,16 +66,6 @@ public class BoxCardController {
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to load customers.");
         }
-    }
-
-    public void preloadEditWindow(Box box) {
-        lblHeader.setText("Edit box.");
-        updateBox = true;
-        boxToBeUpdated = box;
-        txtNumber.setText(String.valueOf(box.getNumber()));
-        txtTitle.setText(box.getTitle());
-        customerCombobox.setVisible(false);
-        customerCombobox.setManaged(false);
     }
 
     @FXML
@@ -100,31 +86,20 @@ public class BoxCardController {
             return;
         }
 
-        if (updateBox) {
-            try {
-                boxToBeUpdated.setNumber(number);
-                boxToBeUpdated.setTitle(title);
-                boxDocumentModel.updateBox(boxToBeUpdated);
-            } catch (Exception e) {
-                AlertHelper.showError("Error", "Failed to update box.");
-                return;
-            }
-        } else {
-            Customer customer = customerCombobox.getSelectionModel().getSelectedItem();
+        Customer customer = customerCombobox.getSelectionModel().getSelectedItem();
 
-            if (customer == null)
-                return;
+        if (customer == null)
+            return;
 
-            Box newBox = new Box(0, number, title, LocalDateTime.now(),
-                    loggedInUserId, 0, 0, customer.getId());
-            newBox.setCreatedByUsername(loggedInUsername);
+        Box newBox = new Box(0, number, title, LocalDateTime.now(),
+                loggedInUserId, 0, 0, customer.getId());
+        newBox.setCreatedByUsername(loggedInUsername);
 
-            try {
-                boxDocumentModel.createBox(newBox);
-            } catch (Exception e) {
-                AlertHelper.showError("Error", "Failed to create box.");
-                return;
-            }
+        try {
+            boxDocumentModel.createBox(newBox);
+        } catch (Exception e) {
+            AlertHelper.showError("Error", "Failed to create box.");
+            return;
         }
 
         hideOverlay();
@@ -140,8 +115,6 @@ public class BoxCardController {
             overlay.setVisible(false);
             overlay.setManaged(false);
         }
-        updateBox = false;
-        boxToBeUpdated = null;
         txtNumber.clear();
         txtTitle.clear();
     }

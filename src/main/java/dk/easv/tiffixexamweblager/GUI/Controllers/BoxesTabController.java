@@ -98,29 +98,15 @@ public class BoxesTabController implements Initializable {
     private void setupManageColumn() {
         colManage.setCellFactory(col -> new TableCell<>() {
 
-            final Button btnEdit   = new Button();
             final Button btnDelete = new Button();
-            final HBox   container = new HBox(8, btnEdit, btnDelete);
+            final HBox   container = new HBox(8, btnDelete);
             {
-                btnEdit.setGraphic(new FontIcon("bi-pencil"));
-                btnEdit.getStyleClass().addAll("icon-button");
-                btnEdit.setOnAction(e ->
-                        handleEditBox(tblBoxes.getItems().get(getIndex()))
-                );
-
                 btnDelete.setGraphic(new FontIcon("bi-trash"));
                 btnDelete.getStyleClass().addAll("icon-button", "danger");
                 btnDelete.setOnAction(e ->
                         handleDeleteBox(tblBoxes.getItems().get(getIndex()))
                 );
                 container.setAlignment(Pos.CENTER);
-            }
-
-            private void handleEditBox(Box box) {
-                if (box == null) return;
-                boxCardController.preloadEditWindow(box);
-                boxCardOverlay.setVisible(true);
-                boxCardOverlay.setManaged(true);
             }
 
             private void handleDeleteBox(Box box) {

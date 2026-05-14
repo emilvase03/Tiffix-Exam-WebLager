@@ -39,12 +39,6 @@ public class BoxDocumentModel {
         return created;
     }
 
-    public void updateBox(Box box) throws Exception {
-        boxManager.updateBox(box);
-        allBoxes.remove(box);
-        insertSorted(box);
-    }
-
     public void deleteBox(Box box) throws Exception {
         boxManager.deleteBox(box);
         allBoxes.remove(box);
