@@ -39,10 +39,20 @@ public class Rule {
         return RuleType.fromDatabase(Name);
     }
 
+
     @Override
     public String toString() {
-        return getName();
+        switch (getName()) {
+            case "ROTATE":
+                return "Rotate (" + amount + "°)";
+            case "BRIGHTNESS":
+                return "Brightness (" + (amount >= 0 ? "+" : "") + amount + ")";
+            default:
+                return getName() + " (" + amount + ")";
+        }
     }
+
+
 
     @Override
     public boolean equals(Object o) {

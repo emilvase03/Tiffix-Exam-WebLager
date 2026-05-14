@@ -124,7 +124,7 @@ public class EmployeeDashboardController {
         runFetch(); }
 
     private void runFetch() {
-        setFetchButtonsDisabled(true);
+
 
         final int modelSizeBefore = fileImportModel.getScanResults().size();
         final int fileSizeBefore  = currentFiles.size();
@@ -208,7 +208,7 @@ public class EmployeeDashboardController {
             updateDocumentFileCountLabels();
             updateTotalFilesInBoxLabel();   // keep box-total in sync after each fetch
             if (firstNewIndex != -1) openPreviewAt(firstNewIndex);
-            setFetchButtonsDisabled(false);
+
         });
 
         task.setOnFailed(e -> {
@@ -216,7 +216,7 @@ public class EmployeeDashboardController {
             AlertHelper.showError("Fetch failed",
                     "Could not retrieve files from the scanner API.\n"
                             + (cause != null ? cause.getMessage() : "Unknown error"));
-            setFetchButtonsDisabled(false);
+
         });
 
         Thread t = new Thread(task);
@@ -263,7 +263,10 @@ public class EmployeeDashboardController {
         rebuildAllSortOrders();
 
         // Snapshot — shallow copy of the map so the background thread has a stable key set
-        Map<Document, List<ScannedFile>> snapshot = new LinkedHashMap<>(sessionData);
+        Map<Document, List<ScannedFile>> snapshot  = new LinkedHashMap<>(sessionData);
+        // Snapshot active rules so the background thread can apply them to any
+        // DB-loaded page whose processedImage was never populated (lazy path).
+        final List<Rule> rules = List.copyOf(activeRules);
 
         // 4. Save to DB + export on a background thread
         Task<String> exportTask = new Task<>() {
@@ -294,11 +297,11 @@ public class EmployeeDashboardController {
                     if (multiPage) {
                         String filename = sanitizeLabel(docLabel) + ".tiff";
                         Path   outFile  = outputDir.resolve(filename);
-                        int    written  = exportService.exportMultiPage(files, outFile);
+                        int    written  = exportService.exportMultiPage(files, outFile,rules);
                         summary.append(docLabel)
                                 .append(": ").append(written).append(" page(s) written\n");
                     } else {
-                        exportService.exportSinglePage(files, outputDir, docLabel);
+                        exportService.exportSinglePage(files, outputDir, docLabel, rules);
                         summary.append(docLabel)
                                 .append(": ").append(files.size()).append(" file(s) written\n");
                     }
@@ -602,7 +605,8 @@ public class EmployeeDashboardController {
         ViewHandler.LOGIN.show(false);
     }
 
-    @FXML private void onBtnStartScanningSession(ActionEvent event) { showChooseProfileModal(); }
+    @FXML private void onBtnStartScanningSession(ActionEvent event) {
+        showChooseProfileModal(); }
 
     // ── Drag-reorder ──────────────────────────────────────────────────────────
 
@@ -702,10 +706,10 @@ public class EmployeeDashboardController {
         lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
     }
 
-    private void setFetchButtonsDisabled(boolean disabled) {
-        if (btnFetch  != null) btnFetch.setDisable(disabled);
-        if (btnRescan != null) btnRescan.setDisable(disabled);
-    }
+//    private void setFetchButtonsDisabled(boolean disabled) {
+//        if (btnFetch  != null) btnFetch.setDisable(disabled);
+//        if (btnRescan != null) btnRescan.setDisable(disabled);
+//    }
 
     private void setTotalsVisible(boolean visible) {
         lblTotalDocText.setVisible(visible);    lblTotalDocText.setManaged(visible);

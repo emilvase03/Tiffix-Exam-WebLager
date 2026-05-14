@@ -122,7 +122,8 @@ public class ProfileCardController implements Initializable {
                     profileToBeUpdated.setTitle(txtTitle.getText().trim());
 
                     profileRuleModel.updateProfile(profileToBeUpdated);
-                    profileRuleModel.updateRulesForProfile(profileToBeUpdated, rulesList.getItems());
+                    profileRuleModel.
+                            updateRulesForProfile(profileToBeUpdated, rulesList.getItems());
                     customerProfileModel.updateProfileForCustomer(customerDropdown.getSelectionModel().getSelectedItem(), profileToBeUpdated);
                     profilesTabController.getTable().refresh();
 
