@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface ISoftDeleteDataAccess<T> {
 
-    public List<T> getTrueAll() throws Exception;
+    public List<T> getAllIncludingSoftDeleted() throws Exception;
 }

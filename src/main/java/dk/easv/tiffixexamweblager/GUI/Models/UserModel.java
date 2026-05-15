@@ -66,7 +66,7 @@ public class UserModel {
 
     public void loadEmployees(Runnable onLoaded) {
         BackgroundExecutor.execute(
-                () -> userManager.getTrueAll(),
+                () -> userManager.getAllIncludingSoftDeleted(),
                 result -> {
                     employees.setAll(result);
                     if (onLoaded != null) onLoaded.run();

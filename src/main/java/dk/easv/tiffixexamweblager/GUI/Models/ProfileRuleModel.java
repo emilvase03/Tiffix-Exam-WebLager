@@ -27,8 +27,8 @@ public class ProfileRuleModel {
     }
 
     // ProfileManager
-    public ObservableList<Profile> getAllTrueObservableProfiles() throws Exception {
-        allProfiles.setAll(profileManager.getTrueAll());
+    public ObservableList<Profile> getAllObservableIncludingSoftDeleted() throws Exception {
+        allProfiles.setAll(profileManager.getAllIncludingSoftDeleted());
         return allProfiles;
     };
 

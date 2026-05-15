@@ -54,8 +54,8 @@ public class CustomerProfileModel {
         customerManager.deleteCustomer(customer);
     }
 
-    public ObservableList<Customer> getTrueAll() throws Exception {
-        allTrueCustomers.setAll(customerManager.getTrueAll());
+    public ObservableList<Customer> getAllObservableIncludingSoftDeleted() throws Exception {
+        allTrueCustomers.setAll(customerManager.getAllIncludingSoftDeleted());
         return allTrueCustomers;
     }
 }

@@ -28,8 +28,8 @@ public class BoxDocumentModel {
     }
 
     // BoxManager
-    public ObservableList<Box> getAllTrueObservableBoxes() throws Exception {
-        allBoxes.setAll(boxManager.getTrueAll());
+    public ObservableList<Box> getAllObservableIncludingSoftDeleted() throws Exception {
+        allBoxes.setAll(boxManager.getAllIncludingSoftDeleted());
         return allBoxes;
     }
 

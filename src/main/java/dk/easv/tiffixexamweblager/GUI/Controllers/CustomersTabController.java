@@ -54,7 +54,7 @@ public class CustomersTabController implements Initializable {
         colTitle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getName()));
 
         try {
-            tblCustomer.setItems(customerProfileModel.getTrueAll());
+            tblCustomer.setItems(customerProfileModel.getAllObservableIncludingSoftDeleted());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve customers from database.");
         }

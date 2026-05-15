@@ -61,7 +61,7 @@ public class ProfilesTabController implements Initializable {
         colTitle.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTitle()));
 
         try {
-            tblProfiles.setItems(profileRuleModel.getAllTrueObservableProfiles());
+            tblProfiles.setItems(profileRuleModel.getAllObservableIncludingSoftDeleted());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve profiles from database.");
         }

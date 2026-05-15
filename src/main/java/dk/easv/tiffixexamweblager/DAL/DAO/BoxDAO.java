@@ -114,7 +114,7 @@ public class BoxDAO implements IBoxDataAccess {
     }
 
     @Override
-    public List<Box> getTrueAll() throws Exception {
+    public List<Box> getAllIncludingSoftDeleted() throws Exception {
         List<Box> boxes = new ArrayList<>();
         String sql = """
                 SELECT b.Id, b.Number, b.Title, b.CreatedAt,

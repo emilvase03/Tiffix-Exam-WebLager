@@ -96,7 +96,7 @@ public class CustomerDAO implements ICustomerDataAccess {
     }
 
     @Override
-    public List<Customer> getTrueAll() throws Exception {
+    public List<Customer> getAllIncludingSoftDeleted() throws Exception {
         List<Customer> customers = new ArrayList<>();
 
         String sql = "SELECT Id, Name, IsDeleted FROM Customer;";

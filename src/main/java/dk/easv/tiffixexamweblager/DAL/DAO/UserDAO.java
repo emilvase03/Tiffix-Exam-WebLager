@@ -180,7 +180,7 @@ public class UserDAO implements IUserDataAccess {
     }
 
     @Override
-    public List<User> getTrueAll() throws Exception {
+    public List<User> getAllIncludingSoftDeleted() throws Exception {
         List<User> users = new ArrayList<>();
         String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId, IsDeleted FROM [User]";
 

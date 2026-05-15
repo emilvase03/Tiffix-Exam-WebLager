@@ -32,7 +32,7 @@ public class CustomerManager {
         dataAccess.delete(customer);
     }
 
-    public List<Customer> getTrueAll() throws Exception {
-        return dataAccess.getTrueAll();
+    public List<Customer> getAllIncludingSoftDeleted() throws Exception {
+        return dataAccess.getAllIncludingSoftDeleted();
     }
 }
