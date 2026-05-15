@@ -5,6 +5,7 @@ import dk.easv.tiffixexamweblager.BE.Document;
 import dk.easv.tiffixexamweblager.GUI.Controllers.EmployeeDashboardController;
 
 //Java/JavaFX imports
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.input.ClipboardContent;
@@ -139,4 +140,6 @@ public class DocumentTileController {
     public String   getLabel()    {
         return label; }
 
+    public void setContainerWidthProperty(ReadOnlyDoubleProperty readOnlyDoubleProperty) {
+    }
 }
