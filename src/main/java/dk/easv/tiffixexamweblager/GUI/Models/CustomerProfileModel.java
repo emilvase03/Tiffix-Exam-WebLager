@@ -50,8 +50,8 @@ public class CustomerProfileModel {
         customerManager.updateCustomer(customer);
     }
 
-    public void deleteCustomer(Customer customer) throws Exception {
-        customerManager.deleteCustomer(customer);
+    public boolean toggleSoftDelete(int id) throws Exception {
+        return customerManager.toggleSoftDelete(id);
     }
 
     public ObservableList<Customer> getAllObservableIncludingSoftDeleted() throws Exception {

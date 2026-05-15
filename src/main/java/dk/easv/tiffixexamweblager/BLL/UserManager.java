@@ -78,6 +78,10 @@ public class UserManager {
         return dataAccess.getAllIncludingSoftDeleted();
     }
 
+    public boolean toggleSoftDelete(int id) throws Exception {
+        return dataAccess.toggleSoftDelete(id);
+    }
+
     public static void main(String[] args) {
 
         try {
