@@ -94,7 +94,7 @@ public class ProfileDAO implements IProfileDataAccess {
     }
 
     @Override
-    public List<Profile> getTrueAll() throws Exception {
+    public List<Profile> getAllIncludingSoftDeleted() throws Exception {
         List<Profile> profiles = new ArrayList<>();
 
         String sql = "SELECT Id, Title, IsDeleted FROM Profile;";

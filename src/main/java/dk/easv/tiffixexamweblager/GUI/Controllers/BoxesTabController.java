@@ -89,7 +89,7 @@ public class BoxesTabController implements Initializable {
                 new SimpleObjectProperty<>(d.getValue().getPagesAmount()));
 
         try {
-            tblBoxes.setItems(boxDocumentModel.getAllTrueObservableBoxes());
+            tblBoxes.setItems(boxDocumentModel.getAllObservableIncludingSoftDeleted());
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to retrieve boxes from database.");
         }

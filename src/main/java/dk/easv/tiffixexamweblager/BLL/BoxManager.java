@@ -30,7 +30,7 @@ public class BoxManager {
         dataAccess.delete(box);
     }
 
-    public List<Box> getTrueAll() throws Exception {
-        return dataAccess.getTrueAll();
+    public List<Box> getAllIncludingSoftDeleted() throws Exception {
+        return dataAccess.getAllIncludingSoftDeleted();
     }
 }

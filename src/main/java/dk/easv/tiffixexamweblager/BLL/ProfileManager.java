@@ -31,7 +31,7 @@ public class ProfileManager {
         dataAccess.delete(profile);
     };
 
-    public List<Profile> getTrueAll() throws Exception {
-        return dataAccess.getTrueAll();
+    public List<Profile> getAllIncludingSoftDeleted() throws Exception {
+        return dataAccess.getAllIncludingSoftDeleted();
     }
 }
