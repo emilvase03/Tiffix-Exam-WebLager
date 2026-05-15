@@ -1,6 +1,7 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 // Project imports
+import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
@@ -68,27 +69,18 @@ public class EmployeesTabController {
         colManage.setCellFactory(col -> new TableCell<>() {
 
             private final Button btnEdit = new Button();
-            private final Button btnDelete = new Button();
 
-            private final HBox container = new HBox(8, btnEdit, btnDelete);
+            private final HBox container = new HBox(8, btnEdit);
 
             {
                 FontIcon editIcon = new FontIcon("bi-pencil");
-                FontIcon deleteIcon = new FontIcon("bi-trash");
 
                 btnEdit.setGraphic(editIcon);
-                btnDelete.setGraphic(deleteIcon);
 
                 btnEdit.getStyleClass().add("icon-button");
-                btnDelete.getStyleClass().add("icon-button");
-                btnDelete.getStyleClass().add("danger");
 
                 btnEdit.setOnAction(e ->
                         onBtnEditUser(getTableView().getItems().get(getIndex()))
-                );
-
-                btnDelete.setOnAction(e ->
-                        onBtnDeleteUser(getTableView().getItems().get(getIndex()))
                 );
 
                 container.setAlignment(Pos.CENTER);
@@ -115,16 +107,30 @@ public class EmployeesTabController {
                 btnActive.setGraphic(new FontIcon("bi-check-square"));
                 btnActive.getStyleClass().addAll("icon-button");
                 btnActive.setOnAction(e -> {
-                    // Not implemented yet
+                    handleToggle(true);
                 });
 
                 btnDeactivate.setGraphic(new FontIcon("bi-dash-square"));
                 btnDeactivate.getStyleClass().addAll("icon-button", "danger");
                 btnDeactivate.setOnAction(e -> {
-                    // Not implemented yet
+                    handleToggle(false);
                 });
 
                 container.setAlignment(Pos.CENTER);
+            }
+
+            private void handleToggle(boolean newDeletedState) {
+                User user = getTableView().getItems().get(getIndex());
+                try {
+                    userModel.toggleSoftDelete(user, success -> {
+                        if (success) {
+                            user.setIsDeleted(newDeletedState);
+                            getTableView().refresh();
+                        }
+                    });
+                } catch (Exception ex) {
+                    AlertHelper.showError("Error", "Failed to toggle active status of " +user.getUsername());
+                }
             }
 
             @Override
@@ -138,26 +144,6 @@ public class EmployeesTabController {
                 setGraphic(container);
             }
         });
-    }
-
-    private void onBtnDeleteUser(User user) {
-
-        if (user == null) return;
-
-        boolean confirmed = AlertHelper.showConfirmation(
-                "Delete User",
-                "Are you sure you want to delete " + user.getUsername() + "?"
-        );
-
-        if (confirmed) {
-            try {
-                userModel.deleteUser(user);
-                userModel.getEmployees().remove(user);
-            } catch (Exception e) {
-                AlertHelper.showError("Error", "Failed to delete user.");
-                e.printStackTrace();
-            }
-        }
     }
 
     private void onBtnEditUser(User user) {

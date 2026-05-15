@@ -1,6 +1,7 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 // Project imports
+import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.CustomerCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.CustomerProfileModel;
@@ -44,7 +45,6 @@ public class CustomersTabController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
         setupActiveColumn();
-        setupManageColumn();
 
         customerCardController.setOverlay(customerCardOverlay);
         customerCardController.setCustomersTabController(this);
@@ -71,47 +71,6 @@ public class CustomersTabController implements Initializable {
         });
     }
 
-    private void setupManageColumn() {
-        colManage.setCellFactory(col -> new TableCell<>() {
-
-            private final Button btnDelete = new Button();
-            private final HBox container  = new HBox(8, btnDelete);
-
-            {
-                btnDelete.setGraphic(new FontIcon("bi-trash"));
-                btnDelete.getStyleClass().addAll("icon-button", "danger");
-                btnDelete.setOnAction(e ->
-                        handleDeleteCustomer(tblCustomer.getItems().get(getIndex()))
-                );
-
-                container.setAlignment(Pos.CENTER);
-            }
-
-            private void handleDeleteCustomer(Customer customer) {
-                if (customer == null) return;
-
-                boolean confirmed = AlertHelper.showConfirmation(
-                        "Deactivate Customer",
-                        "Are you sure you want to deactivate \"" + customer.getName() + "\"?"
-                );
-                if (!confirmed) return;
-
-                try {
-                    customerProfileModel.deleteCustomer(customer);
-                    tblCustomer.getItems().remove(customer);
-                } catch (Exception e) {
-                    AlertHelper.showError("Error", "Failed to deactivate customer.");
-                }
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : container);
-            }
-        });
-    }
-
     private void setupActiveColumn() {
         colActive.setCellValueFactory(data ->
                 new SimpleBooleanProperty(data.getValue().getIsDeleted())
@@ -125,16 +84,31 @@ public class CustomersTabController implements Initializable {
                 btnActive.setGraphic(new FontIcon("bi-check-square"));
                 btnActive.getStyleClass().addAll("icon-button");
                 btnActive.setOnAction(e -> {
-                    // Not implemented yet
+                    handleToggle(true);
                 });
 
                 btnDeactivate.setGraphic(new FontIcon("bi-dash-square"));
                 btnDeactivate.getStyleClass().addAll("icon-button", "danger");
                 btnDeactivate.setOnAction(e -> {
-                    // Not implemented yet
+                    handleToggle(false);
                 });
 
                 container.setAlignment(Pos.CENTER);
+            }
+
+            private void handleToggle(boolean newDeletedState) {
+                Customer customer = getTableView().getItems().get(getIndex());
+                boolean success = false;
+                try {
+                    success = customerProfileModel.toggleSoftDelete(customer.getId());
+                } catch (Exception ex) {
+                    AlertHelper.showError("Error", "Failed to toggle active status of " +customer.getName());
+                }
+
+                if (success) {
+                    customer.setIsDeleted(newDeletedState);
+                    getTableView().refresh();
+                }
             }
 
             @Override

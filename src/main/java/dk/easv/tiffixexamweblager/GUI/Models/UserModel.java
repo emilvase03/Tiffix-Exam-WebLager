@@ -15,7 +15,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import java.util.List;
+import java.util.function.Consumer;
 
 public class UserModel {
     private final UserManager userManager;
@@ -131,14 +131,13 @@ public class UserModel {
     }
 
 
-    public void deleteUser(User user) {
+    public void toggleSoftDelete(User user, Consumer<Boolean> onSuccess) {
         BackgroundExecutor.execute(
-                () -> { userManager.deleteUser(user); return null; },
-                result -> {
-                    users.remove(user);
-                    employees.remove(user);
+                () -> userManager.toggleSoftDelete(user.getId()),
+                success -> {
+                    onSuccess.accept(success);
                 },
-                e -> { throw new RuntimeException("Failed to delete user", e); },
+                e -> { throw new RuntimeException("Failed to toggle active status of " + user.getUsername(), e); },
                 loading::set
         );
     }

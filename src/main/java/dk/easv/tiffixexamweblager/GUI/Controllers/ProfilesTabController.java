@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
+import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ProfileCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
@@ -49,7 +50,6 @@ public class ProfilesTabController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
         setupActiveColumn();
-        setupManageColumn();
 
         profileCardController.setOverlay(profileCardOverlay);
         profileCardController.setProfilesTabController(this);
@@ -78,60 +78,6 @@ public class ProfilesTabController implements Initializable {
         });
     }
 
-    private void setupManageColumn() {
-        colManage.setCellFactory(col -> new TableCell<>() {
-
-            private final Button btnAssign = new Button();
-            private final Button btnDelete = new Button();
-            private final HBox container  = new HBox(8, btnAssign, btnDelete);
-
-            {
-                btnAssign.setGraphic(new FontIcon("bi-person-plus"));
-                btnAssign.getStyleClass().add("icon-button");
-                btnAssign.setOnAction(e ->
-                        handleAssignEmployee(tblProfiles.getItems().get(getIndex()))
-                );
-
-                btnDelete.setGraphic(new FontIcon("bi-trash"));
-                btnDelete.getStyleClass().addAll("icon-button", "danger");
-                btnDelete.setOnAction(e ->
-                        handleDeleteProfile(tblProfiles.getItems().get(getIndex()))
-                );
-
-                container.setAlignment(Pos.CENTER);
-            }
-
-            private void handleAssignEmployee(Profile profile) {
-                if (profile == null) return;
-
-                assignEmployeeProfileController.preload(userModel, profile.getId());
-                showAssignOverlay();
-            }
-
-            private void handleDeleteProfile(Profile profile) {
-                if (profile == null) return;
-
-                boolean confirmed = AlertHelper.showConfirmation(
-                        "Deactivate Profile",
-                        "Are you sure you want to deactivate \"" + profile.getTitle() + "\"?"
-                );
-                if (!confirmed) return;
-
-                try {
-                    profileRuleModel.deleteProfile(profile);
-                    tblProfiles.getItems().remove(profile);
-                } catch (Exception e) {
-                    AlertHelper.showError("Error", "Failed to deactivate profile.");
-                }
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : container);
-            }
-        });
-    }
 
     private void setupActiveColumn() {
         colActive.setCellValueFactory(data ->
@@ -146,16 +92,31 @@ public class ProfilesTabController implements Initializable {
                 btnActive.setGraphic(new FontIcon("bi-check-square"));
                 btnActive.getStyleClass().addAll("icon-button");
                 btnActive.setOnAction(e -> {
-                    // Not implemented yet
+                    handleToggle(true);
                 });
 
                 btnDeactivate.setGraphic(new FontIcon("bi-dash-square"));
                 btnDeactivate.getStyleClass().addAll("icon-button", "danger");
                 btnDeactivate.setOnAction(e -> {
-                    // Not implemented yet
+                    handleToggle(false);
                 });
 
                 container.setAlignment(Pos.CENTER);
+            }
+
+            private void handleToggle(boolean newDeletedState) {
+                Profile profile = getTableView().getItems().get(getIndex());
+                boolean success = false;
+                try {
+                    success = profileRuleModel.toggleSoftDelete(profile.getId());
+                } catch (Exception ex) {
+                    AlertHelper.showError("Error", "Failed to toggle active status of " +profile.getTitle());
+                }
+
+                if (success) {
+                    profile.setIsDeleted(newDeletedState);
+                    getTableView().refresh();
+                }
             }
 
             @Override

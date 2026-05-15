@@ -151,4 +151,17 @@ public class BoxDAO implements IBoxDataAccess {
         }
         return boxes;
     }
+
+    @Override
+    public boolean toggleSoftDelete(int id) throws Exception {
+        String sql = "UPDATE Box SET IsDeleted = 1 - IsDeleted WHERE Id = ?";
+
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
 }

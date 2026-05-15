@@ -40,9 +40,9 @@ public class ProfileRuleModel {
         profileManager.updateProfile(profile);
     };
 
-    public void deleteProfile(Profile profile) throws Exception {
-        profileManager.deleteProfile(profile);
-    };
+    public boolean toggleSoftDelete(int id) throws Exception {
+        return profileManager.toggleSoftDelete(id);
+    }
 
     // ProfileRuleManager
     public void addRulesToProfile(Profile profile, List<Rule> rules) throws Exception {

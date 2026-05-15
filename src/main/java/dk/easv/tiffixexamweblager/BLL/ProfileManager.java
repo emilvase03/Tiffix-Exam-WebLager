@@ -34,4 +34,8 @@ public class ProfileManager {
     public List<Profile> getAllIncludingSoftDeleted() throws Exception {
         return dataAccess.getAllIncludingSoftDeleted();
     }
+
+    public boolean toggleSoftDelete(int id) throws Exception {
+        return dataAccess.toggleSoftDelete(id);
+    }
 }

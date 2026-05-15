@@ -40,7 +40,6 @@
                     <columns>
                         <TableColumn fx:id="colTitle" prefWidth="538.0" text="Name" />
                   <TableColumn fx:id="colActive" prefWidth="72.0" text="Active" />
-                        <TableColumn fx:id="colManage" prefWidth="147.6666259765625" text="Manage" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

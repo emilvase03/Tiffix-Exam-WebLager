@@ -138,8 +138,9 @@ public class UserDAO implements IUserDataAccess {
 
     @Override
     public List<User> getUsersByRole(Role role) throws Exception {
-        String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId FROM [User] WHERE RoleId = (?) AND IsDeleted = 0;";
         List<User> users = new ArrayList<>();
+        String sql = "SELECT Id, FirstName, LastName, Username, Password, RoleId FROM [User] WHERE RoleId = (?) AND IsDeleted = 0;";
+
         try (Connection conn = databaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, role.getId());
@@ -194,5 +195,18 @@ public class UserDAO implements IUserDataAccess {
         }
 
         return users;
+    }
+
+    @Override
+    public boolean toggleSoftDelete(int id) throws Exception {
+        String sql = "UPDATE [User] SET IsDeleted = 1 - IsDeleted WHERE Id = ?";
+
+        try (Connection conn = databaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
     }
 }

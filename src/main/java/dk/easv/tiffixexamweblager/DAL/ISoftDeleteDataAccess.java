@@ -6,4 +6,6 @@ import java.util.List;
 public interface ISoftDeleteDataAccess<T> {
 
     public List<T> getAllIncludingSoftDeleted() throws Exception;
+
+    public boolean toggleSoftDelete(int id) throws Exception;
 }
