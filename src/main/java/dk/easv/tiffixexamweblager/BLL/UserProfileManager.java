@@ -15,15 +15,15 @@ public class UserProfileManager {
         dataAccess = new UserProfileDAO();
     }
 
-     public List<UserProfile> getCoordinatorsForEvent(int profileId) throws Exception {
+     public List<UserProfile> getEmployeesForProfile(int profileId) throws Exception {
         return dataAccess.getEmployeesForProfile(profileId);
     }
 
-    public void assignCoordinator(int userId, int profileId) throws Exception {
+    public void assignEmployees(int userId, int profileId) throws Exception {
         dataAccess.assignEmployees(userId, profileId);
     }
 
-    public void removeCoordinator(int userId, int profileId) throws Exception {
+    public void removeEmployees(int userId, int profileId) throws Exception {
         dataAccess.removeEmployees(userId, profileId);
     }
 

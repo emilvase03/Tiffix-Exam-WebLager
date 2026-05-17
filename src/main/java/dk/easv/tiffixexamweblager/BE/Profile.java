@@ -34,4 +34,9 @@ public class Profile {
     public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
+
+    @Override
+    public String toString() {
+        return title;
+    }
 }

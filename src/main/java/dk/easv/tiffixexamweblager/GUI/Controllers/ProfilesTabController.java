@@ -1,13 +1,11 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ProfileCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import javafx.beans.property.SimpleBooleanProperty;
-import org.kordamp.ikonli.javafx.FontIcon;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,31 +14,31 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.javafx.FontIcon;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ProfilesTabController implements Initializable {
 
-    @FXML private TableView<Profile> tblProfiles;
+    @FXML private TableView<Profile>           tblProfiles;
     @FXML private TableColumn<Profile, String> colTitle;
     @FXML private TableColumn<Profile, Boolean> colActive;
-    @FXML private TableColumn<Profile, Void> colManage;
+    @FXML private TableColumn<Profile, Void>   colManage;
 
-    // Create overlay — already wired
-    @FXML private VBox profileCardOverlay;
-    @FXML private ProfileCardController profileCardController;
+    @FXML private VBox                        profileCardOverlay;
+    @FXML private ProfileCardController       profileCardController;
 
-    // Assign overlay — new
-    @FXML private VBox assignEmployeeOverlay;
-    @FXML private AssignEmployeeProfileController assignEmployeeProfileController;
+    @FXML private VBox                              assignEmployeeOverlay;
+    @FXML private AssignEmployeeProfileController   assignEmployeeProfileController;
 
     private ProfileRuleModel profileRuleModel;
-    private UserModel userModel;
+    private UserModel        userModel;
 
     public ProfilesTabController() {
         try {
             profileRuleModel = new ProfileRuleModel();
-            userModel    = new UserModel();
+            userModel        = new UserModel();
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to initialize models.");
         }
@@ -50,6 +48,7 @@ public class ProfilesTabController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
         setupActiveColumn();
+        setupManageColumn();
 
         profileCardController.setOverlay(profileCardOverlay);
         profileCardController.setProfilesTabController(this);
@@ -78,28 +77,49 @@ public class ProfilesTabController implements Initializable {
         });
     }
 
+    private void setupManageColumn() {
+        colManage.setCellFactory(col -> new TableCell<>() {
+
+            private final Button btnAssign  = new Button();
+            private final HBox   container  = new HBox(8, btnAssign);
+
+            {
+                btnAssign.setGraphic(new FontIcon("bi-people"));
+                btnAssign.getStyleClass().add("icon-button");
+                btnAssign.setOnAction(e -> {
+                    Profile profile = getTableView().getItems().get(getIndex());
+                    assignEmployeeProfileController.preload(userModel, profile.getId());
+                    showAssignOverlay();
+                });
+
+                container.setAlignment(Pos.CENTER);
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : container);
+            }
+        });
+    }
 
     private void setupActiveColumn() {
         colActive.setCellValueFactory(data ->
-                new SimpleBooleanProperty(data.getValue().getIsDeleted())
-        );
+                new SimpleBooleanProperty(data.getValue().getIsDeleted()));
 
         colActive.setCellFactory(col -> new TableCell<>() {
-            final Button btnActive = new Button();
+            final Button btnActive     = new Button();
             final Button btnDeactivate = new Button();
-            final HBox container = new HBox();
+            final HBox   container     = new HBox();
+
             {
                 btnActive.setGraphic(new FontIcon("bi-check-square"));
                 btnActive.getStyleClass().addAll("icon-button");
-                btnActive.setOnAction(e -> {
-                    handleToggle(true);
-                });
+                btnActive.setOnAction(e -> handleToggle(true));
 
                 btnDeactivate.setGraphic(new FontIcon("bi-dash-square"));
                 btnDeactivate.getStyleClass().addAll("icon-button", "danger");
-                btnDeactivate.setOnAction(e -> {
-                    handleToggle(false);
-                });
+                btnDeactivate.setOnAction(e -> handleToggle(false));
 
                 container.setAlignment(Pos.CENTER);
             }
@@ -110,9 +130,8 @@ public class ProfilesTabController implements Initializable {
                 try {
                     success = profileRuleModel.toggleSoftDelete(profile.getId());
                 } catch (Exception ex) {
-                    AlertHelper.showError("Error", "Failed to toggle active status of " +profile.getTitle());
+                    AlertHelper.showError("Error", "Failed to toggle active status of " + profile.getTitle());
                 }
-
                 if (success) {
                     profile.setIsDeleted(newDeletedState);
                     getTableView().refresh();
@@ -122,10 +141,7 @@ public class ProfilesTabController implements Initializable {
             @Override
             protected void updateItem(Boolean isDeleted, boolean empty) {
                 super.updateItem(isDeleted, empty);
-                if (empty || isDeleted == null) {
-                    setGraphic(null);
-                    return;
-                }
+                if (empty || isDeleted == null) { setGraphic(null); return; }
                 container.getChildren().setAll(isDeleted ? btnDeactivate : btnActive);
                 setGraphic(container);
             }
@@ -138,9 +154,7 @@ public class ProfilesTabController implements Initializable {
         profileCardController.preloadCreateWindow();
     }
 
-    public TableView<Profile> getTable() {
-        return tblProfiles;
-    }
+    public TableView<Profile> getTable() { return tblProfiles; }
 
     private void showCreateOverlay() {
         profileCardOverlay.setVisible(true);

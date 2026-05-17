@@ -12,7 +12,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-
 <StackPane xmlns="http://javafx.com/javafx/24.0.1"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.EmployeesTabController"
@@ -29,9 +28,7 @@
 
         <center>
             <VBox prefHeight="241.0" prefWidth="390.0"
-                  spacing="5.0"
-                  BorderPane.alignment="CENTER">
-
+                  spacing="5.0" BorderPane.alignment="CENTER">
                 <BorderPane.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0"/>
                 </BorderPane.margin>
@@ -41,18 +38,13 @@
                     <padding>
                         <Insets left="5.0" top="5.0"/>
                     </padding>
-
                     <Label styleClass="h2" text="Employees"/>
-
                     <Region HBox.hgrow="ALWAYS"/>
-
                     <Button fx:id="btnCreate"
-                            alignment="CENTER"
                             mnemonicParsing="false"
                             onAction="#onBtnCreateEmployee"
                             styleClass="action-btn"
-                            prefHeight="32.0"
-                            prefWidth="138.0"
+                            prefHeight="32.0" prefWidth="138.0"
                             text="Create Employee">
                         <HBox.margin>
                             <Insets right="5.0"/>
@@ -67,7 +59,7 @@
                         <TableColumn fx:id="colFirstName" prefWidth="114.0" text="First name"/>
                         <TableColumn fx:id="colLastName"  prefWidth="72.0"  text="Last Name"/>
                         <TableColumn fx:id="colUsername"  prefWidth="90.0"  text="Username"/>
-                        <TableColumn fx:id="colActive" prefWidth="72.0" resizable="false" text="Active" />
+                        <TableColumn fx:id="colActive"    prefWidth="72.0"  resizable="false" text="Active"/>
                         <TableColumn fx:id="colManage"    prefWidth="140.0" resizable="false" text="Manage"/>
                     </columns>
                     <columnResizePolicy>
@@ -77,11 +69,14 @@
                         <Insets left="5.0" right="5.0"/>
                     </VBox.margin>
                 </TableView>
-
             </VBox>
         </center>
     </BorderPane>
 
     <ModalPane fx:id="modalPane"/>
+
+    <VBox fx:id="assignProfileOverlay" alignment="CENTER" managed="false" visible="false">
+        <fx:include fx:id="assignProfileToEmployee" source="../components/AssignProfileToEmployee.fxml"/>
+    </VBox>
 
 </StackPane>

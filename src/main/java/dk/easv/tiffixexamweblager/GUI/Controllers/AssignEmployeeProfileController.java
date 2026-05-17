@@ -1,20 +1,15 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-import atlantafx.base.theme.Styles;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BE.UserProfile;
 import dk.easv.tiffixexamweblager.BLL.UserProfileManager;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.CheckComboBox;
 
@@ -70,7 +65,7 @@ public class AssignEmployeeProfileController implements Initializable {
         try {
             employeeDropdown.getItems().addAll(allEmployees);
 
-            List<UserProfile> assigned = userProfileManager.getCoordinatorsForEvent(currentProfileId);
+            List<UserProfile> assigned = userProfileManager.getEmployeesForProfile(currentProfileId);
 
             isLoading = true;
             for (User u : allEmployees) {
@@ -94,7 +89,7 @@ public class AssignEmployeeProfileController implements Initializable {
                         assignedList.getItems().add(u);
                         if (!isLoading) {
                             try {
-                                userProfileManager.assignCoordinator(u.getId(), currentProfileId);
+                                userProfileManager.assignEmployees(u.getId(), currentProfileId);
                             } catch (Exception e) {
                                 AlertHelper.showError("Failed to assign employee", e.getMessage());
                             }
@@ -106,7 +101,7 @@ public class AssignEmployeeProfileController implements Initializable {
                         assignedList.getItems().remove(u);
                         if (!isLoading) {
                             try {
-                                userProfileManager.removeCoordinator(u.getId(), currentProfileId);
+                                userProfileManager.removeEmployees(u.getId(), currentProfileId);
                             } catch (Exception e) {
                                 AlertHelper.showError("Failed to remove employee", e.getMessage());
                             }
