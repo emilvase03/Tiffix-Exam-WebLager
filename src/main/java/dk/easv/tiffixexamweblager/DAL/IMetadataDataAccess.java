@@ -4,5 +4,5 @@ package dk.easv.tiffixexamweblager.DAL;
 import dk.easv.tiffixexamweblager.BE.Metadata;
 
 public interface IMetadataDataAccess {
-    public void createMetadata(Metadata metadata) throws Exception;
+    public void saveMetadata(Metadata metadata) throws Exception;
 }

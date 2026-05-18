@@ -255,7 +255,7 @@ public class EmployeeDashboardController {
 
                 int documentsAmount = (int) snapshot.values().stream().filter(f -> !f.isEmpty()).count();
                 int totalFilesAmount = snapshot.values().stream().mapToInt(List::size).sum();
-                boxDocumentModel.createMetadata(new Metadata(boxId, documentsAmount, totalFilesAmount, notes));
+                boxDocumentModel.saveMetadata(new Metadata(boxId, documentsAmount, totalFilesAmount, notes));
 
                 return sb.toString().trim();
             }

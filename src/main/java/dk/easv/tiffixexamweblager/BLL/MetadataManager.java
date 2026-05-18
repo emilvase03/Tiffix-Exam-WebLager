@@ -12,7 +12,7 @@ public class MetadataManager {
         dataAccess = new MetadataDAO();
     }
 
-    public void createMetadata(Metadata metadata) throws Exception{
-        dataAccess.createMetadata(metadata);
+    public void saveMetadata(Metadata metadata) throws Exception{
+        dataAccess.saveMetadata(metadata);
     }
 }

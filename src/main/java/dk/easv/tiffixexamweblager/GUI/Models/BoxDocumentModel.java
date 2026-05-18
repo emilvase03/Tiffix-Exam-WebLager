@@ -84,7 +84,7 @@ public class BoxDocumentModel {
     }
 
     // MetadataManager
-    public void createMetadata(Metadata metadata) throws Exception {
-        metadataManager.createMetadata(metadata);
+    public void saveMetadata(Metadata metadata) throws Exception {
+        metadataManager.saveMetadata(metadata);
     }
 }
