@@ -1,15 +1,14 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-import dk.easv.tiffixexamweblager.BE.Box;
-import dk.easv.tiffixexamweblager.BE.Document;
-import dk.easv.tiffixexamweblager.BE.Rule;
-import dk.easv.tiffixexamweblager.BE.ScannedFile;
+//Project imports
+import dk.easv.tiffixexamweblager.BE.*;
 import dk.easv.tiffixexamweblager.BLL.DocumentManager;
 import dk.easv.tiffixexamweblager.BLL.ScannedFileManager;
 import dk.easv.tiffixexamweblager.BLL.Utils.BarcodeDetector;
 import dk.easv.tiffixexamweblager.BLL.Utils.ImageTransformations;
 import dk.easv.tiffixexamweblager.BLL.Utils.TiffExportService;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
+import dk.easv.tiffixexamweblager.GUI.Controllers.components.DocumentTileController;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Models.FileImportModel;
@@ -17,9 +16,11 @@ import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
+//Antlanta imports
 import atlantafx.base.controls.ModalPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+//JavaFX imports
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -34,6 +35,8 @@ import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 
 import javax.imageio.ImageIO;
+
+//Java imports
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -92,6 +95,7 @@ public class EmployeeDashboardController {
     private static final double TREE_THUMB_H = 42.0;
 
     private Path scanTempDir;
+
 
     @FXML
     private void initialize() {
@@ -355,9 +359,7 @@ public class EmployeeDashboardController {
                     createNewDocument();
                     currentFiles.clear(); fileTileControllers.clear(); filesTilePane.getChildren().clear();
                 } else if (activeDocument == null) {
-                    AlertHelper.showError("No document selected",
-                            "Scan a barcode page first to start a new document.");
-                    return;
+                    AlertHelper.showError("No document selected", "Scan a barcode page first."); return;
                 }
                 if (selectedFileIndex >= 0 && selectedFileIndex < currentFiles.size()) {
                     sessionData.get(activeDocument).set(selectedFileIndex, f);
@@ -374,6 +376,7 @@ public class EmployeeDashboardController {
                     if (firstNewIndex == -1) firstNewIndex = currentFiles.size() - 1;
                     addFileToTree(activeDocument, f);
                 }
+
             }
             updateDocumentFileCountLabels();
             updateTotalFilesInBoxLabel();
@@ -389,59 +392,81 @@ public class EmployeeDashboardController {
 
     // ── Export ────────────────────────────────────────────────────────────────
 
-    @FXML private void onBtnExport(ActionEvent event) {
+    @FXML
+    private void onBtnExport(ActionEvent event) {
         if (sessionData.isEmpty() || sessionData.values().stream().allMatch(List::isEmpty)) {
-            AlertHelper.showError("Nothing to export", "There are no scanned files to export.");
-            return;
+            AlertHelper.showError("Nothing to export", "There are no scanned files to export."); return;
         }
+
         ButtonType btnSingle = new ButtonType("Single-page TIFFs");
         ButtonType btnMulti  = new ButtonType("Multi-page TIFF");
         ButtonType btnCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert typeAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        typeAlert.setTitle("Export"); typeAlert.setHeaderText("Choose export format");
-        typeAlert.setContentText("Single-page: one .tiff per page.\nMulti-page: one .tiff per document.");
-        typeAlert.getButtonTypes().setAll(btnSingle, btnMulti, btnCancel);
-        Optional<ButtonType> choice = typeAlert.showAndWait();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        alert.setTitle("Export"); alert.setHeaderText("Choose export format");
+        alert.setContentText("Single-page: one .tiff per page.\nMulti-page: one .tiff per document.");
+        alert.getButtonTypes().setAll(btnSingle, btnMulti, btnCancel);
+
+        TextArea notesField = new TextArea();
+        notesField.setPromptText("Enter notes for this box (optional)");
+        notesField.setWrapText(true);
+        notesField.setPrefRowCount(3);
+        notesField.setStyle("-fx-padding: 0px");
+        alert.getDialogPane().setExpandableContent(notesField);
+        alert.getDialogPane().setExpanded(true);
+
+        Optional<ButtonType> choice = alert.showAndWait();
         if (choice.isEmpty() || choice.get() == btnCancel) return;
-        boolean multiPage = (choice.get() == btnMulti);
-        DirectoryChooser chooser = new DirectoryChooser(); chooser.setTitle("Select Export Folder");
+        boolean multiPage = choice.get() == btnMulti;
+        final String notes = notesField.getText().trim().isEmpty() ? null : notesField.getText().trim();
+
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select Export Folder");
         File dir = chooser.showDialog(root.getScene().getWindow());
         if (dir == null) return;
         Path outputDir = dir.toPath();
         rebuildAllSortOrders();
         Map<Document, List<ScannedFile>> snapshot = new LinkedHashMap<>(sessionData);
         final List<Rule> rules = List.copyOf(activeRules);
+
         Task<String> exportTask = new Task<>() {
             @Override protected String call() throws Exception {
                 TiffExportService svc = new TiffExportService();
                 StringBuilder sb = new StringBuilder();
-                for (Map.Entry<Document, List<ScannedFile>> entry : snapshot.entrySet()) {
-                    Document doc = entry.getKey(); List<ScannedFile> files = entry.getValue();
+                Document doc = null;
+
+                int boxId = snapshot.keySet().iterator().next().getBoxId();
+
+                for (var entry : snapshot.entrySet()) {
+                    doc = entry.getKey();
+                    List<ScannedFile> files = entry.getValue();
                     if (files.isEmpty()) continue;
-                    String docLabel = documentLabels.getOrDefault(doc, "Document_" + doc.getSortOrder());
+                    String label = documentLabels.getOrDefault(doc, "Document_" + doc.getSortOrder());
+
                     if (doc.isUnsaved()) {
-                        Document created = documentManager.createDocument(doc.getBoxId(), doc.getSortOrder());
-                        doc.setId(created.getId());
+                        Document c = documentManager.createDocument(doc.getBoxId(), doc.getSortOrder());
+                        doc.setId(c.getId());
                     }
                     scannedFileManager.saveFilesForDocument(doc.getId(), files);
+
                     if (multiPage) {
-                        int w = svc.exportMultiPage(files, outputDir.resolve(sanitizeLabel(docLabel) + ".tiff"), rules);
-                        sb.append(docLabel).append(": ").append(w).append(" page(s) written\n");
+                        int w = svc.exportMultiPage(files, outputDir.resolve(sanitizeLabel(label) + ".tiff"), rules);
+                        sb.append(label).append(": ").append(w).append(" page(s)\n");
                     } else {
-                        svc.exportSinglePage(files, outputDir, docLabel, rules);
-                        sb.append(docLabel).append(": ").append(files.size()).append(" file(s) written\n");
+                        svc.exportSinglePage(files, outputDir, label, rules);
+                        sb.append(label).append(": ").append(files.size()).append(" file(s)\n");
                     }
                 }
+
+                int documentsAmount = (int) snapshot.values().stream().filter(f -> !f.isEmpty()).count();
+                int totalFilesAmount = snapshot.values().stream().mapToInt(List::size).sum();
+                boxDocumentModel.saveMetadata(new Metadata(boxId, documentsAmount, totalFilesAmount, notes));
+
                 return sb.toString().trim();
             }
         };
-        exportTask.setOnSucceeded(e -> {
-            Alert done = new Alert(Alert.AlertType.INFORMATION);
-            done.setTitle("Export complete"); done.setHeaderText("Files saved to: " + outputDir);
-            done.setContentText(exportTask.getValue()); done.showAndWait();
-        });
-        exportTask.setOnFailed(e -> AlertHelper.showError("Export failed",
-                exportTask.getException() != null ? exportTask.getException().getMessage() : "Unknown error"));
+        exportTask.setOnSucceeded(e -> { Alert d = new Alert(Alert.AlertType.INFORMATION); d.setTitle("Export complete"); d.setHeaderText("Saved to: " + outputDir); d.setContentText(exportTask.getValue()); d.showAndWait(); });
+        exportTask.setOnFailed(e -> AlertHelper.showError("Export failed", exportTask.getException() != null ? exportTask.getException().getMessage() : "Unknown error"));
         new Thread(exportTask).start();
     }
 
@@ -454,13 +479,12 @@ public class EmployeeDashboardController {
     private void showChooseProfileModal() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ChooseScanSettingsView.fxml"));
-            Parent modalContent = loader.load();
-            ChooseScanSettingsController controller = loader.getController();
-            controller.init(modalPane, this::onSessionStarted);
-            modalPane.show(modalContent);
+            Parent content = loader.load();
+            ChooseScanSettingsController ctrl = loader.getController();
+            ctrl.init(modalPane, this::onSessionStarted);
+            modalPane.show(content);
         } catch (Exception e) {
-            AlertHelper.showError("Unable to open profile selection",
-                    "The profile selection could not be opened at this time.");
+            AlertHelper.showError("Unable to open profile selection", "Could not open profile selection.");
         }
     }
 
@@ -515,8 +539,6 @@ public class EmployeeDashboardController {
         }
     }
 
-    // ── Document management ───────────────────────────────────────────────────
-
     private void refreshDocumentPanel() {
         if (boxTreeItem == null) return;
         boxTreeItem.getChildren().sort((a, b) -> {
@@ -527,6 +549,8 @@ public class EmployeeDashboardController {
         treeView.refresh();
         lblTotalDocInBox.setText(String.valueOf(sessionData.size()));
     }
+
+
 
     private void createNewDocument() {
         Box box = UserSession.getInstance().getActiveBox();
@@ -620,8 +644,7 @@ public class EmployeeDashboardController {
         previewImageView.setRotate(0);
     }
 
-    /** Shared by loadPreviewImage() and fileThumbnail() — loads + caches processed image. */
-    BufferedImage getOrLoadProcessedImage(ScannedFile file) {
+    private BufferedImage getOrLoadProcessedImage(ScannedFile file) {
         if (file.getProcessedImage() != null) return file.getProcessedImage();
         byte[] bytes = file.getTiffFile();
         if (bytes != null && bytes.length > 0) {

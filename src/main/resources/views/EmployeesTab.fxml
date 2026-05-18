@@ -40,6 +40,7 @@
                     </padding>
                     <Label styleClass="h2" text="Employees"/>
                     <Region HBox.hgrow="ALWAYS"/>
+                    <fx:include source="../components/SearchBar.fxml"/>
                     <Button fx:id="btnCreate"
                             mnemonicParsing="false"
                             onAction="#onBtnCreateEmployee"
