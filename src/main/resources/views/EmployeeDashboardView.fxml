@@ -6,10 +6,10 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
@@ -63,66 +63,38 @@
         </top>
 
         <center>
-            <SplitPane dividerPositions="0.45" BorderPane.alignment="CENTER">
+            <SplitPane dividerPositions="0.30" BorderPane.alignment="CENTER">
                 <items>
 
                     <VBox fx:id="documentsPanel" styleClass="documents-panel" VBox.vgrow="ALWAYS">
 
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
-                            <Label fx:id="lblTotalDocText" styleClass="text-muted"
-                                   text="Total documents in box:"/>
-                            <Label fx:id="lblTotalDocInBox" styleClass="h3" text="0"/>
+                            <Label fx:id="lblTotalDocText"
+                                   styleClass="text-muted" text="Total documents in box:"
+                                   visible="false" managed="false"/>
+                            <Label fx:id="lblTotalDocInBox"
+                                   styleClass="h3" text="0"
+                                   visible="false" managed="false"/>
                         </HBox>
 
-                        <ScrollPane fx:id="documentsScrollPane" fitToWidth="true"
-                                    styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
-                            <content>
-
-                                <VBox fx:id="documentsContainer" spacing="0">
-
-                                    <HBox fx:id="boxCell"
-                                          styleClass="box-cell"
-                                          alignment="CENTER_LEFT"
-                                          spacing="10.0"
-                                          onMouseClicked="#onBoxCellClicked"
-                                          visible="false"
-                                          managed="false"
-                                          maxWidth="Infinity">
-                                        <FontIcon iconLiteral="bi-archive-fill"
-                                                  styleClass="box-cell-icon"/>
-                                        <Label fx:id="lblBoxCellTitle"
-                                               styleClass="box-cell-title" text="Box"/>
-                                        <Region HBox.hgrow="ALWAYS"/>
-                                        <Label fx:id="lblBoxCellFileCount"
-                                               styleClass="doc-count-label"/>
-                                        <padding>
-                                            <Insets left="12.0" right="12.0"
-                                                    top="10.0" bottom="10.0"/>
-                                        </padding>
-                                    </HBox>
-                                    <FlowPane fx:id="documentsTilePane"
-                                              hgap="12.0" vgap="12.0">
-                                        <padding>
-                                            <Insets bottom="8.0" left="8.0"
-                                                    right="8.0" top="8.0"/>
-                                        </padding>
-                                    </FlowPane>
-
-                                </VBox>
-                            </content>
-                        </ScrollPane>
+                        <TreeView fx:id="treeView"
+                                  styleClass="nav-tree"
+                                  VBox.vgrow="ALWAYS"/>
 
                         <Button mnemonicParsing="false" onAction="#onBtnExport"
                                 styleClass="action-btn" text="Export"/>
-                        <padding><Insets bottom="8.0" left="8.0" right="8.0"/></padding>
+                        <padding><Insets bottom="8.0" left="8.0" right="8.0" top="4.0"/></padding>
                     </VBox>
 
                     <VBox fx:id="filesPanel" styleClass="files-panel" VBox.vgrow="ALWAYS">
 
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
-                            <Label fx:id="lblTotalFilesText" styleClass="text-muted"
-                                   text="Files in document:"/>
-                            <Label fx:id="lblTotalFilesInDoc" styleClass="h3" text="0"/>
+                            <Label fx:id="lblTotalFilesText"
+                                   styleClass="text-muted" text="Files in document:"
+                                   visible="false" managed="false"/>
+                            <Label fx:id="lblTotalFilesInDoc"
+                                   styleClass="h3" text="0"
+                                   visible="false" managed="false"/>
                         </HBox>
 
                         <StackPane VBox.vgrow="ALWAYS">
