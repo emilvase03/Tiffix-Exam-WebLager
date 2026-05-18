@@ -25,9 +25,11 @@ public class BoxDAO implements IBoxDataAccess {
         String sql = """
                 SELECT b.Id, b.Number, b.Title, b.CreatedAt,
                        u.Username AS CreatedByUsername,
-                       b.DocumentsAmount, b.PagesAmount, b.ProfileId, b.CustomerId
+                       b.ProfileId, b.CustomerId,
+                       m.DocumentsAmount, m.FilesAmount, m.Notes
                 FROM Box b
                 LEFT JOIN [User] u ON u.Id = b.CreatedByUserId
+                LEFT JOIN Metadata m ON m.BoxId = b.Id
                 WHERE b.IsDeleted = 0
                 ORDER BY b.Number ASC
                 """;
@@ -44,12 +46,16 @@ public class BoxDAO implements IBoxDataAccess {
                         rs.getObject("CreatedAt", LocalDateTime.class),
                         rs.getString("CreatedByUsername"),   // read constructor
                         rs.getInt("DocumentsAmount"),
-                        rs.getInt("PagesAmount"),
+                        rs.getInt("FilesAmount"),
                         rs.getInt("CustomerId")
                 );
                 int profileId = rs.getInt("ProfileId");
                 Integer boxProfileId = rs.wasNull() ? null : profileId;
                 b.setProfileId(boxProfileId);
+
+                String notes = rs.getString("Notes");
+                String boxNotes = rs.wasNull() ? null : notes;
+                b.setNotes(boxNotes);
 
                 boxes.add(b);
             }
@@ -119,9 +125,11 @@ public class BoxDAO implements IBoxDataAccess {
         String sql = """
                 SELECT b.Id, b.Number, b.Title, b.CreatedAt,
                        u.Username AS CreatedByUsername,
-                       b.DocumentsAmount, b.PagesAmount, b.ProfileId, b.CustomerId, b.IsDeleted
+                       b.ProfileId, b.CustomerId, b.IsDeleted,
+                       m.DocumentsAmount, m.FilesAmount, m.Notes
                 FROM Box b
                 LEFT JOIN [User] u ON u.Id = b.CreatedByUserId
+                LEFT JOIN Metadata m ON m.BoxId = b.Id
                 ORDER BY b.Number ASC
                 """;
 
@@ -137,7 +145,7 @@ public class BoxDAO implements IBoxDataAccess {
                         rs.getObject("CreatedAt", LocalDateTime.class),
                         rs.getString("CreatedByUsername"),   // read constructor
                         rs.getInt("DocumentsAmount"),
-                        rs.getInt("PagesAmount"),
+                        rs.getInt("FilesAmount"),
                         rs.getInt("CustomerId")
                 );
                 int profileId = rs.getInt("ProfileId");
@@ -145,6 +153,10 @@ public class BoxDAO implements IBoxDataAccess {
                 b.setProfileId(boxProfileId);
 
                 b.setIsDeleted(rs.getBoolean("IsDeleted"));
+
+                String notes = rs.getString("Notes");
+                String boxNotes = rs.wasNull() ? null : notes;
+                b.setNotes(boxNotes);
 
                 boxes.add(b);
             }
