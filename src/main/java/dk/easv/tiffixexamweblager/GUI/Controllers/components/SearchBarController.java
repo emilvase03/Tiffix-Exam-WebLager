@@ -18,14 +18,14 @@ public class SearchBarController {
 
     @FXML
     public void initialize() {
-        // Defer until parent controller's initialize() has run and set table items
+        // wait until parent controllers initialize() has run and set table items
         Platform.runLater(this::attachToTable);
     }
 
     /**
      * Walks up the scene graph from the search bar until it finds
      * an ancestor whose direct children include a TableView.
-     * Works regardless of nesting depth — zero configuration needed.
+     * Works regardless of nesting depth — zero setup needed.
      */
     private void attachToTable() {
         Parent current = searchField.getParent();
