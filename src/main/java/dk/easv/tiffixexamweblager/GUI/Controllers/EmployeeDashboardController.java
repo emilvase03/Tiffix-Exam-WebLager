@@ -201,9 +201,18 @@ public class EmployeeDashboardController {
         alert.setContentText("Single-page: one .tiff per page.\nMulti-page: one .tiff per document.");
         alert.getButtonTypes().setAll(btnSingle, btnMulti, btnCancel);
 
+        TextArea notesField = new TextArea();
+        notesField.setPromptText("Enter notes for this box (optional)");
+        notesField.setWrapText(true);
+        notesField.setPrefRowCount(3);
+        notesField.setStyle("-fx-padding: 0px");
+        alert.getDialogPane().setExpandableContent(notesField);
+        alert.getDialogPane().setExpanded(true);
+
         Optional<ButtonType> choice = alert.showAndWait();
         if (choice.isEmpty() || choice.get() == btnCancel) return;
         boolean multiPage = choice.get() == btnMulti;
+        final String notes = notesField.getText().trim().isEmpty() ? null : notesField.getText().trim();
 
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Select Export Folder");
@@ -246,7 +255,7 @@ public class EmployeeDashboardController {
 
                 int documentsAmount = (int) snapshot.values().stream().filter(f -> !f.isEmpty()).count();
                 int totalFilesAmount = snapshot.values().stream().mapToInt(List::size).sum();
-                boxDocumentModel.createMetadata(new Metadata(boxId, documentsAmount, totalFilesAmount, "TEST"));
+                boxDocumentModel.createMetadata(new Metadata(boxId, documentsAmount, totalFilesAmount, notes));
 
                 return sb.toString().trim();
             }
