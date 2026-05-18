@@ -1,10 +1,7 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 //Project imports
-import dk.easv.tiffixexamweblager.BE.Box;
-import dk.easv.tiffixexamweblager.BE.Document;
-import dk.easv.tiffixexamweblager.BE.Rule;
-import dk.easv.tiffixexamweblager.BE.ScannedFile;
+import dk.easv.tiffixexamweblager.BE.*;
 import dk.easv.tiffixexamweblager.BLL.DocumentManager;
 import dk.easv.tiffixexamweblager.BLL.ScannedFileManager;
 import dk.easv.tiffixexamweblager.BLL.Utils.BarcodeDetector;
@@ -194,13 +191,16 @@ public class EmployeeDashboardController {
         if (sessionData.isEmpty() || sessionData.values().stream().allMatch(List::isEmpty)) {
             AlertHelper.showError("Nothing to export", "There are no scanned files to export."); return;
         }
+
         ButtonType btnSingle = new ButtonType("Single-page TIFFs");
         ButtonType btnMulti  = new ButtonType("Multi-page TIFF");
         ButtonType btnCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
         alert.setTitle("Export"); alert.setHeaderText("Choose export format");
         alert.setContentText("Single-page: one .tiff per page.\nMulti-page: one .tiff per document.");
         alert.getButtonTypes().setAll(btnSingle, btnMulti, btnCancel);
+
         Optional<ButtonType> choice = alert.showAndWait();
         if (choice.isEmpty() || choice.get() == btnCancel) return;
         boolean multiPage = choice.get() == btnMulti;
@@ -219,15 +219,35 @@ public class EmployeeDashboardController {
             @Override protected String call() throws Exception {
                 TiffExportService svc = new TiffExportService();
                 StringBuilder sb = new StringBuilder();
+                Document doc = null;
+
+                int boxId = snapshot.keySet().iterator().next().getBoxId();
+
                 for (var entry : snapshot.entrySet()) {
-                    Document doc = entry.getKey(); List<ScannedFile> files = entry.getValue();
+                    doc = entry.getKey();
+                    List<ScannedFile> files = entry.getValue();
                     if (files.isEmpty()) continue;
                     String label = documentLabels.getOrDefault(doc, "Document_" + doc.getSortOrder());
-                    if (doc.isUnsaved()) { Document c = documentManager.createDocument(doc.getBoxId(), doc.getSortOrder()); doc.setId(c.getId()); }
+
+                    if (doc.isUnsaved()) {
+                        Document c = documentManager.createDocument(doc.getBoxId(), doc.getSortOrder());
+                        doc.setId(c.getId());
+                    }
                     scannedFileManager.saveFilesForDocument(doc.getId(), files);
-                    if (multiPage) { int w = svc.exportMultiPage(files, outputDir.resolve(sanitizeLabel(label) + ".tiff"), rules); sb.append(label).append(": ").append(w).append(" page(s)\n"); }
-                    else { svc.exportSinglePage(files, outputDir, label, rules); sb.append(label).append(": ").append(files.size()).append(" file(s)\n"); }
+
+                    if (multiPage) {
+                        int w = svc.exportMultiPage(files, outputDir.resolve(sanitizeLabel(label) + ".tiff"), rules);
+                        sb.append(label).append(": ").append(w).append(" page(s)\n");
+                    } else {
+                        svc.exportSinglePage(files, outputDir, label, rules);
+                        sb.append(label).append(": ").append(files.size()).append(" file(s)\n");
+                    }
                 }
+
+                int documentsAmount = (int) snapshot.values().stream().filter(f -> !f.isEmpty()).count();
+                int totalFilesAmount = snapshot.values().stream().mapToInt(List::size).sum();
+                boxDocumentModel.createMetadata(new Metadata(boxId, documentsAmount, totalFilesAmount, "TEST"));
+
                 return sb.toString().trim();
             }
         };

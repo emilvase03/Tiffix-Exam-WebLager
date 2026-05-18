@@ -3,9 +3,11 @@ package dk.easv.tiffixexamweblager.GUI.Models;
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BE.Document;
+import dk.easv.tiffixexamweblager.BE.Metadata;
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
 import dk.easv.tiffixexamweblager.BLL.BoxManager;
 import dk.easv.tiffixexamweblager.BLL.DocumentManager;
+import dk.easv.tiffixexamweblager.BLL.MetadataManager;
 import dk.easv.tiffixexamweblager.BLL.ScannedFileManager;
 
 // Java imports
@@ -17,6 +19,7 @@ public class BoxDocumentModel {
     private final BoxManager boxManager;
     private final DocumentManager documentManager;
     private final ScannedFileManager scannedFileManager;
+    private final MetadataManager metadataManager;
     private final ObservableList<Box> allBoxes = FXCollections.observableArrayList();
     private final ObservableList<Document> documentsForBox = FXCollections.observableArrayList();
     private final ObservableList<ScannedFile> filesForDocument = FXCollections.observableArrayList();
@@ -25,6 +28,7 @@ public class BoxDocumentModel {
         boxManager = new BoxManager();
         documentManager = new DocumentManager();
         scannedFileManager = new ScannedFileManager();
+        metadataManager = new MetadataManager();
     }
 
     // BoxManager
@@ -77,5 +81,10 @@ public class BoxDocumentModel {
                 scannedFileManager.getFilesForDocument(document.getId())
         );
         return filesForDocument;
+    }
+
+    // MetadataManager
+    public void createMetadata(Metadata metadata) throws Exception {
+        metadataManager.createMetadata(metadata);
     }
 }
