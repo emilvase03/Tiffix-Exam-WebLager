@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.BE;
 
+// Java imports
 import java.time.LocalDateTime;
 
 public class Box {
@@ -14,6 +15,7 @@ public class Box {
     private Integer profileId;
     private int customerId;
     private boolean isDeleted;
+    private String notes;
 
     public Box(int id, int number, String title, LocalDateTime createdAt,
                String createdByUsername, int documentsAmount, int pagesAmount, int customerId) {
@@ -103,6 +105,13 @@ public class Box {
 
     public boolean getIsDeleted() { return isDeleted; }
     public void setIsDeleted(boolean isDeleted) { this.isDeleted = isDeleted; }
+
+    public String getNotes() {
+        return notes;
+    }
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 
     @Override
     public String toString() {
