@@ -23,6 +23,9 @@
                                         <Font name="Roboto Regular" size="24.0" />
                                     </font>
                                 </Label>
+                                <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                                        <fx:include source="../components/SearchBar.fxml" />
+                                </HBox>
                             </children>
                         </HBox>
                     </children>
@@ -30,7 +33,6 @@
                         <Insets top="10.0" />
                     </VBox.margin>
                 </HBox>
-
                 <TableView fx:id="tblMetadata" prefHeight="505.0" prefWidth="752.0" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colBoxTitle" prefWidth="138.0" text="Box" />
