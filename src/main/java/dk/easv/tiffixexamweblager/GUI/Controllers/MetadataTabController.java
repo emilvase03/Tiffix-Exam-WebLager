@@ -2,12 +2,15 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
-import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
+import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.BoxCardController;
+import dk.easv.tiffixexamweblager.GUI.Controllers.components.MetadataCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // Ikonli imports
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 // Java imports
@@ -17,33 +20,23 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
-public class BoxesTabController implements Initializable {
-
-    @FXML private TableView<Box>            tblBoxes;
-    @FXML private TableColumn<Box, Integer> colNumber;
-    @FXML private TableColumn<Box, String>  colTitle;
-    @FXML private TableColumn<Box, String>  colCreatedBy;
-    @FXML private TableColumn<Box, String>  colCreatedAt;
-    @FXML private TableColumn<Box, Integer> colDocuments;
-    @FXML private TableColumn<Box, Integer> colPages;
-    @FXML private TableColumn<Box, Boolean> colActive;
-    @FXML private VBox              boxCardOverlay;
-    @FXML private BoxCardController boxCardController;
-
-    private static final DateTimeFormatter DATE_FMT =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+public class MetadataTabController implements Initializable {
+    @FXML private TableView<Box> tblMetadata;
+    @FXML private TableColumn<Box, String> colBoxTitle;
+    @FXML private TableColumn<Box, String> colNotes;
+    @FXML private TableColumn<Box, Integer> colDocumentsAmount;
+    @FXML private TableColumn<Box, Integer> colFilesAmount;
+    @FXML private TableColumn<Box, Boolean> colBoxActiveStatus;
+    @FXML private VBox metadataCardOverlay;
+    @FXML private MetadataCardController metadataCardController;
 
     private BoxDocumentModel boxDocumentModel;
 
-    public BoxesTabController() {
+    public MetadataTabController() {
         try {
             boxDocumentModel = new BoxDocumentModel();
         } catch (Exception e) {
@@ -56,49 +49,48 @@ public class BoxesTabController implements Initializable {
         setupTable();
         setupActiveColumn();
 
-        boxCardController.setOverlay(boxCardOverlay);
-        boxCardController.setBoxesTabController(this);
-        boxCardController.setBoxModel(boxDocumentModel);
-        boxCardController.setLoggedInUser(
-                UserSession.getInstance().getCurrentUser().getId(),
-                UserSession.getInstance().getCurrentUser().getUsername()
-        );
+        metadataCardController.init();
+        metadataCardController.setOverlay(metadataCardOverlay);
+        metadataCardController.setMetadataTabController(this);
     }
 
     private void setupTable() {
-        colNumber.setCellValueFactory(d ->
-                new SimpleObjectProperty<>(d.getValue().getNumber()));
+        colBoxTitle.setCellValueFactory(d ->
+                new SimpleObjectProperty<>(d.getValue().getTitle()));
 
-        colTitle.setCellValueFactory(d ->
-                new SimpleStringProperty(d.getValue().getTitle()));
+        colNotes.setCellValueFactory(d ->
+                new SimpleStringProperty(d.getValue().getNotes()));
 
-        colCreatedBy.setCellValueFactory(d ->
-                new SimpleStringProperty(d.getValue().getCreatedByUsername()));
+        colDocumentsAmount.setCellValueFactory(d ->
+                new SimpleObjectProperty(d.getValue().getDocumentsAmount()));
 
-        colCreatedAt.setCellValueFactory(d -> {
-            LocalDateTime dt = d.getValue().getCreatedAt();
-            return new SimpleStringProperty(dt != null ? dt.format(DATE_FMT) : "");
-        });
-
-        colDocuments.setCellValueFactory(d ->
-                new SimpleObjectProperty<>(d.getValue().getDocumentsAmount()));
-
-        colPages.setCellValueFactory(d ->
+        colFilesAmount.setCellValueFactory(d ->
                 new SimpleObjectProperty<>(d.getValue().getFilesAmount()));
 
         try {
-            tblBoxes.setItems(boxDocumentModel.getAllObservableIncludingSoftDeleted());
+            tblMetadata.setItems(boxDocumentModel.getAllObservableIncludingSoftDeleted());
         } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to retrieve boxes from database.");
+            AlertHelper.showError("Error", "Failed to retrieve metadata from database.");
         }
+
+        tblMetadata.setRowFactory(tv -> {
+            TableRow<Box> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    showOverlay();
+                    metadataCardController.preloadWindow(row.getItem());
+                }
+            });
+            return row;
+        });
     }
 
     private void setupActiveColumn() {
-        colActive.setCellValueFactory(data ->
+        colBoxActiveStatus.setCellValueFactory(data ->
                 new SimpleBooleanProperty(data.getValue().getIsDeleted())
         );
 
-        colActive.setCellFactory(col -> new TableCell<>() {
+        colBoxActiveStatus.setCellFactory(col -> new TableCell<>() {
             final Button btnActive = new Button();
             final Button btnDeactivate = new Button();
             final HBox container = new HBox();
@@ -146,10 +138,12 @@ public class BoxesTabController implements Initializable {
         });
     }
 
-    @FXML
-    private void handleCreateBox() {
-        boxCardController.preloadCreateWindow();
-        boxCardOverlay.setVisible(true);
-        boxCardOverlay.setManaged(true);
+    private void showOverlay() {
+        metadataCardOverlay.setVisible(true);
+        metadataCardOverlay.setManaged(true);
+    }
+
+    public TableView getTable() {
+        return tblMetadata;
     }
 }
