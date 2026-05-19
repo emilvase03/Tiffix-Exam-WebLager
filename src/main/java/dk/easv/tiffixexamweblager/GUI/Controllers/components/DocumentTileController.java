@@ -17,12 +17,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class DocumentTileController {
-
 
     private double TILE_WIDTH;
     private double TILE_HEIGHT;
@@ -36,6 +34,9 @@ public class DocumentTileController {
     @FXML private VBox      root;
     @FXML private VBox      tileContent;
     @FXML private FlowPane  inlineFilesPane;
+    @FXML private StackPane thumbArea;
+    @FXML private ImageView imgThumbnail;
+    @FXML private ImageView docIcon;
     @FXML private Label     lblDocumentTitle;
     @FXML private Label     lblFileCount;
 
@@ -46,7 +47,6 @@ public class DocumentTileController {
     private String                      label    = "";
 
     private ReadOnlyDoubleProperty containerWidth;
-
 
     @FXML
     private void initialize() {
@@ -84,34 +84,33 @@ public class DocumentTileController {
 
         tileContent.setOnDragExited(e -> { removeDragHighlight(); e.consume(); });
 
-        tileContent.setOnDragDropped(e -> {
+        root.setOnDragDropped(e -> {
             removeDragHighlight();
+
             Dragboard db = e.getDragboard();
             boolean success = false;
-            if (db.hasString()) {
-                String s = db.getString();
-                if (s.startsWith("FILE_ID:")) {
-                    int scanOrder = Integer.parseInt(s.substring(8));
-                    if (dashboardController != null) dashboardController.moveFileToDocument(scanOrder, document);
-                    success = true;
-                } else if (s.startsWith("DOC_ID:")) {
-                    int draggedOrder = Integer.parseInt(s.substring(7));
-                    if (dashboardController != null) dashboardController.swapDocuments(draggedOrder, document);
-                    success = true;
+
+            if (db.hasString() && db.getString().equals("FILE")) {
+
+                if (dashboardController != null) {
+                    dashboardController.moveFileToDocument(
+                            dashboardController.getDraggedFile(),
+                            document
+                    );
                 }
+
+                success = true;
             }
+
             e.setDropCompleted(success);
             e.consume();
         });
-    }
 
-    // ── Container width binding ───────────────────────────────────────────────
+    }
 
     public void setContainerWidthProperty(ReadOnlyDoubleProperty widthProperty) {
         this.containerWidth = widthProperty;
     }
-
-    // ── Expand / Collapse ─────────────────────────────────────────────────────
 
     public void setExpanded(boolean expand) {
         this.expanded = expand;
@@ -136,7 +135,6 @@ public class DocumentTileController {
                 tileContent.getStyleClass().add(EXPANDED_CLASS);
 
         } else {
-            // Restore to FXML-declared tile width
             root.setPrefWidth(TILE_WIDTH);
             inlineFilesPane.setVisible(false);
             inlineFilesPane.setManaged(false);
@@ -182,10 +180,8 @@ public class DocumentTileController {
     }
 
     private String resolveFileName(ScannedFile file) {
-        String p = file.getFilePath();
-        if (p != null && !p.isBlank()) {
-            try { return Path.of(p).getFileName().toString(); } catch (Exception ignored) {}
-        }
+        String name = file.getFileName();
+        if (name != null && !name.isBlank()) return name;
         return "File " + file.getScanOrder();
     }
 
@@ -194,7 +190,9 @@ public class DocumentTileController {
             tileContent.getStyleClass().add(DRAG_OVER_CLASS);
     }
 
-    private void removeDragHighlight() { tileContent.getStyleClass().remove(DRAG_OVER_CLASS); }
+    private void removeDragHighlight() {
+        tileContent.getStyleClass().remove(DRAG_OVER_CLASS); }
+
 
     public void setDashboardController(EmployeeDashboardController c) {
         this.dashboardController = c; }
@@ -207,14 +205,30 @@ public class DocumentTileController {
         lblDocumentTitle.setText(label);
     }
 
+    public void setFileCount(int count) {
+        lblFileCount.setText(count == 0 ? "" : count + (count == 1 ? " file" : " files"));
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        if (selected) {
+            if (!tileContent.getStyleClass().contains(SELECTED_CLASS))
+                tileContent.getStyleClass().add(SELECTED_CLASS);
+        } else {
+            tileContent.getStyleClass().remove(SELECTED_CLASS);
+        }
+    }
+
 
     public Document getDocument() {
         return document; }
 
     public VBox     getRoot()     {
-        return root;      }
+        return root;     }
 
     public String   getLabel()    {
-        return label;     }
+        return label;    }
 
+
+    public boolean  isExpanded()  { return expanded; }
 }

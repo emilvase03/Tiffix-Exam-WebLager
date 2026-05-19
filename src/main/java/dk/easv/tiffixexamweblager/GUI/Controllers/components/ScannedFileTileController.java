@@ -39,28 +39,37 @@ public class ScannedFileTileController {
         renderThumbnail();
     }
 
-    public void setScannedFile(ScannedFile file) { setFile(file); }
+    public void setScannedFile(ScannedFile file) {
+        setFile(file); }
 
-    public ScannedFile getFile() { return file; }
+    public ScannedFile getFile() {
+        return file; }
 
     public void setDashboardController(EmployeeDashboardController c) {
         this.dashboardController = c;
     }
 
     public void refresh() {
-        if (file != null) renderThumbnail();
+        if (file != null) {
+            lblFileTitle.setText(buildDisplayName(file));
+            renderThumbnail();
+        }
     }
 
     @FXML
     private void initialize() {
 
         root.setOnDragDetected(e -> {
-            if (file == null) return;
             Dragboard db = root.startDragAndDrop(TransferMode.MOVE);
-            ClipboardContent cc = new ClipboardContent();
-            cc.putString("FILE_ID:" + file.getScanOrder());
-            db.setContent(cc);
-            root.setOpacity(0.5);
+
+            ClipboardContent content = new ClipboardContent();
+            content.putString("FILE");
+            db.setContent(content);
+
+            if (dashboardController != null) {
+                dashboardController.setDraggedFile(file);
+            }
+
             e.consume();
         });
 
@@ -71,27 +80,41 @@ public class ScannedFileTileController {
 
         root.setOnDragOver(e -> {
             if (e.getDragboard().hasString() &&
-                    e.getDragboard().getString().startsWith("FILE_ID:"))
+                    e.getDragboard().getString().equals("FILE")) {
+
                 e.acceptTransferModes(TransferMode.MOVE);
+            }
             e.consume();
         });
 
         root.setOnDragEntered(e -> {
             if (e.getDragboard().hasString() &&
-                    e.getDragboard().getString().startsWith("FILE_ID:"))
+                    e.getDragboard().getString().equals("FILE")) {
+
                 addDragHighlight();
+            }
             e.consume();
         });
 
-        root.setOnDragExited(e -> { removeDragHighlight(); e.consume(); });
+        root.setOnDragExited(e -> {
+            removeDragHighlight();
+            e.consume();
+        });
 
         root.setOnDragDropped(e -> {
             removeDragHighlight();
+
             Dragboard db = e.getDragboard();
-            if (db.hasString() && db.getString().startsWith("FILE_ID:")) {
-                int draggedScanOrder = Integer.parseInt(db.getString().substring(8));
-                if (dashboardController != null)
-                    dashboardController.reorderFiles(draggedScanOrder, file);
+
+            if (db.hasString() && db.getString().equals("FILE")) {
+
+                if (dashboardController != null) {
+                    dashboardController.reorderFiles(
+                            dashboardController.getDraggedFile(),
+                            file
+                    );
+                }
+
                 e.setDropCompleted(true);
             } else {
                 e.setDropCompleted(false);
@@ -99,7 +122,6 @@ public class ScannedFileTileController {
             e.consume();
         });
     }
-
 
     private void renderThumbnail() {
         BufferedImage base = resolveBaseImage();
@@ -136,9 +158,16 @@ public class ScannedFileTileController {
     }
 
     private String buildDisplayName(ScannedFile file) {
+
+        String name = file.getFileName();
+        if (name != null && !name.isBlank()) return name;
+
         String path = file.getFilePath();
-        if (path != null && !path.isBlank())
-            return Path.of(path).getFileName().toString();
+        if (path != null && !path.isBlank()) {
+            try { return Path.of(path).getFileName().toString(); }
+            catch (Exception ignored) { }
+        }
+
         return "File " + file.getScanOrder();
     }
 
@@ -148,7 +177,6 @@ public class ScannedFileTileController {
 
         double thumbW = iv.getFitWidth();
         double thumbH = iv.getFitHeight();
-
         double imageRatio = img.getWidth() / img.getHeight();
         double thumbRatio = thumbW / thumbH;
         Rectangle2D viewport;
@@ -170,5 +198,6 @@ public class ScannedFileTileController {
             root.getStyleClass().add(DRAG_OVER_CLASS);
     }
 
-    private void removeDragHighlight() { root.getStyleClass().remove(DRAG_OVER_CLASS); }
+    private void removeDragHighlight() {
+        root.getStyleClass().remove(DRAG_OVER_CLASS); }
 }
