@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<HBox fx:id="searchRoot"
-      alignment="CENTER_LEFT"
-      spacing="6"
-      styleClass="search-bar"
-      xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.SearchBarController">
+<HBox fx:id="searchRoot" alignment="CENTER_LEFT" minWidth="120.0" spacing="6" styleClass="search-bar" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.components.SearchBarController">
 
-    <FontIcon iconLiteral="bi-search" iconSize="14" styleClass="text-muted"/>
-    <TextField fx:id="searchField" promptText="Search..." prefWidth="180"/>
+    <FontIcon iconLiteral="bi-search" iconSize="14" styleClass="text-muted" />
+    <TextField fx:id="searchField" minWidth="100.0" prefWidth="180" promptText="Search..." />
 
 </HBox>
