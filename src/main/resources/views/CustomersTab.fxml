@@ -26,8 +26,8 @@
                                 </Label>
                             </children>
                         </HBox>
-                        <fx:include source="../components/SearchBar.fxml"/>
-                        <Button mnemonicParsing="false" onAction="#handleCreateCustomer" prefHeight="32.0" prefWidth="138.0" styleClass="action-btn" text="Create Customer">
+                        <fx:include source="../components/SearchBar.fxml" />
+                        <Button minWidth="120.0" mnemonicParsing="false" onAction="#handleCreateCustomer" prefHeight="32.0" prefWidth="138.0" styleClass="action-btn" text="Create Customer">
                             <cursor>
                                 <Cursor fx:constant="DEFAULT" />
                             </cursor>
