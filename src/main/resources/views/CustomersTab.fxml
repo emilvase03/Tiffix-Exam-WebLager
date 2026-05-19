@@ -26,6 +26,7 @@
                                 </Label>
                             </children>
                         </HBox>
+                        <fx:include source="../components/SearchBar.fxml"/>
                         <Button mnemonicParsing="false" onAction="#handleCreateCustomer" prefHeight="32.0" prefWidth="138.0" styleClass="action-btn" text="Create Customer">
                             <cursor>
                                 <Cursor fx:constant="DEFAULT" />
@@ -39,7 +40,7 @@
                 <TableView fx:id="tblCustomer" prefHeight="505.0" prefWidth="752.0" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colTitle" prefWidth="538.0" text="Name" />
-                  <TableColumn fx:id="colActive" prefWidth="72.0" text="Active" />
+                        <TableColumn fx:id="colActive" prefWidth="72.0" text="Active" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

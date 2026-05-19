@@ -32,6 +32,7 @@
                                 </Label>
                             </children>
                         </HBox>
+                        <fx:include source="../components/SearchBar.fxml"/>
                         <Button mnemonicParsing="false"
                                 onAction="#handleCreateProfile"
                                 prefHeight="32.0" prefWidth="138.0"

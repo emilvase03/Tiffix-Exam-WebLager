@@ -24,16 +24,13 @@ import java.nio.file.Path;
 
 public class ScannedFileTileController {
 
-    private static final double THUMB_W = 120;
-    private static final double THUMB_H = 160;
-
     private static final String DRAG_OVER_CLASS = "drag-over";
 
     @FXML private ImageView imgThumbnail;
     @FXML private VBox      root;
     @FXML private Label     lblFileTitle;
 
-    private ScannedFile   file;
+    private ScannedFile                 file;
     private EmployeeDashboardController dashboardController;
 
     public void setFile(ScannedFile file) {
@@ -42,11 +39,9 @@ public class ScannedFileTileController {
         renderThumbnail();
     }
 
-    public void setScannedFile(ScannedFile file) {
-        setFile(file); }
+    public void setScannedFile(ScannedFile file) { setFile(file); }
 
-    public ScannedFile getFile()    {
-        return file; }
+    public ScannedFile getFile() { return file; }
 
     public void setDashboardController(EmployeeDashboardController c) {
         this.dashboardController = c;
@@ -74,29 +69,21 @@ public class ScannedFileTileController {
             removeDragHighlight();
         });
 
-
         root.setOnDragOver(e -> {
             if (e.getDragboard().hasString() &&
-                    e.getDragboard().getString().startsWith("FILE_ID:")) {
+                    e.getDragboard().getString().startsWith("FILE_ID:"))
                 e.acceptTransferModes(TransferMode.MOVE);
-            }
             e.consume();
         });
 
-        // Highlight when a FILE drag enters this tile
         root.setOnDragEntered(e -> {
             if (e.getDragboard().hasString() &&
-                    e.getDragboard().getString().startsWith("FILE_ID:")) {
+                    e.getDragboard().getString().startsWith("FILE_ID:"))
                 addDragHighlight();
-            }
             e.consume();
         });
 
-        // Remove highlight when drag leaves
-        root.setOnDragExited(e -> {
-            removeDragHighlight();
-            e.consume();
-        });
+        root.setOnDragExited(e -> { removeDragHighlight(); e.consume(); });
 
         root.setOnDragDropped(e -> {
             removeDragHighlight();
@@ -113,14 +100,6 @@ public class ScannedFileTileController {
         });
     }
 
-    private void addDragHighlight() {
-        if (!root.getStyleClass().contains(DRAG_OVER_CLASS))
-            root.getStyleClass().add(DRAG_OVER_CLASS);
-    }
-
-    private void removeDragHighlight() {
-        root.getStyleClass().remove(DRAG_OVER_CLASS);
-    }
 
     private void renderThumbnail() {
         BufferedImage base = resolveBaseImage();
@@ -131,9 +110,6 @@ public class ScannedFileTileController {
 
         WritableImage fxImage = SwingFXUtils.toFXImage(display, null);
         imgThumbnail.setImage(fxImage);
-        imgThumbnail.setFitWidth(THUMB_W);
-        imgThumbnail.setFitHeight(THUMB_H);
-        imgThumbnail.setPreserveRatio(false);
         applyCenterCrop(imgThumbnail);
     }
 
@@ -170,8 +146,11 @@ public class ScannedFileTileController {
         Image img = iv.getImage();
         if (img == null) return;
 
+        double thumbW = iv.getFitWidth();
+        double thumbH = iv.getFitHeight();
+
         double imageRatio = img.getWidth() / img.getHeight();
-        double thumbRatio = THUMB_W / THUMB_H;
+        double thumbRatio = thumbW / thumbH;
         Rectangle2D viewport;
 
         if (imageRatio > thumbRatio) {
@@ -185,4 +164,11 @@ public class ScannedFileTileController {
         }
         iv.setViewport(viewport);
     }
+
+    private void addDragHighlight() {
+        if (!root.getStyleClass().contains(DRAG_OVER_CLASS))
+            root.getStyleClass().add(DRAG_OVER_CLASS);
+    }
+
+    private void removeDragHighlight() { root.getStyleClass().remove(DRAG_OVER_CLASS); }
 }

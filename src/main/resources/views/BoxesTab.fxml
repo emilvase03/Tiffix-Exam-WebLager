@@ -27,6 +27,7 @@
                                 </Label>
                             </children>
                         </HBox>
+                        <fx:include source="../components/SearchBar.fxml"/>
                         <Button mnemonicParsing="false" onAction="#handleCreateBox" prefHeight="32.0" prefWidth="138.0" styleClass="action-btn" text="Create Box">
                             <cursor>
                                 <Cursor fx:constant="DEFAULT" />
