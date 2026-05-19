@@ -103,6 +103,19 @@
             </graphic>
         </Button>
 
+        <Button fx:id="btnLogs"
+                maxWidth="Infinity"
+                mnemonicParsing="false"
+                onAction="#onLogs"
+                styleClass="sidebar-btn"
+                text="Logs">
+            <graphic>
+                <HBox alignment="CENTER" spacing="6">
+                    <FontIcon iconLiteral="bi-clock-history"/>
+                </HBox>
+            </graphic>
+        </Button>
+
         <Region VBox.vgrow="ALWAYS"/>
     </VBox>
 
