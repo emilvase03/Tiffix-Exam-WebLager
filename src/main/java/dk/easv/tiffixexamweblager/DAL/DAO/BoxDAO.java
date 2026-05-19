@@ -79,7 +79,7 @@ public class BoxDAO implements IBoxDataAccess {
             stmt.setObject(3, box.getCreatedAt());
             stmt.setInt(4, box.getCreatedByUserId());
             stmt.setInt(5, box.getDocumentsAmount());
-            stmt.setInt(6, box.getPagesAmount());
+            stmt.setInt(6, box.getFilesAmount());
             stmt.setObject(7, box.getProfileId(), Types.INTEGER);
             stmt.setInt(8, box.getCustomerId());
             stmt.executeUpdate();

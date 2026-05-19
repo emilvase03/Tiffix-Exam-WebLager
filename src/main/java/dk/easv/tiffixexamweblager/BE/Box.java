@@ -11,33 +11,33 @@ public class Box {
     private int createdByUserId;
     private String createdByUsername;
     private int documentsAmount;
-    private int pagesAmount;
+    private int filesAmount;
     private Integer profileId;
     private int customerId;
     private boolean isDeleted;
     private String notes;
 
     public Box(int id, int number, String title, LocalDateTime createdAt,
-               String createdByUsername, int documentsAmount, int pagesAmount, int customerId) {
+               String createdByUsername, int documentsAmount, int filesAmount, int customerId) {
         this.id                = id;
         this.number            = number;
         this.title             = title;
         this.createdAt         = createdAt;
         this.createdByUsername = createdByUsername;
         this.documentsAmount   = documentsAmount;
-        this.pagesAmount       = pagesAmount;
+        this.filesAmount       = filesAmount;
         this.customerId = customerId;
     }
 
     public Box(int id, int number, String title, LocalDateTime createdAt,
-               int createdByUserId, int documentsAmount, int pagesAmount, int customerId) {
+               int createdByUserId, int documentsAmount, int filesAmount, int customerId) {
         this.id              = id;
         this.number          = number;
         this.title           = title;
         this.createdAt       = createdAt;
         this.createdByUserId = createdByUserId;
         this.documentsAmount = documentsAmount;
-        this.pagesAmount     = pagesAmount;
+        this.filesAmount     = filesAmount;
         this.customerId = customerId;
     }
 
@@ -90,11 +90,11 @@ public class Box {
         this.documentsAmount = documentsAmount;
     }
 
-    public int getPagesAmount() {
-        return pagesAmount;
+    public int getFilesAmount() {
+        return filesAmount;
     }
-    public void setPagesAmount(int pagesAmount) {
-        this.pagesAmount = pagesAmount;
+    public void setFilesAmount(int filesAmount) {
+        this.filesAmount = filesAmount;
     }
 
     public Integer getProfileId() { return profileId; }
