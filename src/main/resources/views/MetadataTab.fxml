@@ -35,8 +35,8 @@
                     <columns>
                         <TableColumn fx:id="colBoxTitle" prefWidth="138.0" text="Box" />
                   <TableColumn fx:id="colNotes" prefWidth="308.0" text="Notes" />
-                        <TableColumn fx:id="colDocumentsAmount" prefWidth="123.0" resizable="false" text="Number of docs" />
-                        <TableColumn fx:id="colFilesAmount" prefWidth="99.0" resizable="false" text="Number of files" />
+                        <TableColumn fx:id="colDocumentsAmount" prefWidth="99.0" resizable="false" text="Documents" />
+                        <TableColumn fx:id="colFilesAmount" prefWidth="99.0" resizable="false" text="Files" />
                   <TableColumn fx:id="colBoxActiveStatus" resizable="false" text="Box status" />
                     </columns>
                     <columnResizePolicy>
