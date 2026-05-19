@@ -8,7 +8,6 @@ import dk.easv.tiffixexamweblager.BLL.Utils.BarcodeDetector;
 import dk.easv.tiffixexamweblager.BLL.Utils.ImageTransformations;
 import dk.easv.tiffixexamweblager.BLL.Utils.TiffExportService;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
-import dk.easv.tiffixexamweblager.GUI.Controllers.components.DocumentTileController;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Models.FileImportModel;
@@ -16,7 +15,7 @@ import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
-//Antlanta imports
+//Atlanta imports
 import atlantafx.base.controls.ModalPane;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -47,7 +46,6 @@ import java.util.*;
 
 public class EmployeeDashboardController {
 
-
     @FXML private StackPane        root;
     @FXML private ModalPane        modalPane;
     @FXML private Label            lblBoxID;
@@ -75,19 +73,18 @@ public class EmployeeDashboardController {
     private Document      activeDocument = null;
     private ScannedFile   activeFile     = null;
 
-
-    private final List<ScannedFile>                                       currentFiles        = new ArrayList<>();
-    private final LinkedHashMap<Document, List<ScannedFile>>              sessionData         = new LinkedHashMap<>();
+    private final List<ScannedFile>  currentFiles        = new ArrayList<>();
+    private final LinkedHashMap<Document, List<ScannedFile>>     sessionData   = new LinkedHashMap<>();
     private int nextDocSortOrder   = 1;
     private int nextCreationNumber = 1;
     private int previewIndex       = 0;
     private int selectedFileIndex  = -1;
 
-    private final List<Rule>                                              activeRules         = new ArrayList<>();
+    private final List<Rule>      activeRules         = new ArrayList<>();
     private final IdentityHashMap<ScannedFile, ScannedFileTileController> fileTileControllers = new IdentityHashMap<>();
-    private final IdentityHashMap<Document, String>                       documentLabels      = new IdentityHashMap<>();
+    private final IdentityHashMap<Document, String>  documentLabels      = new IdentityHashMap<>();
 
-    private TreeItem<Object>                                      boxTreeItem       = null;
+    private TreeItem<Object>   boxTreeItem       = null;
     private final IdentityHashMap<Document,    TreeItem<Object>>  documentTreeItems = new IdentityHashMap<>();
     private final IdentityHashMap<ScannedFile, TreeItem<Object>>  fileTreeItems     = new IdentityHashMap<>();
 
@@ -95,6 +92,7 @@ public class EmployeeDashboardController {
     private static final double TREE_THUMB_H = 42.0;
 
     private Path scanTempDir;
+    private ScannedFile draggedFile;
 
 
     @FXML
@@ -114,10 +112,14 @@ public class EmployeeDashboardController {
         dashboardContent.prefWidthProperty().bind(root.widthProperty());
         dashboardContent.prefHeightProperty().bind(root.heightProperty());
 
+        if (treeView == null) {
+            AlertHelper.showError("Layout error",
+                    "TreeView missing from FXML. Ensure EmployeeDashboardView.fxml has <TreeView fx:id=\"treeView\">.");
+            return;
+        }
+
         treeView.setCellFactory(tv -> createTreeCell());
-        treeView.getSelectionModel().setSelectionMode(
-                javafx.scene.control.SelectionMode.SINGLE
-        );
+        treeView.getSelectionModel().setSelectionMode(javafx.scene.control.SelectionMode.SINGLE);
         treeView.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
             if (sel == null) return;
             Object val = sel.getValue();
@@ -127,42 +129,56 @@ public class EmployeeDashboardController {
         });
     }
 
+    private void assignAllBoxFileNames() {
+        int counter = 1;
+        List<Map.Entry<Document, List<ScannedFile>>> sorted = new ArrayList<>(sessionData.entrySet());
+        sorted.sort(Comparator.comparingInt(e -> e.getKey().getSortOrder()));
+        for (Map.Entry<Document, List<ScannedFile>> entry : sorted) {
+            for (ScannedFile f : entry.getValue()) {
+                f.assignOrderName(counter++);   // "File 1", "File 2", "File 3", …
+            }
+        }
+    }
+
+    private void refreshTileLabels() {
+        fileTileControllers.forEach((file, ctrl) -> ctrl.refresh());
+    }
+
+
     private TreeCell<Object> createTreeCell() {
         return new TreeCell<>() {
             @Override
             protected void updateItem(Object item, boolean empty) {
                 super.updateItem(item, empty);
                 getStyleClass().removeAll("tree-box-cell", "tree-doc-cell", "tree-file-cell");
-
-                if (empty || item == null) {
-                    setText(null); setGraphic(null); return;
-                }
+                if (empty || item == null) { setText(null); setGraphic(null); return; }
 
                 if (item instanceof Box b) {
                     getStyleClass().add("tree-box-cell");
                     int total = sessionData.values().stream().mapToInt(List::size).sum();
-                    setText("Box " + b.getNumber() );
+                    setText("Box " + b.getNumber() + "  ("
+                            + total + (total == 1 ? " file" : " files") + ")");
                     setGraphic(makeIcon("/img/Box.png", 28));
 
                 } else if (item instanceof Document d) {
                     getStyleClass().add("tree-doc-cell");
                     String lbl   = documentLabels.getOrDefault(d, "Document " + d.getSortOrder());
                     int    count = sessionData.getOrDefault(d, Collections.emptyList()).size();
-                    setText(lbl);
-
+                    setText(count > 0 ? lbl + "  (" + count + ")" : lbl);
                     setGraphic(makeIcon("/img/FileI.png", 22));
 
                 } else if (item instanceof ScannedFile f) {
                     getStyleClass().add("tree-file-cell");
-                    setText(fileDisplayName(f));
+                    String name = f.getFileName();
+                    setText(name != null && !name.isBlank() ? name : "File " + f.getScanOrder());
                     setGraphic(fileThumbnail(f));
                 }
             }
         };
     }
 
-    private ImageView makeIcon(String classpathPath, double size) {
-        var stream = getClass().getResourceAsStream(classpathPath);
+    private ImageView makeIcon(String cp, double size) {
+        var stream = getClass().getResourceAsStream(cp);
         if (stream == null) return null;
         var iv = new ImageView(new Image(stream));
         iv.setFitWidth(size); iv.setFitHeight(size);
@@ -181,25 +197,15 @@ public class EmployeeDashboardController {
         var fxImg = SwingFXUtils.toFXImage(
                 ImageTransformations.applyAll(bi, f.getUserRotation(), f.getUserBrightness()), null);
         var iv = new ImageView(fxImg);
-        iv.setFitWidth(TREE_THUMB_W);
-        iv.setFitHeight(TREE_THUMB_H);
-        iv.setPreserveRatio(true);
-        iv.setSmooth(true);
+        iv.setFitWidth(TREE_THUMB_W); iv.setFitHeight(TREE_THUMB_H);
+        iv.setPreserveRatio(true); iv.setSmooth(true);
         iv.getStyleClass().add("tree-thumb");
         return iv;
     }
 
-    private String fileDisplayName(ScannedFile file) {
-        String p = file.getFilePath();
-        if (p != null && !p.isBlank()) {
-            try { return Path.of(p).getFileName().toString(); } catch (Exception ignored) {}
-        }
-        return "File " + file.getScanOrder();
-    }
 
     private void buildTree(Box box) {
-        documentTreeItems.clear();
-        fileTreeItems.clear();
+        documentTreeItems.clear(); fileTreeItems.clear();
         boxTreeItem = new TreeItem<>(box);
         boxTreeItem.setExpanded(true);
         treeView.setRoot(boxTreeItem);
@@ -209,8 +215,7 @@ public class EmployeeDashboardController {
     private void populateTreeFromDocuments(List<Document> documents) {
         if (boxTreeItem == null) return;
         boxTreeItem.getChildren().clear();
-        documentTreeItems.clear();
-        fileTreeItems.clear();
+        documentTreeItems.clear(); fileTreeItems.clear();
         for (Document doc : documents) {
             documentLabels.put(doc, "Document " + nextCreationNumber++);
             TreeItem<Object> docItem = new TreeItem<>(doc);
@@ -236,15 +241,13 @@ public class EmployeeDashboardController {
     }
 
     private void refreshTreeFileNodes(Document doc) {
-        TreeItem<Object> docItem = documentTreeItems.get(doc);
-        if (docItem == null) return;
+        TreeItem<Object> docItem = documentTreeItems.get(doc); if (docItem == null) return;
         for (TreeItem<Object> child : new ArrayList<>(docItem.getChildren()))
             fileTreeItems.remove(child.getValue());
         docItem.getChildren().clear();
         for (ScannedFile f : sessionData.getOrDefault(doc, Collections.emptyList())) {
             TreeItem<Object> fi = new TreeItem<>(f);
-            docItem.getChildren().add(fi);
-            fileTreeItems.put(f, fi);
+            docItem.getChildren().add(fi); fileTreeItems.put(f, fi);
         }
         treeView.refresh();
     }
@@ -259,11 +262,8 @@ public class EmployeeDashboardController {
     }
 
     private void onBoxSelected() {
-        activeDocument = null;
-        activeFile     = null;
-        currentFiles.clear();
-        fileTileControllers.clear();
-        filesTilePane.getChildren().clear();
+        activeDocument = null; activeFile = null;
+        currentFiles.clear(); fileTileControllers.clear(); filesTilePane.getChildren().clear();
         sessionData.entrySet().stream()
                 .sorted(Comparator.comparingInt(e -> e.getKey().getSortOrder()))
                 .forEach(entry -> entry.getValue().forEach(f -> {
@@ -276,22 +276,23 @@ public class EmployeeDashboardController {
     }
 
     private void onDocumentSelected(Document doc) {
-        activeDocument = doc;
-        activeFile     = null;
+        activeDocument = doc; activeFile = null;
         lblDocumentNr.setText(documentLabels.getOrDefault(doc, String.valueOf(doc.getSortOrder())));
+
         if (!doc.isUnsaved()) {
             try {
                 if (!sessionData.containsKey(doc)) {
-                    sessionData.put(doc, new ArrayList<>(boxDocumentModel.loadFilesForDocument(doc)));
+                    List<ScannedFile> loaded = new ArrayList<>(boxDocumentModel.loadFilesForDocument(doc));
+                    sessionData.put(doc, loaded);
+                    assignAllBoxFileNames();   // recalculate box-wide after lazy load
                     refreshTreeFileNodes(doc);
                 }
             } catch (Exception e) {
                 AlertHelper.showError("Load error", "Could not load files for the selected document.");
             }
         }
-        currentFiles.clear();
-        fileTileControllers.clear();
-        filesTilePane.getChildren().clear();
+
+        currentFiles.clear(); fileTileControllers.clear(); filesTilePane.getChildren().clear();
         currentFiles.addAll(sessionData.getOrDefault(doc, new ArrayList<>()));
         for (ScannedFile f : currentFiles) filesTilePane.getChildren().add(createFileTile(f));
         updateDocumentFileCountLabels();
@@ -304,19 +305,18 @@ public class EmployeeDashboardController {
             if (entry.getValue().contains(file)) { parentDoc = entry.getKey(); break; }
         if (parentDoc == null) return;
 
-        activeDocument = parentDoc;
-        activeFile     = file;
-        currentFiles.clear();
-        fileTileControllers.clear();
-        filesTilePane.getChildren().clear();
+        activeDocument = parentDoc; activeFile = file;
+        currentFiles.clear(); fileTileControllers.clear(); filesTilePane.getChildren().clear();
         currentFiles.addAll(sessionData.getOrDefault(parentDoc, new ArrayList<>()));
         for (ScannedFile f : currentFiles) filesTilePane.getChildren().add(createFileTile(f));
-        int idx = currentFiles.indexOf(file);
-        selectedFileIndex = Math.max(idx, 0);
+
+        int idx = currentFiles.indexOf(file); selectedFileIndex = Math.max(idx, 0);
         lblDocumentNr.setText(documentLabels.getOrDefault(parentDoc, "Document " + parentDoc.getSortOrder()));
         updateDocumentFileCountLabels();
         openPreviewAt(selectedFileIndex);
     }
+
+    // ── Scanning ──────────────────────────────────────────────────────────────
 
     @FXML private void onBtnFetch(ActionEvent event)  {
         runFetch(); }
@@ -334,16 +334,15 @@ public class EmployeeDashboardController {
                 fileImportModel.fetchScansFromApi();
                 List<ScannedFile> newFiles = new ArrayList<>();
                 var allResults = fileImportModel.getScanResults();
-                int scanOrder  = fileSizeBefore + 1;
+                int scanOrder = fileSizeBefore + 1;
                 for (int i = modelSizeBefore; i < allResults.size(); i++) {
-                    var scan    = allResults.get(i);
-                    byte[] bytes = scan.fileBytes();
-                    Path dest   = writeTempFile(scan.fileName(), bytes);
+                    var scan = allResults.get(i); byte[] bytes = scan.fileBytes();
+                    Path dest = writeTempFile(scan.fileName(), bytes);
                     ScannedFile sf = ScannedFile.unsaved(scanOrder++, dest.toString(), bytes);
                     try (var stream = new ByteArrayInputStream(bytes)) {
                         BufferedImage raw = ImageIO.read(stream);
                         if (raw != null) sf.setProcessedImage(ImageTransformations.applyRules(raw, rules));
-                    } catch (IOException ignored) { }
+                    } catch (IOException ignored) {}
                     newFiles.add(sf);
                 }
                 return newFiles;
@@ -376,7 +375,8 @@ public class EmployeeDashboardController {
                     if (firstNewIndex == -1) firstNewIndex = currentFiles.size() - 1;
                     addFileToTree(activeDocument, f);
                 }
-
+                assignAllBoxFileNames();
+                refreshTileLabels();
             }
             updateDocumentFileCountLabels();
             updateTotalFilesInBoxLabel();
@@ -385,45 +385,34 @@ public class EmployeeDashboardController {
         });
 
         task.setOnFailed(e -> AlertHelper.showError("Fetch failed",
-                "Could not retrieve files from the scanner API.\n"
+                "Could not retrieve files.\n"
                         + (task.getException() != null ? task.getException().getMessage() : "")));
         new Thread(task).start();
     }
 
     // ── Export ────────────────────────────────────────────────────────────────
 
-    @FXML
-    private void onBtnExport(ActionEvent event) {
+    @FXML private void onBtnExport(ActionEvent event) {
         if (sessionData.isEmpty() || sessionData.values().stream().allMatch(List::isEmpty)) {
             AlertHelper.showError("Nothing to export", "There are no scanned files to export."); return;
         }
-
         ButtonType btnSingle = new ButtonType("Single-page TIFFs");
         ButtonType btnMulti  = new ButtonType("Multi-page TIFF");
         ButtonType btnCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-
         alert.setTitle("Export"); alert.setHeaderText("Choose export format");
         alert.setContentText("Single-page: one .tiff per page.\nMulti-page: one .tiff per document.");
         alert.getButtonTypes().setAll(btnSingle, btnMulti, btnCancel);
-
         TextArea notesField = new TextArea();
         notesField.setPromptText("Enter notes for this box (optional)");
-        notesField.setWrapText(true);
-        notesField.setPrefRowCount(3);
-        notesField.setStyle("-fx-padding: 0px");
-        alert.getDialogPane().setExpandableContent(notesField);
-        alert.getDialogPane().setExpanded(true);
-
+        notesField.setWrapText(true); notesField.setPrefRowCount(3); notesField.setStyle("-fx-padding: 0px");
+        alert.getDialogPane().setExpandableContent(notesField); alert.getDialogPane().setExpanded(true);
         Optional<ButtonType> choice = alert.showAndWait();
         if (choice.isEmpty() || choice.get() == btnCancel) return;
         boolean multiPage = choice.get() == btnMulti;
         final String notes = notesField.getText().trim().isEmpty() ? null : notesField.getText().trim();
-
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Select Export Folder");
-        File dir = chooser.showDialog(root.getScene().getWindow());
-        if (dir == null) return;
+        DirectoryChooser chooser = new DirectoryChooser(); chooser.setTitle("Select Export Folder");
+        File dir = chooser.showDialog(root.getScene().getWindow()); if (dir == null) return;
         Path outputDir = dir.toPath();
         rebuildAllSortOrders();
         Map<Document, List<ScannedFile>> snapshot = new LinkedHashMap<>(sessionData);
@@ -433,40 +422,37 @@ public class EmployeeDashboardController {
             @Override protected String call() throws Exception {
                 TiffExportService svc = new TiffExportService();
                 StringBuilder sb = new StringBuilder();
-                Document doc = null;
-
                 int boxId = snapshot.keySet().iterator().next().getBoxId();
-
                 for (var entry : snapshot.entrySet()) {
-                    doc = entry.getKey();
-                    List<ScannedFile> files = entry.getValue();
+                    Document doc = entry.getKey(); List<ScannedFile> files = entry.getValue();
                     if (files.isEmpty()) continue;
-                    String label = documentLabels.getOrDefault(doc, "Document_" + doc.getSortOrder());
-
+                    String lbl = documentLabels.getOrDefault(doc, "Document_" + doc.getSortOrder());
                     if (doc.isUnsaved()) {
                         Document c = documentManager.createDocument(doc.getBoxId(), doc.getSortOrder());
                         doc.setId(c.getId());
                     }
                     scannedFileManager.saveFilesForDocument(doc.getId(), files);
-
                     if (multiPage) {
-                        int w = svc.exportMultiPage(files, outputDir.resolve(sanitizeLabel(label) + ".tiff"), rules);
-                        sb.append(label).append(": ").append(w).append(" page(s)\n");
+                        int w = svc.exportMultiPage(files, outputDir.resolve(sanitizeLabel(lbl) + ".tiff"), rules);
+                        sb.append(lbl).append(": ").append(w).append(" page(s)\n");
                     } else {
-                        svc.exportSinglePage(files, outputDir, label, rules);
-                        sb.append(label).append(": ").append(files.size()).append(" file(s)\n");
+                        svc.exportSinglePage(files, outputDir, lbl, rules);
+                        sb.append(lbl).append(": ").append(files.size()).append(" file(s)\n");
                     }
                 }
-
-                int documentsAmount = (int) snapshot.values().stream().filter(f -> !f.isEmpty()).count();
-                int totalFilesAmount = snapshot.values().stream().mapToInt(List::size).sum();
-                boxDocumentModel.saveMetadata(new Metadata(boxId, documentsAmount, totalFilesAmount, notes));
-
+                int docAmt  = (int) snapshot.values().stream().filter(f -> !f.isEmpty()).count();
+                int fileAmt = snapshot.values().stream().mapToInt(List::size).sum();
+                boxDocumentModel.saveMetadata(new Metadata(boxId, docAmt, fileAmt, notes));
                 return sb.toString().trim();
             }
         };
-        exportTask.setOnSucceeded(e -> { Alert d = new Alert(Alert.AlertType.INFORMATION); d.setTitle("Export complete"); d.setHeaderText("Saved to: " + outputDir); d.setContentText(exportTask.getValue()); d.showAndWait(); });
-        exportTask.setOnFailed(e -> AlertHelper.showError("Export failed", exportTask.getException() != null ? exportTask.getException().getMessage() : "Unknown error"));
+        exportTask.setOnSucceeded(e -> {
+            Alert d = new Alert(Alert.AlertType.INFORMATION);
+            d.setTitle("Export complete"); d.setHeaderText("Saved to: " + outputDir);
+            d.setContentText(exportTask.getValue()); d.showAndWait();
+        });
+        exportTask.setOnFailed(e -> AlertHelper.showError("Export failed",
+                exportTask.getException() != null ? exportTask.getException().getMessage() : "Unknown error"));
         new Thread(exportTask).start();
     }
 
@@ -498,8 +484,7 @@ public class EmployeeDashboardController {
             for (var profile : UserSession.getInstance().getActiveProfiles()) {
                 try { activeRules.addAll(profileRuleModel.getRulesForProfile(profile)); }
                 catch (Exception e) {
-                    AlertHelper.showError("Rule load error",
-                            "Could not load rules for profile: " + profile.getTitle());
+                    AlertHelper.showError("Rule load error", "Could not load rules for: " + profile.getTitle());
                 }
             }
 
@@ -522,12 +507,13 @@ public class EmployeeDashboardController {
                     if (docItem != null) {
                         for (ScannedFile f : files) {
                             TreeItem<Object> fi = new TreeItem<>(f);
-                            docItem.getChildren().add(fi);
-                            fileTreeItems.put(f, fi);
+                            docItem.getChildren().add(fi); fileTreeItems.put(f, fi);
                         }
                     }
                 } catch (Exception e) { sessionData.put(doc, new ArrayList<>()); }
             }
+
+            assignAllBoxFileNames();
 
             setTotalsVisible(true);
             updateTotalFilesInBoxLabel();
@@ -539,6 +525,8 @@ public class EmployeeDashboardController {
         }
     }
 
+    // ── Document management ───────────────────────────────────────────────────
+
     private void refreshDocumentPanel() {
         if (boxTreeItem == null) return;
         boxTreeItem.getChildren().sort((a, b) -> {
@@ -549,8 +537,6 @@ public class EmployeeDashboardController {
         treeView.refresh();
         lblTotalDocInBox.setText(String.valueOf(sessionData.size()));
     }
-
-
 
     private void createNewDocument() {
         Box box = UserSession.getInstance().getActiveBox();
@@ -566,16 +552,21 @@ public class EmployeeDashboardController {
 
     private Node createFileTile(ScannedFile file) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ScannedFileTileView.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/views/ScannedFileTileView.fxml"));
             Node tile = loader.load();
             ScannedFileTileController ctrl = loader.getController();
             ctrl.setScannedFile(file);
             ctrl.setDashboardController(this);
             fileTileControllers.put(file, ctrl);
-            tile.setOnMouseClicked(e -> { int idx = currentFiles.indexOf(file); selectedFileIndex = idx; openPreviewAt(idx); });
+            tile.setOnMouseClicked(e -> {
+                int idx = currentFiles.indexOf(file);
+                selectedFileIndex = idx;
+                openPreviewAt(idx);
+            });
             return tile;
         } catch (Exception e) {
-            AlertHelper.showError("Display error", "A file tile could not be shown.");
+            AlertHelper.showError("Display error", "A file tile could not be shown: " + e.getMessage());
             return new VBox();
         }
     }
@@ -589,41 +580,84 @@ public class EmployeeDashboardController {
     private void refreshFileTile(ScannedFile file) {
         ScannedFileTileController ctrl = fileTileControllers.get(file);
         if (ctrl != null) ctrl.refresh();
+        treeView.refresh();
     }
 
     // ── Drag-reorder ──────────────────────────────────────────────────────────
 
-    public void reorderFiles(int draggedScanOrder, ScannedFile target) {
-        if (target == null) return;
-        ScannedFile dragged = currentFiles.stream().filter(f -> f.getScanOrder() == draggedScanOrder).findFirst().orElse(null);
-        if (dragged == null || dragged == target) return;
-        int from = currentFiles.indexOf(dragged), to = currentFiles.indexOf(target);
+
+    public void reorderFiles(ScannedFile dragged, ScannedFile target) {
+        if (dragged == null || target == null || dragged == target) return;
+
+        int from = currentFiles.indexOf(dragged);
+        int to = currentFiles.indexOf(target);
+
         if (from == -1 || to == -1) return;
-        currentFiles.remove(from); currentFiles.add(to, dragged);
+
+        currentFiles.remove(from);
+        currentFiles.add(to, dragged);
+
         sessionData.put(activeDocument, new ArrayList<>(currentFiles));
+
         updateFileSortOrders(currentFiles);
-        refreshFilePanel();
-        refreshTreeFileNodes(activeDocument);
+        assignAllBoxFileNames();
+
+        onDocumentSelected(activeDocument);
+
+        treeView.refresh();
+
+        draggedFile = null;
     }
 
-    public void moveFileToDocument(int draggedScanOrder, Document target) {
-        if (target == null || activeDocument == null || target == activeDocument) return;
-        ScannedFile file = currentFiles.stream().filter(f -> f.getScanOrder() == draggedScanOrder).findFirst().orElse(null);
-        if (file == null) return;
-        Document source = activeDocument;
-        List<ScannedFile> sf = sessionData.get(source); if (sf != null) sf.remove(file);
-        currentFiles.remove(file); updateFileSortOrders(currentFiles);
-        List<ScannedFile> tf = sessionData.computeIfAbsent(target, d -> new ArrayList<>());
-        tf.add(file); file.setSortOrder(tf.size());
-        removeFileFromTree(file); addFileToTree(target, file);
-        refreshFilePanel(); updateDocumentFileCountLabels();
-        updateTotalFilesInBoxLabel(); treeView.refresh();
+
+    public void setDraggedFile(ScannedFile file) {
+        this.draggedFile = file;
     }
+
+    public ScannedFile getDraggedFile() {
+        return draggedFile;
+    }
+
+    public void moveFileToDocument(ScannedFile file, Document target) {
+        if (file == null || target == null || activeDocument == null || target == activeDocument) return;
+
+        Document source = activeDocument;
+
+        List<ScannedFile> sourceFiles = sessionData.get(source);
+        if (sourceFiles != null) {
+            sourceFiles.remove(file);
+        }
+
+        currentFiles.remove(file);
+        updateFileSortOrders(currentFiles);
+
+        List<ScannedFile> targetFiles = sessionData.computeIfAbsent(target, d -> new ArrayList<>());
+        targetFiles.add(file);
+        file.setSortOrder(targetFiles.size());
+
+        removeFileFromTree(file);
+        addFileToTree(target, file);
+
+        assignAllBoxFileNames();
+
+        onDocumentSelected(source);
+
+        updateTotalFilesInBoxLabel();
+        treeView.refresh();
+
+        draggedFile = null;
+    }
+
+
 
     public void swapDocuments(int draggedSortOrder, Document target) {
-        Document dragged = sessionData.keySet().stream().filter(d -> d.getSortOrder() == draggedSortOrder).findFirst().orElse(null);
+        Document dragged = sessionData.keySet().stream()
+                .filter(d -> d.getSortOrder() == draggedSortOrder).findFirst().orElse(null);
         if (dragged == null || target == null || dragged == target) return;
-        int tmp = dragged.getSortOrder(); dragged.setSortOrder(target.getSortOrder()); target.setSortOrder(tmp);
+        int tmp = dragged.getSortOrder();
+        dragged.setSortOrder(target.getSortOrder()); target.setSortOrder(tmp);
+
+        assignAllBoxFileNames();
         refreshDocumentPanel();
     }
 
@@ -644,21 +678,24 @@ public class EmployeeDashboardController {
         previewImageView.setRotate(0);
     }
 
-    private BufferedImage getOrLoadProcessedImage(ScannedFile file) {
+    BufferedImage getOrLoadProcessedImage(ScannedFile file) {
         if (file.getProcessedImage() != null) return file.getProcessedImage();
         byte[] bytes = file.getTiffFile();
         if (bytes != null && bytes.length > 0) {
             try {
                 BufferedImage raw = ImageIO.read(new ByteArrayInputStream(bytes));
-                if (raw != null) { file.setProcessedImage(ImageTransformations.applyRules(raw, activeRules)); return file.getProcessedImage(); }
-            } catch (IOException ignored) { }
+                if (raw != null) {
+                    file.setProcessedImage(ImageTransformations.applyRules(raw, activeRules));
+                    return file.getProcessedImage();
+                }
+            } catch (IOException ignored) {}
         }
         String path = file.getFilePath();
         if (path != null && !path.isBlank()) {
             try {
                 BufferedImage raw = ImageIO.read(new File(path));
                 if (raw != null) file.setProcessedImage(ImageTransformations.applyRules(raw, activeRules));
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {}
         }
         return file.getProcessedImage();
     }
@@ -675,7 +712,8 @@ public class EmployeeDashboardController {
         cur.setUserRotation((cur.getUserRotation() + 90) % 360);
         loadPreviewImage(cur); refreshFileTile(cur);
     }
-    @FXML private void onBtnCloseOverview(ActionEvent e) { topOverview.setVisible(false); }
+    @FXML private void onBtnCloseOverview(ActionEvent e) {
+        topOverview.setVisible(false); }
 
     @FXML public void onLogout(ActionEvent event) {
         UserSession.getInstance().clear();
@@ -689,8 +727,10 @@ public class EmployeeDashboardController {
     private void rebuildAllSortOrders() {
         int order = 1;
         for (Map.Entry<Document, List<ScannedFile>> e : sessionData.entrySet()) {
-            e.getKey().setSortOrder(order++); updateFileSortOrders(e.getValue());
+            e.getKey().setSortOrder(order++);
+            updateFileSortOrders(e.getValue());
         }
+        assignAllBoxFileNames();
         treeView.refresh();
     }
 
@@ -698,11 +738,14 @@ public class EmployeeDashboardController {
         for (int i = 0; i < files.size(); i++) files.get(i).setSortOrder(i + 1);
     }
 
-    private void updateDocumentFileCountLabels() { lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size())); }
+    private void updateDocumentFileCountLabels() {
+        lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
+    }
 
     private void updateTotalFilesInBoxLabel() {
         if (lblTotalFilesInBox != null)
-            lblTotalFilesInBox.setText(String.valueOf(sessionData.values().stream().mapToInt(List::size).sum()));
+            lblTotalFilesInBox.setText(
+                    String.valueOf(sessionData.values().stream().mapToInt(List::size).sum()));
     }
 
     private void setTotalsVisible(boolean v) {
