@@ -40,7 +40,7 @@ public class LogsTabController {
     }
 
     @FXML
-    private void handleRefresh() {
+    protected void handleRefresh() {
         loadLogs();
     }
 

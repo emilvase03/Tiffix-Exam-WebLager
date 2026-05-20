@@ -125,7 +125,7 @@ public class CustomersTabController implements Initializable {
     }
 
     @FXML
-    private void handleCreateCustomer(ActionEvent event) {
+    protected void handleCreate() {
         showCreateOverlay();
         customerCardController.preloadCreateWindow();
     }

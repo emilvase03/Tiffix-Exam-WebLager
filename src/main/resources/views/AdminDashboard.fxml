@@ -17,6 +17,11 @@
         <HBox alignment="CENTER_LEFT" spacing="16" styleClass="top-bar">
 
             <Button mnemonicParsing="false" onAction="#onBtnOpenSideBar" styleClass="hamburger-btn" text="☰" />
+            <Label fx:id="lblInfo" onMouseEntered="#onMouseEnter" onMouseExited="#onMouseExit" styleClass="sidebar-btn">
+                <graphic>
+                    <FontIcon iconLiteral="bi-question-square" />
+                </graphic>
+            </Label>
          <ImageView fitHeight="45.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
             <image>
                <Image url="@../img/Tiffix.png" />
@@ -37,6 +42,10 @@
 
         <StackPane fx:id="contentArea" styleClass="content-area" VBox.vgrow="ALWAYS" />
 
+    </VBox>
+
+    <VBox fx:id="shortcutCardOverlay" alignment="CENTER" visible="false" mouseTransparent="true">
+        <fx:include fx:id="shortcutOverlay" source="../components/ShortcutCard.fxml" />
     </VBox>
 
 </StackPane>

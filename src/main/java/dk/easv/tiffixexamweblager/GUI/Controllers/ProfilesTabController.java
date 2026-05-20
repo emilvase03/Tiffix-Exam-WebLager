@@ -1,10 +1,16 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ProfileCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// Ikonli imports
+import org.kordamp.ikonli.javafx.FontIcon;
+
+// Java imports
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -14,8 +20,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
-
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -149,7 +153,7 @@ public class ProfilesTabController implements Initializable {
     }
 
     @FXML
-    private void handleCreateProfile(ActionEvent event) {
+    protected void handleCreate() {
         showCreateOverlay();
         profileCardController.preloadCreateWindow();
     }
