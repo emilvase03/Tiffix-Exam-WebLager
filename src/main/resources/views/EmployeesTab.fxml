@@ -43,7 +43,7 @@
                     <fx:include source="../components/SearchBar.fxml"/>
                     <Button fx:id="btnCreate"
                             mnemonicParsing="false"
-                            onAction="#onBtnCreateEmployee"
+                            onAction="#handleCreate"
                             styleClass="action-btn"
                             prefHeight="32.0" prefWidth="138.0"
                             text="Create Employee">

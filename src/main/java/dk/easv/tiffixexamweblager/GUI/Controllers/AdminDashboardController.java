@@ -3,6 +3,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 // Project imports
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ShortcutCardController;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+import dk.easv.tiffixexamweblager.GUI.Utils.ShortcutRegistry;
 
 // AtlantaFX imports
 import atlantafx.base.controls.ModalPane;
@@ -13,21 +14,28 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 
 public class AdminDashboardController {
-
     @FXML private StackPane root;
     @FXML private StackPane contentArea;
     @FXML private ModalPane modalPane;
     @FXML private Parent drawer;
     @FXML private VBox shortcutCardOverlay;
     @FXML private ShortcutCardController shortcutOverlayController;
+
+    private final ShortcutRegistry shortcutRegistry = new ShortcutRegistry();
+    private SideBarController sideBarController;
 
     private static final double   SIDEBAR_WIDTH  = 250;
     private static final Duration SLIDE_DURATION = Duration.millis(150);
@@ -42,6 +50,25 @@ public class AdminDashboardController {
         loadSidebar();
         setupModalPane();
         loadInitialView();
+
+        root.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (oldScene != null)
+                shortcutRegistry.detach();
+            if (newScene != null)
+                registerShortcuts(newScene);
+        });
+    }
+
+    private void registerShortcuts(Scene scene) {
+        shortcutRegistry
+                .register(new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN), sideBarController::onEmployees)
+                .register(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN), sideBarController::onProfiles)
+                .register(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN), sideBarController::onCustomers)
+                .register(new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN), sideBarController::onBoxes)
+                .register(new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN), sideBarController::onMetadata)
+                .register(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN), sideBarController::onLogs)
+                .register(new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.SHIFT_ANY), sideBarController::logout)
+                .attach(scene);
     }
 
     private void loadSidebar() {
@@ -54,8 +81,8 @@ public class AdminDashboardController {
             FXMLLoader loader = new FXMLLoader(sidebarUrl);
             drawer = loader.load();
 
-            SideBarController drawerController = loader.getController();
-            drawerController.setDashboard(this);
+            sideBarController = loader.getController();
+            sideBarController.setDashboard(this);
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to load sidebar", e);
@@ -120,13 +147,41 @@ public class AdminDashboardController {
             FXMLLoader loader = new FXMLLoader(viewUrl);
             Parent view = loader.load();
             contentArea.getChildren().setAll(view);
+
+            updatePrimaryAction(loader.getController());
+
             if (modalPane != null && modalPane.isDisplay()) {
                 closeSideBar();
             }
 
         } catch (Exception e) {
             AlertHelper.showError("Error", "Failed to load view.");
-            e.printStackTrace();
+        }
+    }
+
+    private void updatePrimaryAction(Object controller) {
+        if (controller instanceof LogsTabController c) {
+            shortcutRegistry.setPrimaryAction(c::handleRefresh);
+            return;
+        }
+
+        if (controller instanceof MetadataTabController) {
+            shortcutRegistry.setPrimaryAction(null);
+            return;
+        }
+
+        try {
+            Method method = controller.getClass().getDeclaredMethod("handleCreate");
+            method.setAccessible(true);
+            shortcutRegistry.setPrimaryAction(() -> {
+                try {
+                    method.invoke(controller);
+                } catch (Exception e) {
+                    AlertHelper.showError("Error", "Failed to setup keyboard shortcut for create button");
+                }
+            });
+        } catch (NoSuchMethodException e) {
+            shortcutRegistry.setPrimaryAction(null);
         }
     }
 

@@ -147,7 +147,7 @@ public class BoxesTabController implements Initializable {
     }
 
     @FXML
-    private void handleCreateBox() {
+    protected void handleCreate() {
         boxCardController.preloadCreateWindow();
         boxCardOverlay.setVisible(true);
         boxCardOverlay.setManaged(true);

@@ -158,7 +158,7 @@ public class EmployeesTabController {
     }
 
     @FXML
-    private void onBtnCreateEmployee() {
+    protected void handleCreate() {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/views/NewEmployeeView.fxml"));
