@@ -1,35 +1,44 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-import atlantafx.base.controls.ModalPane;
+// Project imports
+import dk.easv.tiffixexamweblager.GUI.Controllers.components.ShortcutCardController;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// AtlantaFX imports
+import atlantafx.base.controls.ModalPane;
+
+// Java imports
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
-
 import java.io.IOException;
 import java.net.URL;
 
 public class AdminDashboardController {
 
-    @FXML
-    private StackPane root;
-    @FXML
-    private StackPane contentArea;
-    @FXML
-    private ModalPane modalPane;
-    @FXML
-    private Parent drawer;
+    @FXML private StackPane root;
+    @FXML private StackPane contentArea;
+    @FXML private ModalPane modalPane;
+    @FXML private Parent drawer;
+    @FXML private VBox shortcutCardOverlay;
+    @FXML private ShortcutCardController shortcutOverlayController;
 
     private static final double   SIDEBAR_WIDTH  = 250;
     private static final Duration SLIDE_DURATION = Duration.millis(150);
     private static final Duration FADE_DURATION  = Duration.millis(120);
 
+
     @FXML
     public void initialize() {
+        shortcutCardOverlay.prefWidthProperty().bind(root.widthProperty());
+        shortcutCardOverlay.prefHeightProperty().bind(root.heightProperty());
+
         loadSidebar();
         setupModalPane();
         loadInitialView();
@@ -119,5 +128,17 @@ public class AdminDashboardController {
             AlertHelper.showError("Error", "Failed to load view.");
             e.printStackTrace();
         }
+    }
+
+
+    @FXML
+    private void onMouseEnter(MouseEvent event) {
+        shortcutOverlayController.preloadWindow(true);
+        shortcutCardOverlay.setVisible(true);
+    }
+
+    @FXML
+    private void onMouseExit(MouseEvent event) {
+        shortcutCardOverlay.setVisible(false);
     }
 }
