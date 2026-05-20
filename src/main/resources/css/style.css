@@ -887,3 +887,33 @@
 .nord-dark .nav-tree .tree-cell:selected .tree-icon {
     -fx-icon-color: rgba(255,255,255,0.95);
 }
+
+
+/* ── Document drag-over highlight (tile panel + tree) ───────────────────── */
+/*
+ * Applied when a DOC drag hovers over a document target.
+ * Tile panel: DocumentTileController adds "drag-over" to tileContent VBox.
+ * Tree panel: EmployeeDashboardController adds "tree-doc-drag-over" to TreeCell.
+ *
+ * The .drag-over rule is already used by ScannedFileTileController for file
+ * tiles; document tiles share the same class so they get the same blue border.
+ */
+
+/* Ensure .drag-over works on VBox (document tiles) as well as on root VBox */
+.document-tile.drag-over {
+    -fx-border-color:  -wl-brand-dark;
+    -fx-border-width:  2px;
+    -fx-border-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(45,61,79,0.30), 10, 0.15, 0, 3);
+}
+
+/* Tree cell highlight when a DOC is dragged over another document node */
+.nav-tree .tree-cell.tree-doc-drag-over {
+    -fx-background-color: derive(-wl-row-select, -4%);
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(45,61,79,0.25), 10, 0.15, 0, 3);
+}
+.nord-dark .nav-tree .tree-cell.tree-doc-drag-over {
+    -fx-background-color: derive(-wl-row-select, -10%);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 10, 0.15, 0, 3);
+}

@@ -25,8 +25,7 @@ public class DocumentTileController {
     private double TILE_WIDTH;
     private double TILE_HEIGHT;
 
-    private static final double FLOW_PADDING = 16.0;
-
+    private static final double FLOW_PADDING  = 16.0;
     private static final String DRAG_OVER_CLASS = "drag-over";
     private static final String SELECTED_CLASS  = "selected";
     private static final String EXPANDED_CLASS  = "expanded";
@@ -57,18 +56,25 @@ public class DocumentTileController {
             if (document == null) return;
             Dragboard db = tileContent.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent cc = new ClipboardContent();
-            cc.putString("DOC_ID:" + document.getSortOrder());
+            cc.putString("DOC");
             db.setContent(cc);
+            if (dashboardController != null)
+                dashboardController.setDraggedDocument(document);
             tileContent.setOpacity(0.5);
             e.consume();
         });
 
-        tileContent.setOnDragDone(e -> { tileContent.setOpacity(1.0); removeDragHighlight(); });
+        tileContent.setOnDragDone(e -> {
+            tileContent.setOpacity(1.0);
+            removeDragHighlight();
+            if (dashboardController != null)
+                dashboardController.setDraggedDocument(null);
+        });
 
         tileContent.setOnDragOver(e -> {
             if (e.getDragboard().hasString()) {
                 String s = e.getDragboard().getString();
-                if (s.startsWith("FILE_ID:") || s.startsWith("DOC_ID:"))
+                if (s.equals("DOC") || s.equals("FILE"))
                     e.acceptTransferModes(TransferMode.MOVE);
             }
             e.consume();
@@ -77,35 +83,48 @@ public class DocumentTileController {
         tileContent.setOnDragEntered(e -> {
             if (e.getDragboard().hasString()) {
                 String s = e.getDragboard().getString();
-                if (s.startsWith("FILE_ID:") || s.startsWith("DOC_ID:")) addDragHighlight();
+                if (s.equals("DOC")) {
+                    Document dragged = dashboardController != null
+                            ? dashboardController.getDraggedDocument() : null;
+                    if (dragged != null && dragged != document)
+                        addDragHighlight();
+                } else if (s.equals("FILE")) {
+                    addDragHighlight();
+                }
             }
             e.consume();
         });
 
         tileContent.setOnDragExited(e -> { removeDragHighlight(); e.consume(); });
 
-        root.setOnDragDropped(e -> {
+        tileContent.setOnDragDropped(e -> {
             removeDragHighlight();
-
             Dragboard db = e.getDragboard();
             boolean success = false;
 
-            if (db.hasString() && db.getString().equals("FILE")) {
+            if (db.hasString() && dashboardController != null) {
+                String s = db.getString();
 
-                if (dashboardController != null) {
-                    dashboardController.moveFileToDocument(
-                            dashboardController.getDraggedFile(),
-                            document
-                    );
+                if (s.equals("DOC")) {
+                    // Move document: insert dragged before this document
+                    Document dragged = dashboardController.getDraggedDocument();
+                    if (dragged != null && dragged != document) {
+                        dashboardController.moveDocument(dragged, document);
+                        success = true;
+                    }
+
+                } else if (s.equals("FILE")) {
+                    ScannedFile draggedFile = dashboardController.getDraggedFile();
+                    if (draggedFile != null) {
+                        dashboardController.moveFileToDocument(draggedFile, document);
+                        success = true;
+                    }
                 }
-
-                success = true;
             }
 
             e.setDropCompleted(success);
             e.consume();
         });
-
     }
 
     public void setContainerWidthProperty(ReadOnlyDoubleProperty widthProperty) {
@@ -191,7 +210,9 @@ public class DocumentTileController {
     }
 
     private void removeDragHighlight() {
-        tileContent.getStyleClass().remove(DRAG_OVER_CLASS); }
+        tileContent.getStyleClass().remove(DRAG_OVER_CLASS);
+    }
+
 
 
     public void setDashboardController(EmployeeDashboardController c) {
@@ -219,7 +240,6 @@ public class DocumentTileController {
         }
     }
 
-
     public Document getDocument() {
         return document; }
 
@@ -229,6 +249,6 @@ public class DocumentTileController {
     public String   getLabel()    {
         return label;    }
 
-
-    public boolean  isExpanded()  { return expanded; }
+    public boolean  isExpanded()  {
+        return expanded; }
 }
