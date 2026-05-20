@@ -9,23 +9,25 @@ import dk.easv.tiffixexamweblager.BLL.Utils.ImageTransformations;
 import dk.easv.tiffixexamweblager.BLL.Utils.TiffExportService;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController;
+import dk.easv.tiffixexamweblager.GUI.Controllers.components.ShortcutCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Models.FileImportModel;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+import dk.easv.tiffixexamweblager.GUI.Utils.ShortcutRegistry;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
 //Atlanta imports
 import atlantafx.base.controls.ModalPane;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
+
+// Ikonli imports
 import org.kordamp.ikonli.javafx.FontIcon;
 
 //JavaFX imports
+import javafx.scene.Scene;
+import javafx.scene.input.*;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -66,6 +68,8 @@ public class EmployeeDashboardController {
     @FXML private Button           btnRescan;
     @FXML private ScrollPane       previewScrollPane;
     @FXML private BorderPane       dashboardContent;
+    @FXML private VBox shortcutCardOverlay;
+    @FXML private ShortcutCardController shortcutOverlayController;
 
     private BoxDocumentModel   boxDocumentModel;
     private FileImportModel    fileImportModel;
@@ -100,6 +104,8 @@ public class EmployeeDashboardController {
 
     private static final String TREE_DRAG_OVER = "tree-doc-drag-over";
 
+    private final ShortcutRegistry shortcutRegistry = new ShortcutRegistry();
+
 
     @FXML
     private void initialize() {
@@ -132,6 +138,51 @@ public class EmployeeDashboardController {
             if      (val instanceof Box)            onBoxSelected();
             else if (val instanceof Document  d)    onDocumentSelected(d);
             else if (val instanceof ScannedFile f)  onTreeFileSelected(f);
+        });
+
+        root.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (oldScene != null)
+                shortcutRegistry.detach();
+            if (newScene != null)
+                registerShortcuts(newScene);
+        });
+    }
+
+    private void registerShortcuts(Scene scene) {
+        shortcutRegistry
+                .register(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN), this::onLogout)
+                .register(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), this::onBtnStartScanningSession)
+                .register(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), this::onBtnFetch)
+                .register(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN), this::onBtnExport)
+                .register(new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.SHIFT_ANY), this::onBtnCloseOverview)
+                .register(new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.SHIFT_ANY), this::onBtnRescan)
+                .register(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN), this::onBtnRotate)
+                .register(new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_ANY), this::onBtnNext)
+                .register(new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_ANY), this::onBtnPreviousPage)
+                .attach(scene);
+
+        treeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                TreeItem<Object> selected = treeView.getSelectionModel().getSelectedItem();
+                if (selected != null && !selected.isLeaf()) {
+                    selected.setExpanded(!selected.isExpanded());
+                }
+                event.consume();
+                return;
+            }
+
+            if (event.getCode() != KeyCode.TAB)
+                return;
+
+            int current = treeView.getSelectionModel().getSelectedIndex();
+            int next = event.isShiftDown() ? current - 1 : current + 1;
+
+            if (next >= 0 && next < treeView.getExpandedItemCount()) {
+                treeView.getSelectionModel().select(next);
+                treeView.scrollTo(next);
+            }
+
+            event.consume();
         });
     }
 
@@ -392,10 +443,10 @@ public class EmployeeDashboardController {
 
     // ── Scanning ──────────────────────────────────────────────────────────────
 
-    @FXML private void onBtnFetch(ActionEvent event)  {
+    @FXML private void onBtnFetch()  {
         runFetch(); }
 
-    @FXML private void onBtnRescan(ActionEvent event) {
+    @FXML private void onBtnRescan() {
         runFetch(); }
 
     private void runFetch() {
@@ -466,7 +517,7 @@ public class EmployeeDashboardController {
 
     // ── Export ────────────────────────────────────────────────────────────────
 
-    @FXML private void onBtnExport(ActionEvent event) {
+    @FXML private void onBtnExport() {
         if (sessionData.isEmpty() || sessionData.values().stream().allMatch(List::isEmpty)) {
             AlertHelper.showError("Nothing to export", "There are no scanned files to export."); return;
         }
@@ -535,7 +586,7 @@ public class EmployeeDashboardController {
 
     // ── Session ───────────────────────────────────────────────────────────────
 
-    @FXML private void onBtnStartScanningSession(ActionEvent event) {
+    @FXML private void onBtnStartScanningSession() {
         showChooseProfileModal(); }
 
     private void showChooseProfileModal() {
@@ -763,21 +814,21 @@ public class EmployeeDashboardController {
         return file.getProcessedImage();
     }
 
-    @FXML private void onBtnPreviousPage(ActionEvent e) {
+    @FXML private void onBtnPreviousPage() {
         if (!currentFiles.isEmpty() && previewIndex > 0) openPreviewAt(previewIndex - 1);
     }
-    @FXML private void onBtnNext(ActionEvent e) {
+    @FXML private void onBtnNext() {
         if (!currentFiles.isEmpty() && previewIndex < currentFiles.size() - 1) openPreviewAt(previewIndex + 1);
     }
-    @FXML private void onBtnRotate(ActionEvent event) {
+    @FXML private void onBtnRotate() {
         if (currentFiles.isEmpty()) return;
         ScannedFile cur = currentFiles.get(previewIndex);
         cur.setUserRotation((cur.getUserRotation() + 90) % 360);
         loadPreviewImage(cur); refreshFileTile(cur);
     }
-    @FXML private void onBtnCloseOverview(ActionEvent e) { topOverview.setVisible(false); }
+    @FXML private void onBtnCloseOverview() { topOverview.setVisible(false); }
 
-    @FXML public void onLogout(ActionEvent event) {
+    @FXML public void onLogout() {
         UserSession.getInstance().clear();
         ViewHandler.EMPLOYEE_DASHBOARD.close();
         ViewHandler.EMPLOYEE_DASHBOARD.reset();
@@ -839,5 +890,16 @@ public class EmployeeDashboardController {
         }
         Files.write(dest, bytes);
         return dest;
+    }
+
+    @FXML
+    private void onMouseEnter(MouseEvent event) {
+        shortcutOverlayController.preloadWindow(false);
+        shortcutCardOverlay.setVisible(true);
+    }
+
+    @FXML
+    private void onMouseExit(MouseEvent event) {
+        shortcutCardOverlay.setVisible(false);
     }
 }
