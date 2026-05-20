@@ -9,6 +9,7 @@ import dk.easv.tiffixexamweblager.BLL.Utils.ImageTransformations;
 import dk.easv.tiffixexamweblager.BLL.Utils.TiffExportService;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController;
+import dk.easv.tiffixexamweblager.GUI.Controllers.components.ShortcutCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Models.FileImportModel;
 import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
@@ -18,16 +19,15 @@ import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
 //Atlanta imports
 import atlantafx.base.controls.ModalPane;
-import javafx.scene.Scene;
-import javafx.scene.input.*;
 
 // Ikonli imports
 import org.kordamp.ikonli.javafx.FontIcon;
 
 //JavaFX imports
+import javafx.scene.Scene;
+import javafx.scene.input.*;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -68,6 +68,8 @@ public class EmployeeDashboardController {
     @FXML private Button           btnRescan;
     @FXML private ScrollPane       previewScrollPane;
     @FXML private BorderPane       dashboardContent;
+    @FXML private VBox shortcutCardOverlay;
+    @FXML private ShortcutCardController shortcutOverlayController;
 
     private BoxDocumentModel   boxDocumentModel;
     private FileImportModel    fileImportModel;
@@ -888,5 +890,16 @@ public class EmployeeDashboardController {
         }
         Files.write(dest, bytes);
         return dest;
+    }
+
+    @FXML
+    private void onMouseEnter(MouseEvent event) {
+        shortcutOverlayController.preloadWindow(false);
+        shortcutCardOverlay.setVisible(true);
+    }
+
+    @FXML
+    private void onMouseExit(MouseEvent event) {
+        shortcutCardOverlay.setVisible(false);
     }
 }

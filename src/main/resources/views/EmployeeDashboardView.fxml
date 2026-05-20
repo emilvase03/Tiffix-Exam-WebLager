@@ -45,6 +45,11 @@
                             styleClass="action-btn" text="Start scanning session"/>
                     <Button fx:id="btnFetch" mnemonicParsing="false" onAction="#onBtnFetch"
                             styleClass="action-btn" text="Fetch"/>
+                    <Label fx:id="lblInfo" onMouseEntered="#onMouseEnter" onMouseExited="#onMouseExit" styleClass="sidebar-btn">
+                        <graphic>
+                            <FontIcon iconLiteral="bi-question-square" />
+                        </graphic>
+                    </Label>
                     <Region HBox.hgrow="ALWAYS"/>
                     <HBox alignment="CENTER" spacing="6">
                         <Label styleClass="h3" text="Box"/>
@@ -166,6 +171,10 @@
         </center>
 
     </BorderPane>
+
+    <VBox fx:id="shortcutCardOverlay" alignment="CENTER" visible="false" mouseTransparent="true">
+        <fx:include fx:id="shortcutOverlay" source="../components/ShortcutCard.fxml" />
+    </VBox>
 
     <ModalPane fx:id="modalPane" prefHeight="412.0" prefWidth="515.0"/>
 
