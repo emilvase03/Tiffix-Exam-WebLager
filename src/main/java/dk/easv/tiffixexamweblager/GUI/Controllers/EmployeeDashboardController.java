@@ -17,6 +17,9 @@ import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
 //Atlanta imports
 import atlantafx.base.controls.ModalPane;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 //JavaFX imports
@@ -73,26 +76,29 @@ public class EmployeeDashboardController {
     private Document      activeDocument = null;
     private ScannedFile   activeFile     = null;
 
-    private final List<ScannedFile>  currentFiles        = new ArrayList<>();
-    private final LinkedHashMap<Document, List<ScannedFile>>     sessionData   = new LinkedHashMap<>();
+    private final List<ScannedFile>                                       currentFiles        = new ArrayList<>();
+    private final LinkedHashMap<Document, List<ScannedFile>>              sessionData         = new LinkedHashMap<>();
     private int nextDocSortOrder   = 1;
     private int nextCreationNumber = 1;
     private int previewIndex       = 0;
     private int selectedFileIndex  = -1;
 
-    private final List<Rule>      activeRules         = new ArrayList<>();
+    private final List<Rule>                                              activeRules         = new ArrayList<>();
     private final IdentityHashMap<ScannedFile, ScannedFileTileController> fileTileControllers = new IdentityHashMap<>();
-    private final IdentityHashMap<Document, String>  documentLabels      = new IdentityHashMap<>();
+    private final IdentityHashMap<Document, String>                       documentLabels      = new IdentityHashMap<>();
 
-    private TreeItem<Object>   boxTreeItem       = null;
+    private TreeItem<Object>                                      boxTreeItem       = null;
     private final IdentityHashMap<Document,    TreeItem<Object>>  documentTreeItems = new IdentityHashMap<>();
     private final IdentityHashMap<ScannedFile, TreeItem<Object>>  fileTreeItems     = new IdentityHashMap<>();
 
     private static final double TREE_THUMB_W = 32.0;
     private static final double TREE_THUMB_H = 42.0;
 
-    private Path scanTempDir;
+    private Path        scanTempDir;
     private ScannedFile draggedFile;
+    private Document    draggedDocument;
+
+    private static final String TREE_DRAG_OVER = "tree-doc-drag-over";
 
 
     @FXML
@@ -114,7 +120,7 @@ public class EmployeeDashboardController {
 
         if (treeView == null) {
             AlertHelper.showError("Layout error",
-                    "TreeView missing from FXML. Ensure EmployeeDashboardView.fxml has <TreeView fx:id=\"treeView\">.");
+                    "TreeView missing from FXML. Add <TreeView fx:id=\"treeView\"> to EmployeeDashboardView.fxml.");
             return;
         }
 
@@ -133,10 +139,18 @@ public class EmployeeDashboardController {
         int counter = 1;
         List<Map.Entry<Document, List<ScannedFile>>> sorted = new ArrayList<>(sessionData.entrySet());
         sorted.sort(Comparator.comparingInt(e -> e.getKey().getSortOrder()));
-        for (Map.Entry<Document, List<ScannedFile>> entry : sorted) {
-            for (ScannedFile f : entry.getValue()) {
-                f.assignOrderName(counter++);   // "File 1", "File 2", "File 3", …
-            }
+        for (Map.Entry<Document, List<ScannedFile>> entry : sorted)
+            for (ScannedFile f : entry.getValue())
+                f.assignOrderName(counter++);
+    }
+
+    private void assignAllBoxDocumentNames() {
+        List<Document> sorted = new ArrayList<>(sessionData.keySet());
+        sorted.sort(Comparator.comparingInt(Document::getSortOrder));
+        int counter = 1;
+        for (Document doc : sorted) {
+            doc.assignOrderName(counter++);
+            documentLabels.put(doc, doc.getOrderName());
         }
     }
 
@@ -145,12 +159,24 @@ public class EmployeeDashboardController {
     }
 
 
+    public void setDraggedFile(ScannedFile file)     { this.draggedFile     = file; }
+    public ScannedFile getDraggedFile()              { return draggedFile; }
+
+    public void setDraggedDocument(Document doc)     { this.draggedDocument = doc; }
+    public Document getDraggedDocument()             { return draggedDocument; }
+
+
     private TreeCell<Object> createTreeCell() {
         return new TreeCell<>() {
             @Override
             protected void updateItem(Object item, boolean empty) {
                 super.updateItem(item, empty);
                 getStyleClass().removeAll("tree-box-cell", "tree-doc-cell", "tree-file-cell");
+                // Reset drag handlers so recycled cells don't keep stale ones
+                setOnDragDetected(null); setOnDragDone(null);
+                setOnDragOver(null); setOnDragEntered(null);
+                setOnDragExited(null); setOnDragDropped(null);
+
                 if (empty || item == null) { setText(null); setGraphic(null); return; }
 
                 if (item instanceof Box b) {
@@ -162,10 +188,57 @@ public class EmployeeDashboardController {
 
                 } else if (item instanceof Document d) {
                     getStyleClass().add("tree-doc-cell");
-                    String lbl   = documentLabels.getOrDefault(d, "Document " + d.getSortOrder());
                     int    count = sessionData.getOrDefault(d, Collections.emptyList()).size();
+                    String lbl   = documentLabels.getOrDefault(d, "Document " + d.getSortOrder());
                     setText(count > 0 ? lbl + "  (" + count + ")" : lbl);
                     setGraphic(makeIcon("/img/FileI.png", 22));
+
+                    setOnDragDetected(e -> {
+                        Dragboard db = startDragAndDrop(TransferMode.MOVE);
+                        ClipboardContent cc = new ClipboardContent();
+                        cc.putString("DOC");
+                        db.setContent(cc);
+                        setDraggedDocument(d);
+                        setOpacity(0.5);
+                        e.consume();
+                    });
+                    setOnDragDone(e -> {
+                        setOpacity(1.0);
+                        setDraggedDocument(null);
+                    });
+
+                    setOnDragOver(e -> {
+                        if (e.getDragboard().hasString()
+                                && e.getDragboard().getString().equals("DOC")
+                                && getDraggedDocument() != d)       // skip self
+                            e.acceptTransferModes(TransferMode.MOVE);
+                        e.consume();
+                    });
+                    setOnDragEntered(e -> {
+                        if (e.getDragboard().hasString()
+                                && e.getDragboard().getString().equals("DOC")
+                                && getDraggedDocument() != d)
+                            getStyleClass().add(TREE_DRAG_OVER);   // visual highlight
+                        e.consume();
+                    });
+                    setOnDragExited(e -> {
+                        getStyleClass().remove(TREE_DRAG_OVER);
+                        e.consume();
+                    });
+                    setOnDragDropped(e -> {
+                        getStyleClass().remove(TREE_DRAG_OVER);
+                        boolean ok = false;
+                        if (e.getDragboard().hasString()
+                                && e.getDragboard().getString().equals("DOC")) {
+                            Document src = getDraggedDocument();
+                            if (src != null && src != d) {
+                                moveDocument(src, d);
+                                ok = true;
+                            }
+                        }
+                        e.setDropCompleted(ok);
+                        e.consume();
+                    });
 
                 } else if (item instanceof ScannedFile f) {
                     getStyleClass().add("tree-file-cell");
@@ -203,6 +276,7 @@ public class EmployeeDashboardController {
         return iv;
     }
 
+    // Tree build
 
     private void buildTree(Box box) {
         documentTreeItems.clear(); fileTreeItems.clear();
@@ -217,7 +291,6 @@ public class EmployeeDashboardController {
         boxTreeItem.getChildren().clear();
         documentTreeItems.clear(); fileTreeItems.clear();
         for (Document doc : documents) {
-            documentLabels.put(doc, "Document " + nextCreationNumber++);
             TreeItem<Object> docItem = new TreeItem<>(doc);
             docItem.setExpanded(false);
             boxTreeItem.getChildren().add(docItem);
@@ -261,6 +334,7 @@ public class EmployeeDashboardController {
         treeView.refresh();
     }
 
+
     private void onBoxSelected() {
         activeDocument = null; activeFile = null;
         currentFiles.clear(); fileTileControllers.clear(); filesTilePane.getChildren().clear();
@@ -284,7 +358,7 @@ public class EmployeeDashboardController {
                 if (!sessionData.containsKey(doc)) {
                     List<ScannedFile> loaded = new ArrayList<>(boxDocumentModel.loadFilesForDocument(doc));
                     sessionData.put(doc, loaded);
-                    assignAllBoxFileNames();   // recalculate box-wide after lazy load
+                    assignAllBoxFileNames();
                     refreshTreeFileNodes(doc);
                 }
             } catch (Exception e) {
@@ -456,11 +530,13 @@ public class EmployeeDashboardController {
         new Thread(exportTask).start();
     }
 
-    private String sanitizeLabel(String label) { return label.replaceAll("[\\s/\\\\:*?\"<>|]", "_"); }
+    private String sanitizeLabel(String label) {
+        return label.replaceAll("[\\s/\\\\:*?\"<>|]", "_"); }
 
     // ── Session ───────────────────────────────────────────────────────────────
 
-    @FXML private void onBtnStartScanningSession(ActionEvent event) { showChooseProfileModal(); }
+    @FXML private void onBtnStartScanningSession(ActionEvent event) {
+        showChooseProfileModal(); }
 
     private void showChooseProfileModal() {
         try {
@@ -513,6 +589,7 @@ public class EmployeeDashboardController {
                 } catch (Exception e) { sessionData.put(doc, new ArrayList<>()); }
             }
 
+            assignAllBoxDocumentNames();
             assignAllBoxFileNames();
 
             setTotalsVisible(true);
@@ -543,8 +620,8 @@ public class EmployeeDashboardController {
         Document doc = new Document(-1, box.getId(), nextDocSortOrder++);
         activeDocument = doc;
         sessionData.put(doc, new ArrayList<>());
-        documentLabels.put(doc, "Document " + nextCreationNumber++);
         addDocumentToTree(doc);
+        assignAllBoxDocumentNames();
         lblTotalDocInBox.setText(String.valueOf(sessionData.size()));
     }
 
@@ -583,82 +660,68 @@ public class EmployeeDashboardController {
         treeView.refresh();
     }
 
-    // ── Drag-reorder ──────────────────────────────────────────────────────────
-
-
     public void reorderFiles(ScannedFile dragged, ScannedFile target) {
         if (dragged == null || target == null || dragged == target) return;
-
-        int from = currentFiles.indexOf(dragged);
-        int to = currentFiles.indexOf(target);
-
+        int from = currentFiles.indexOf(dragged), to = currentFiles.indexOf(target);
         if (from == -1 || to == -1) return;
-
         currentFiles.remove(from);
         currentFiles.add(to, dragged);
-
         sessionData.put(activeDocument, new ArrayList<>(currentFiles));
-
         updateFileSortOrders(currentFiles);
         assignAllBoxFileNames();
-
         onDocumentSelected(activeDocument);
-
         treeView.refresh();
-
         draggedFile = null;
-    }
-
-
-    public void setDraggedFile(ScannedFile file) {
-        this.draggedFile = file;
-    }
-
-    public ScannedFile getDraggedFile() {
-        return draggedFile;
     }
 
     public void moveFileToDocument(ScannedFile file, Document target) {
         if (file == null || target == null || activeDocument == null || target == activeDocument) return;
-
         Document source = activeDocument;
-
         List<ScannedFile> sourceFiles = sessionData.get(source);
-        if (sourceFiles != null) {
-            sourceFiles.remove(file);
-        }
-
+        if (sourceFiles != null) sourceFiles.remove(file);
         currentFiles.remove(file);
         updateFileSortOrders(currentFiles);
-
         List<ScannedFile> targetFiles = sessionData.computeIfAbsent(target, d -> new ArrayList<>());
-        targetFiles.add(file);
-        file.setSortOrder(targetFiles.size());
-
-        removeFileFromTree(file);
-        addFileToTree(target, file);
-
+        targetFiles.add(file); file.setSortOrder(targetFiles.size());
+        removeFileFromTree(file); addFileToTree(target, file);
         assignAllBoxFileNames();
-
         onDocumentSelected(source);
-
         updateTotalFilesInBoxLabel();
         treeView.refresh();
-
         draggedFile = null;
     }
 
 
-
-    public void swapDocuments(int draggedSortOrder, Document target) {
-        Document dragged = sessionData.keySet().stream()
-                .filter(d -> d.getSortOrder() == draggedSortOrder).findFirst().orElse(null);
+    public void moveDocument(Document dragged, Document target) {
         if (dragged == null || target == null || dragged == target) return;
-        int tmp = dragged.getSortOrder();
-        dragged.setSortOrder(target.getSortOrder()); target.setSortOrder(tmp);
 
-        assignAllBoxFileNames();
+        List<Document> ordered = new ArrayList<>(sessionData.keySet());
+        ordered.sort(Comparator.comparingInt(Document::getSortOrder));
+
+        int fromIdx = ordered.indexOf(dragged);
+        int toIdx   = ordered.indexOf(target);
+        if (fromIdx == -1 || toIdx == -1) return;
+
+
+        ordered.remove(fromIdx);
+
+        toIdx = ordered.indexOf(target);
+        ordered.add(toIdx, dragged);
+
+        for (int i = 0; i < ordered.size(); i++)
+            ordered.get(i).setSortOrder(i + 1);
+
         refreshDocumentPanel();
+
+        assignAllBoxDocumentNames();
+        assignAllBoxFileNames();
+
+        if (activeDocument != null)
+            lblDocumentNr.setText(documentLabels.getOrDefault(activeDocument,
+                    String.valueOf(activeDocument.getSortOrder())));
+
+        refreshTileLabels();
+        draggedDocument = null;
     }
 
     // ── Preview ───────────────────────────────────────────────────────────────
@@ -712,8 +775,7 @@ public class EmployeeDashboardController {
         cur.setUserRotation((cur.getUserRotation() + 90) % 360);
         loadPreviewImage(cur); refreshFileTile(cur);
     }
-    @FXML private void onBtnCloseOverview(ActionEvent e) {
-        topOverview.setVisible(false); }
+    @FXML private void onBtnCloseOverview(ActionEvent e) { topOverview.setVisible(false); }
 
     @FXML public void onLogout(ActionEvent event) {
         UserSession.getInstance().clear();
@@ -730,6 +792,7 @@ public class EmployeeDashboardController {
             e.getKey().setSortOrder(order++);
             updateFileSortOrders(e.getValue());
         }
+        assignAllBoxDocumentNames();
         assignAllBoxFileNames();
         treeView.refresh();
     }
