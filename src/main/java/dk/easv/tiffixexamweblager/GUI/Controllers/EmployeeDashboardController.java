@@ -68,7 +68,7 @@ public class EmployeeDashboardController {
     @FXML private Button           btnRescan;
     @FXML private ScrollPane       previewScrollPane;
     @FXML private BorderPane       dashboardContent;
-    @FXML private VBox shortcutCardOverlay;
+    @FXML private VBox             shortcutCardOverlay;
     @FXML private ShortcutCardController shortcutOverlayController;
 
     private BoxDocumentModel   boxDocumentModel;
@@ -77,8 +77,9 @@ public class EmployeeDashboardController {
     private DocumentManager    documentManager;
     private ScannedFileManager scannedFileManager;
 
-    private Document      activeDocument = null;
-    private ScannedFile   activeFile     = null;
+    private Document    activeDocument = null;
+    private Document    viewedDocument = null;
+    private ScannedFile activeFile     = null;
 
     private final List<ScannedFile>                                       currentFiles        = new ArrayList<>();
     private final LinkedHashMap<Document, List<ScannedFile>>              sessionData         = new LinkedHashMap<>();
@@ -131,57 +132,48 @@ public class EmployeeDashboardController {
         }
 
         treeView.setCellFactory(tv -> createTreeCell());
-        treeView.getSelectionModel().setSelectionMode(javafx.scene.control.SelectionMode.SINGLE);
+        treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         treeView.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
             if (sel == null) return;
             Object val = sel.getValue();
-            if      (val instanceof Box)            onBoxSelected();
-            else if (val instanceof Document  d)    onDocumentSelected(d);
-            else if (val instanceof ScannedFile f)  onTreeFileSelected(f);
+            if      (val instanceof Box)           onBoxSelected();
+            else if (val instanceof Document  d)   onDocumentSelected(d);
+            else if (val instanceof ScannedFile f) onTreeFileSelected(f);
         });
 
         root.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (oldScene != null)
-                shortcutRegistry.detach();
-            if (newScene != null)
-                registerShortcuts(newScene);
+            if (oldScene != null) shortcutRegistry.detach();
+            if (newScene != null) registerShortcuts(newScene);
         });
     }
 
     private void registerShortcuts(Scene scene) {
         shortcutRegistry
-                .register(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN), this::onLogout)
-                .register(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), this::onBtnStartScanningSession)
-                .register(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), this::onBtnFetch)
-                .register(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN), this::onBtnExport)
-                .register(new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.SHIFT_ANY), this::onBtnCloseOverview)
+                .register(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN),     this::onLogout)
+                .register(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN),     this::onBtnStartScanningSession)
+                .register(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),     this::onBtnFetch)
+                .register(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN),     this::onBtnExport)
+                .register(new KeyCodeCombination(KeyCode.ESCAPE,     KeyCombination.SHIFT_ANY), this::onBtnCloseOverview)
                 .register(new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.SHIFT_ANY), this::onBtnRescan)
-                .register(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN), this::onBtnRotate)
-                .register(new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_ANY), this::onBtnNext)
-                .register(new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_ANY), this::onBtnPreviousPage)
+                .register(new KeyCodeCombination(KeyCode.R,     KeyCombination.CONTROL_DOWN), this::onBtnRotate)
+                .register(new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_ANY),    this::onBtnNext)
+                .register(new KeyCodeCombination(KeyCode.LEFT,  KeyCombination.SHIFT_ANY),    this::onBtnPreviousPage)
                 .attach(scene);
 
         treeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
-                TreeItem<Object> selected = treeView.getSelectionModel().getSelectedItem();
-                if (selected != null && !selected.isLeaf()) {
-                    selected.setExpanded(!selected.isExpanded());
-                }
+                TreeItem<Object> sel = treeView.getSelectionModel().getSelectedItem();
+                if (sel != null && !sel.isLeaf()) sel.setExpanded(!sel.isExpanded());
                 event.consume();
                 return;
             }
-
-            if (event.getCode() != KeyCode.TAB)
-                return;
-
-            int current = treeView.getSelectionModel().getSelectedIndex();
-            int next = event.isShiftDown() ? current - 1 : current + 1;
-
+            if (event.getCode() != KeyCode.TAB) return;
+            int cur  = treeView.getSelectionModel().getSelectedIndex();
+            int next = event.isShiftDown() ? cur - 1 : cur + 1;
             if (next >= 0 && next < treeView.getExpandedItemCount()) {
                 treeView.getSelectionModel().select(next);
                 treeView.scrollTo(next);
             }
-
             event.consume();
         });
     }
@@ -189,7 +181,9 @@ public class EmployeeDashboardController {
     private void assignAllBoxFileNames() {
         int counter = 1;
         List<Map.Entry<Document, List<ScannedFile>>> sorted = new ArrayList<>(sessionData.entrySet());
-        sorted.sort(Comparator.comparingInt(e -> e.getKey().getSortOrder()));
+        // Defensive: skip any entry whose key is null (should never happen, but guards the crash)
+        sorted.removeIf(en -> en.getKey() == null);
+        sorted.sort(Comparator.comparingInt(en -> en.getKey().getSortOrder()));
         for (Map.Entry<Document, List<ScannedFile>> entry : sorted)
             for (ScannedFile f : entry.getValue())
                 f.assignOrderName(counter++);
@@ -197,6 +191,7 @@ public class EmployeeDashboardController {
 
     private void assignAllBoxDocumentNames() {
         List<Document> sorted = new ArrayList<>(sessionData.keySet());
+        sorted.removeIf(Objects::isNull);   // defensive null guard
         sorted.sort(Comparator.comparingInt(Document::getSortOrder));
         int counter = 1;
         for (Document doc : sorted) {
@@ -205,16 +200,26 @@ public class EmployeeDashboardController {
         }
     }
 
+    private void pruneNullKeys() {
+        sessionData.keySet().removeIf(Objects::isNull);
+    }
+
     private void refreshTileLabels() {
         fileTileControllers.forEach((file, ctrl) -> ctrl.refresh());
     }
 
+    public void setDraggedFile(ScannedFile file)  {
+        this.draggedFile     = file; }
 
-    public void setDraggedFile(ScannedFile file)     { this.draggedFile     = file; }
-    public ScannedFile getDraggedFile()              { return draggedFile; }
+    public ScannedFile getDraggedFile()           {
+        return draggedFile; }
 
-    public void setDraggedDocument(Document doc)     { this.draggedDocument = doc; }
-    public Document getDraggedDocument()             { return draggedDocument; }
+    public void setDraggedDocument(Document doc)  {
+        this.draggedDocument = doc; }
+
+    public Document getDraggedDocument()          {
+        return draggedDocument; }
+
 
 
     private TreeCell<Object> createTreeCell() {
@@ -223,7 +228,6 @@ public class EmployeeDashboardController {
             protected void updateItem(Object item, boolean empty) {
                 super.updateItem(item, empty);
                 getStyleClass().removeAll("tree-box-cell", "tree-doc-cell", "tree-file-cell");
-                // Reset drag handlers so recycled cells don't keep stale ones
                 setOnDragDetected(null); setOnDragDone(null);
                 setOnDragOver(null); setOnDragEntered(null);
                 setOnDragExited(null); setOnDragDropped(null);
@@ -233,8 +237,7 @@ public class EmployeeDashboardController {
                 if (item instanceof Box b) {
                     getStyleClass().add("tree-box-cell");
                     int total = sessionData.values().stream().mapToInt(List::size).sum();
-                    setText("Box " + b.getNumber() + "  ("
-                            + total + (total == 1 ? " file" : " files") + ")");
+                    setText("Box " + b.getNumber() + "  (" + total + (total == 1 ? " file" : " files") + ")");
                     setGraphic(makeIcon("/img/Box.png", 28));
 
                 } else if (item instanceof Document d) {
@@ -253,15 +256,11 @@ public class EmployeeDashboardController {
                         setOpacity(0.5);
                         e.consume();
                     });
-                    setOnDragDone(e -> {
-                        setOpacity(1.0);
-                        setDraggedDocument(null);
-                    });
-
+                    setOnDragDone(e -> { setOpacity(1.0); setDraggedDocument(null); });
                     setOnDragOver(e -> {
                         if (e.getDragboard().hasString()
                                 && e.getDragboard().getString().equals("DOC")
-                                && getDraggedDocument() != d)       // skip self
+                                && getDraggedDocument() != d)
                             e.acceptTransferModes(TransferMode.MOVE);
                         e.consume();
                     });
@@ -269,23 +268,16 @@ public class EmployeeDashboardController {
                         if (e.getDragboard().hasString()
                                 && e.getDragboard().getString().equals("DOC")
                                 && getDraggedDocument() != d)
-                            getStyleClass().add(TREE_DRAG_OVER);   // visual highlight
+                            getStyleClass().add(TREE_DRAG_OVER);
                         e.consume();
                     });
-                    setOnDragExited(e -> {
-                        getStyleClass().remove(TREE_DRAG_OVER);
-                        e.consume();
-                    });
+                    setOnDragExited(e -> { getStyleClass().remove(TREE_DRAG_OVER); e.consume(); });
                     setOnDragDropped(e -> {
                         getStyleClass().remove(TREE_DRAG_OVER);
                         boolean ok = false;
-                        if (e.getDragboard().hasString()
-                                && e.getDragboard().getString().equals("DOC")) {
+                        if (e.getDragboard().hasString() && e.getDragboard().getString().equals("DOC")) {
                             Document src = getDraggedDocument();
-                            if (src != null && src != d) {
-                                moveDocument(src, d);
-                                ok = true;
-                            }
+                            if (src != null && src != d) { moveDocument(src, d); ok = true; }
                         }
                         e.setDropCompleted(ok);
                         e.consume();
@@ -327,7 +319,6 @@ public class EmployeeDashboardController {
         return iv;
     }
 
-    // Tree build
 
     private void buildTree(Box box) {
         documentTreeItems.clear(); fileTreeItems.clear();
@@ -387,10 +378,19 @@ public class EmployeeDashboardController {
 
 
     private void onBoxSelected() {
-        activeDocument = null; activeFile = null;
+
+        activeDocument = null;
+        viewedDocument = null;
+        activeFile     = null;
+        selectedFileIndex = -1;
+
+        // Prune any null keys that may have slipped in, then show all files.
+        pruneNullKeys();
+
         currentFiles.clear(); fileTileControllers.clear(); filesTilePane.getChildren().clear();
         sessionData.entrySet().stream()
-                .sorted(Comparator.comparingInt(e -> e.getKey().getSortOrder()))
+                .filter(en -> en.getKey() != null)
+                .sorted(Comparator.comparingInt(en -> en.getKey().getSortOrder()))
                 .forEach(entry -> entry.getValue().forEach(f -> {
                     currentFiles.add(f);
                     filesTilePane.getChildren().add(createFileTile(f));
@@ -401,7 +401,11 @@ public class EmployeeDashboardController {
     }
 
     private void onDocumentSelected(Document doc) {
-        activeDocument = doc; activeFile = null;
+        if (doc == null) return;
+        activeDocument    = doc;
+        viewedDocument    = doc;
+        selectedFileIndex = -1;
+        activeFile        = null;
         lblDocumentNr.setText(documentLabels.getOrDefault(doc, String.valueOf(doc.getSortOrder())));
 
         if (!doc.isUnsaved()) {
@@ -427,15 +431,20 @@ public class EmployeeDashboardController {
     private void onTreeFileSelected(ScannedFile file) {
         Document parentDoc = null;
         for (Map.Entry<Document, List<ScannedFile>> entry : sessionData.entrySet())
-            if (entry.getValue().contains(file)) { parentDoc = entry.getKey(); break; }
+            if (entry.getKey() != null && entry.getValue().contains(file)) {
+                parentDoc = entry.getKey(); break;
+            }
         if (parentDoc == null) return;
 
-        activeDocument = parentDoc; activeFile = file;
+        activeDocument = parentDoc;
+        viewedDocument = parentDoc;
+        activeFile     = file;
         currentFiles.clear(); fileTileControllers.clear(); filesTilePane.getChildren().clear();
         currentFiles.addAll(sessionData.getOrDefault(parentDoc, new ArrayList<>()));
         for (ScannedFile f : currentFiles) filesTilePane.getChildren().add(createFileTile(f));
 
-        int idx = currentFiles.indexOf(file); selectedFileIndex = Math.max(idx, 0);
+        int idx = currentFiles.indexOf(file);
+        selectedFileIndex = Math.max(idx, 0);
         lblDocumentNr.setText(documentLabels.getOrDefault(parentDoc, "Document " + parentDoc.getSortOrder()));
         updateDocumentFileCountLabels();
         openPreviewAt(selectedFileIndex);
@@ -443,11 +452,8 @@ public class EmployeeDashboardController {
 
     // ── Scanning ──────────────────────────────────────────────────────────────
 
-    @FXML private void onBtnFetch()  {
-        runFetch(); }
-
-    @FXML private void onBtnRescan() {
-        runFetch(); }
+    @FXML private void onBtnFetch()  { runFetch(); }
+    @FXML private void onBtnRescan() { runFetch(); }
 
     private void runFetch() {
         final int modelSizeBefore = fileImportModel.getScanResults().size();
@@ -459,7 +465,7 @@ public class EmployeeDashboardController {
                 fileImportModel.fetchScansFromApi();
                 List<ScannedFile> newFiles = new ArrayList<>();
                 var allResults = fileImportModel.getScanResults();
-                int scanOrder = fileSizeBefore + 1;
+                int scanOrder  = fileSizeBefore + 1;
                 for (int i = modelSizeBefore; i < allResults.size(); i++) {
                     var scan = allResults.get(i); byte[] bytes = scan.fileBytes();
                     Path dest = writeTempFile(scan.fileName(), bytes);
@@ -476,33 +482,57 @@ public class EmployeeDashboardController {
 
         task.setOnSucceeded(e -> {
             List<ScannedFile> newFiles = task.getValue();
-            int firstNewIndex = -1;
-            if (!newFiles.isEmpty()) {
-                ScannedFile f = newFiles.get(0);
+            if (newFiles.isEmpty()) {
+                updateDocumentFileCountLabels();
+                updateTotalFilesInBoxLabel();
+                return;
+            }
+
+            Document targetDoc    = getNewestDocument();
+            int      firstNewIndex = -1;
+
+            for (ScannedFile f : newFiles) {
+
                 if (BarcodeDetector.hasBarcode(new File(f.getFilePath()))) {
+                    // Barcode → create a new document; this file and all following go there.
                     createNewDocument();
-                    currentFiles.clear(); fileTileControllers.clear(); filesTilePane.getChildren().clear();
-                } else if (activeDocument == null) {
-                    AlertHelper.showError("No document selected", "Scan a barcode page first."); return;
+                    targetDoc = activeDocument;
+                    currentFiles.clear();
+                    fileTileControllers.clear();
+                    filesTilePane.getChildren().clear();
+
+                } else if (targetDoc == null) {
+                    AlertHelper.showError("No document selected",
+                            "Scan a barcode page first to create a document.");
+                    return;
                 }
-                if (selectedFileIndex >= 0 && selectedFileIndex < currentFiles.size()) {
-                    sessionData.get(activeDocument).set(selectedFileIndex, f);
+
+                // Rescan / replace: only for the very first incoming file, only when
+                // the user had a file selected in the currently viewed document.
+                if (firstNewIndex == -1
+                        && selectedFileIndex >= 0
+                        && selectedFileIndex < currentFiles.size()) {
+
+                    sessionData.get(targetDoc).set(selectedFileIndex, f);
                     currentFiles.set(selectedFileIndex, f);
                     filesTilePane.getChildren().set(selectedFileIndex, createFileTile(f));
                     f.setSortOrder(selectedFileIndex + 1);
                     openPreviewAt(selectedFileIndex);
-                    refreshTreeFileNodes(activeDocument);
+                    refreshTreeFileNodes(targetDoc);
+
                 } else {
-                    sessionData.get(activeDocument).add(f);
+                    sessionData.get(targetDoc).add(f);
                     currentFiles.add(f);
                     filesTilePane.getChildren().add(createFileTile(f));
-                    f.setSortOrder(currentFiles.size());
+                    f.setSortOrder(sessionData.get(targetDoc).size());
                     if (firstNewIndex == -1) firstNewIndex = currentFiles.size() - 1;
-                    addFileToTree(activeDocument, f);
+                    addFileToTree(targetDoc, f);
                 }
-                assignAllBoxFileNames();
-                refreshTileLabels();
             }
+
+            selectedFileIndex = -1;
+            assignAllBoxFileNames();
+            refreshTileLabels();
             updateDocumentFileCountLabels();
             updateTotalFilesInBoxLabel();
             treeView.refresh();
@@ -541,6 +571,7 @@ public class EmployeeDashboardController {
         Path outputDir = dir.toPath();
         rebuildAllSortOrders();
         Map<Document, List<ScannedFile>> snapshot = new LinkedHashMap<>(sessionData);
+        snapshot.keySet().removeIf(Objects::isNull);   // never export a null-keyed entry
         final List<Rule> rules = List.copyOf(activeRules);
 
         Task<String> exportTask = new Task<>() {
@@ -582,12 +613,12 @@ public class EmployeeDashboardController {
     }
 
     private String sanitizeLabel(String label) {
-        return label.replaceAll("[\\s/\\\\:*?\"<>|]", "_"); }
+        return label.replaceAll("[\\s/\\\\:*?\"<>|]", "_");
+    }
 
     // ── Session ───────────────────────────────────────────────────────────────
 
-    @FXML private void onBtnStartScanningSession() {
-        showChooseProfileModal(); }
+    @FXML private void onBtnStartScanningSession() { showChooseProfileModal(); }
 
     private void showChooseProfileModal() {
         try {
@@ -615,7 +646,7 @@ public class EmployeeDashboardController {
                 }
             }
 
-            activeDocument = null; activeFile = null;
+            activeDocument = null; viewedDocument = null; activeFile = null;
             nextDocSortOrder = documents.size() + 1; nextCreationNumber = 1;
             sessionData.clear(); currentFiles.clear(); fileTileControllers.clear();
             documentLabels.clear(); fileImportModel.clear();
@@ -642,7 +673,6 @@ public class EmployeeDashboardController {
 
             assignAllBoxDocumentNames();
             assignAllBoxFileNames();
-
             setTotalsVisible(true);
             updateTotalFilesInBoxLabel();
             treeView.refresh();
@@ -713,28 +743,42 @@ public class EmployeeDashboardController {
 
     public void reorderFiles(ScannedFile dragged, ScannedFile target) {
         if (dragged == null || target == null || dragged == target) return;
-        int from = currentFiles.indexOf(dragged), to = currentFiles.indexOf(target);
+
+        if (viewedDocument == null) return;
+
+        int from = currentFiles.indexOf(dragged);
+        int to   = currentFiles.indexOf(target);
         if (from == -1 || to == -1) return;
+
         currentFiles.remove(from);
         currentFiles.add(to, dragged);
-        sessionData.put(activeDocument, new ArrayList<>(currentFiles));
+
+        sessionData.put(viewedDocument, new ArrayList<>(currentFiles));
         updateFileSortOrders(currentFiles);
         assignAllBoxFileNames();
-        onDocumentSelected(activeDocument);
+        onDocumentSelected(viewedDocument);
         treeView.refresh();
         draggedFile = null;
     }
 
     public void moveFileToDocument(ScannedFile file, Document target) {
-        if (file == null || target == null || activeDocument == null || target == activeDocument) return;
-        Document source = activeDocument;
+        if (file == null || target == null) return;
+
+        if (viewedDocument == null) return;
+        if (target == viewedDocument) return;  // already in target — nothing to do
+
+        Document source = viewedDocument;
         List<ScannedFile> sourceFiles = sessionData.get(source);
         if (sourceFiles != null) sourceFiles.remove(file);
         currentFiles.remove(file);
         updateFileSortOrders(currentFiles);
+
         List<ScannedFile> targetFiles = sessionData.computeIfAbsent(target, d -> new ArrayList<>());
-        targetFiles.add(file); file.setSortOrder(targetFiles.size());
-        removeFileFromTree(file); addFileToTree(target, file);
+        targetFiles.add(file);
+        file.setSortOrder(targetFiles.size());
+
+        removeFileFromTree(file);
+        addFileToTree(target, file);
         assignAllBoxFileNames();
         onDocumentSelected(source);
         updateTotalFilesInBoxLabel();
@@ -742,20 +786,18 @@ public class EmployeeDashboardController {
         draggedFile = null;
     }
 
-
     public void moveDocument(Document dragged, Document target) {
         if (dragged == null || target == null || dragged == target) return;
 
         List<Document> ordered = new ArrayList<>(sessionData.keySet());
+        ordered.removeIf(Objects::isNull);
         ordered.sort(Comparator.comparingInt(Document::getSortOrder));
 
         int fromIdx = ordered.indexOf(dragged);
         int toIdx   = ordered.indexOf(target);
         if (fromIdx == -1 || toIdx == -1) return;
 
-
         ordered.remove(fromIdx);
-
         toIdx = ordered.indexOf(target);
         ordered.add(toIdx, dragged);
 
@@ -763,7 +805,6 @@ public class EmployeeDashboardController {
             ordered.get(i).setSortOrder(i + 1);
 
         refreshDocumentPanel();
-
         assignAllBoxDocumentNames();
         assignAllBoxFileNames();
 
@@ -840,6 +881,7 @@ public class EmployeeDashboardController {
     private void rebuildAllSortOrders() {
         int order = 1;
         for (Map.Entry<Document, List<ScannedFile>> e : sessionData.entrySet()) {
+            if (e.getKey() == null) continue;
             e.getKey().setSortOrder(order++);
             updateFileSortOrders(e.getValue());
         }
@@ -891,6 +933,15 @@ public class EmployeeDashboardController {
         Files.write(dest, bytes);
         return dest;
     }
+
+    private Document getNewestDocument() {
+        return sessionData.keySet().stream()
+                .filter(Objects::nonNull)
+                .max(Comparator.comparingInt(Document::getSortOrder))
+                .orElse(null);
+    }
+
+    // ── Shortcut overlay ──────────────────────────────────────────────────────
 
     @FXML
     private void onMouseEnter(MouseEvent event) {
