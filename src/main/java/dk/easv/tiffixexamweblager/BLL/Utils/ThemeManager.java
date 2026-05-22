@@ -40,11 +40,11 @@ public class ThemeManager {
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(window -> {
-                        // Apply to the scene that's already set (if any)
+                        // apply to the scene that is already set (if any)
                         if (window.getScene() != null) {
                             applyClassTo(window.getScene(), darkMode.get());
                         }
-                        // Also watch for scene changes on this window
+                        // also watch for scene changes on this window
                         // (scene may be set slightly after the window is added)
                         window.sceneProperty().addListener((sObs, oldScene, newScene) -> {
                             if (newScene != null) {
