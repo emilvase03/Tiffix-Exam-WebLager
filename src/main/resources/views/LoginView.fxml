@@ -34,6 +34,7 @@
 
         <!-- Company logo -->
         <ImageView
+                fx:id="logoImage"
                 fitWidth="240"
                 preserveRatio="true"
                 pickOnBounds="true"

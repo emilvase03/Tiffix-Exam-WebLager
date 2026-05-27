@@ -2,6 +2,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Role;
+import dk.easv.tiffixexamweblager.BLL.Utils.ThemeManager;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
@@ -11,8 +12,11 @@ import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class LoginController {
+    @FXML private ImageView logoImage;
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
     @FXML private Label lblUserError;
@@ -34,6 +38,9 @@ public class LoginController {
 
     @FXML
     private void initialize() {
+        ThemeManager tm = ThemeManager.getInstance();
+        updateLogo(tm.isDark());
+        tm.darkModeProperty().addListener((obs, old, isDark) -> updateLogo(isDark));
 
         btnLogin.disableProperty().bind(userModel.loadingProperty());
 
@@ -119,4 +126,8 @@ public class LoginController {
         lblGeneralError.setManaged(false);
     }
 
+    private void updateLogo(boolean isDark) {
+        String path = isDark ? "/img/LogoBlue2H.png" : "/img/LogoBlueH.png";
+        logoImage.setImage(new Image(getClass().getResourceAsStream(path)));
+    }
 }
