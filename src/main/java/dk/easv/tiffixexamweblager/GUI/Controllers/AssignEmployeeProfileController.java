@@ -1,18 +1,21 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BE.UserProfile;
-import dk.easv.tiffixexamweblager.BLL.UserProfileManager;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// ControlsFX imports
+import org.controlsfx.control.CheckComboBox;
+
+// java imports
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import org.controlsfx.control.CheckComboBox;
-
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -23,7 +26,6 @@ public class AssignEmployeeProfileController implements Initializable {
     @FXML private ListView<User> assignedList;
 
     private VBox overlay;
-    private UserProfileManager userProfileManager;
     private UserModel userModel;
     private int currentProfileId;
     private boolean isLoading = false;
@@ -46,13 +48,6 @@ public class AssignEmployeeProfileController implements Initializable {
         assignedList.getItems().clear();
         employeeDropdown.setTitle("Select Employees");
 
-        try {
-            userProfileManager = new UserProfileManager();
-        } catch (Exception e) {
-            AlertHelper.showError("Failed to initialize", e.getMessage());
-            return;
-        }
-
         List<User> employees = userModel.getEmployees();
         if (!employees.isEmpty()) {
             populateDropdown(employees);
@@ -65,7 +60,7 @@ public class AssignEmployeeProfileController implements Initializable {
         try {
             employeeDropdown.getItems().addAll(allEmployees);
 
-            List<UserProfile> assigned = userProfileManager.getEmployeesForProfile(currentProfileId);
+            List<UserProfile> assigned = userModel.getEmployeesForProfile(currentProfileId);
 
             isLoading = true;
             for (User u : allEmployees) {
@@ -89,7 +84,7 @@ public class AssignEmployeeProfileController implements Initializable {
                         assignedList.getItems().add(u);
                         if (!isLoading) {
                             try {
-                                userProfileManager.assignEmployees(u.getId(), currentProfileId);
+                                userModel.assignEmployees(u.getId(), currentProfileId);
                             } catch (Exception e) {
                                 AlertHelper.showError("Failed to assign employee", e.getMessage());
                             }
@@ -101,7 +96,7 @@ public class AssignEmployeeProfileController implements Initializable {
                         assignedList.getItems().remove(u);
                         if (!isLoading) {
                             try {
-                                userProfileManager.removeEmployees(u.getId(), currentProfileId);
+                                userModel.removeEmployees(u.getId(), currentProfileId);
                             } catch (Exception e) {
                                 AlertHelper.showError("Failed to remove employee", e.getMessage());
                             }

@@ -23,7 +23,6 @@ public class FileImportModel {
         scanResults.addAll(results);
     }
 
-    // For future clear between documents / barcode splits.
     public void clear() {
         scanResults.clear();
     }

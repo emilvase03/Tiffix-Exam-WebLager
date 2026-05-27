@@ -67,12 +67,8 @@ public class BoxDocumentModel {
         return documentsForBox;
     }
 
-    public ObservableList<Document> getDocumentsForBox() {
-        return documentsForBox;
-    }
-
-    public ObservableList<ScannedFile> getFilesForDocument() {
-        return filesForDocument;
+    public Document createDocument(int boxId, int sortOrder) throws Exception {
+        return documentManager.createDocument(boxId, sortOrder);
     }
 
     // ScannedFileManager
@@ -81,6 +77,10 @@ public class BoxDocumentModel {
                 scannedFileManager.getFilesForDocument(document.getId())
         );
         return filesForDocument;
+    }
+
+    public void saveFilesForDocument(int documentId, List<ScannedFile> files) throws Exception {
+        scannedFileManager.saveFilesForDocument(documentId, files);
     }
 
     // MetadataManager

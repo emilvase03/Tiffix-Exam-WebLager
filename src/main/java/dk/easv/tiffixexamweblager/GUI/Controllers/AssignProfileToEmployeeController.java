@@ -1,11 +1,16 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
-import dk.easv.tiffixexamweblager.BE.UserProfile;
-import dk.easv.tiffixexamweblager.BLL.ProfileManager;
-import dk.easv.tiffixexamweblager.BLL.UserProfileManager;
+import dk.easv.tiffixexamweblager.GUI.Models.ProfileRuleModel;
+import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// ControlsFX imports
+import org.controlsfx.control.CheckComboBox;
+
+// Java imports
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,21 +18,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
-import org.controlsfx.control.CheckComboBox;
-
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class AssignProfileToEmployeeController implements Initializable {
-
     @FXML private CheckComboBox<Profile> profileDropdown;
     @FXML private ListView<Profile>      assignedList;
     @FXML private Label                  lblHeader;
 
     private VBox               overlay;
-    private UserProfileManager userProfileManager;
-    private ProfileManager     profileManager;
+    private UserModel userModel;
+    private ProfileRuleModel profileRuleModel;
     private int                currentUserId;
     private boolean            isLoading = false;
 
@@ -50,15 +52,15 @@ public class AssignProfileToEmployeeController implements Initializable {
         lblHeader.setText("Assign Profiles — " + user.getFirstName() + " " + user.getLastName());
 
         try {
-            userProfileManager = new UserProfileManager();
-            profileManager     = new ProfileManager();
+            userModel = new UserModel();
+            profileRuleModel = new ProfileRuleModel();
         } catch (Exception e) {
             AlertHelper.showError("Failed to initialize", e.getMessage());
             return;
         }
 
         try {
-            populateDropdown(profileManager.getAllProfiles());
+            populateDropdown(profileRuleModel.getAllProfiles());
         } catch (Exception e) {
             AlertHelper.showError("Failed to load profiles", e.getMessage());
         }
@@ -68,7 +70,7 @@ public class AssignProfileToEmployeeController implements Initializable {
         try {
             profileDropdown.getItems().addAll(allProfiles);
 
-            List<Profile> assigned = userProfileManager.getProfilesForEmployee(currentUserId);
+            List<Profile> assigned = userModel.getProfilesForEmployee(currentUserId);
 
             isLoading = true;
             for (Profile p : allProfiles) {
@@ -94,7 +96,7 @@ public class AssignProfileToEmployeeController implements Initializable {
                         assignedList.getItems().add(p);
                         if (!isLoading) {
                             try {
-                                userProfileManager.assignEmployees(currentUserId, p.getId());
+                                userModel.assignEmployees(currentUserId, p.getId());
                             } catch (Exception e) {
                                 AlertHelper.showError("Failed to assign profile", e.getMessage());
                             }
@@ -106,7 +108,7 @@ public class AssignProfileToEmployeeController implements Initializable {
                         assignedList.getItems().remove(p);
                         if (!isLoading) {
                             try {
-                                userProfileManager.removeEmployees(currentUserId, p.getId());
+                                userModel.removeEmployees(currentUserId, p.getId());
                             } catch (Exception e) {
                                 AlertHelper.showError("Failed to remove profile", e.getMessage());
                             }

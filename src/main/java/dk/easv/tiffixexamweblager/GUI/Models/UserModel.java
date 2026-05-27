@@ -1,8 +1,10 @@
 package dk.easv.tiffixexamweblager.GUI.Models;
 
 // Project imports
+import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BE.Role;
+import dk.easv.tiffixexamweblager.BE.UserProfile;
 import dk.easv.tiffixexamweblager.BLL.UserProfileManager;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.BLL.UserManager;
@@ -15,17 +17,18 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class UserModel {
     private final UserManager userManager;
+    private final UserProfileManager userProfileManager;
 
     private final ObjectProperty<User> loggedInUser = new SimpleObjectProperty<>();
     private final BooleanProperty loading = new SimpleBooleanProperty(false);
     private final BooleanProperty loginFailed = new SimpleBooleanProperty(false);
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final ObservableList<User> employees = FXCollections.observableArrayList();
-    private final UserProfileManager userProfileManager;
 
 
     public UserModel() throws Exception {
@@ -47,15 +50,6 @@ public class UserModel {
                     }
                 },
                 e -> loginFailed.set(true),
-                loading::set
-        );
-    }
-
-    public void loadAllUsers() {
-        BackgroundExecutor.execute(
-                () -> userManager.getAllUsers(),
-                users::setAll,
-                e -> { throw new RuntimeException("Failed to load users", e); },
                 loading::set
         );
     }
@@ -142,13 +136,26 @@ public class UserModel {
         );
     }
 
-    public UserProfileManager getUserProfileManager() {
-        return userProfileManager;
-    }
-
     public ObservableList<User> getEmployees ()          { return employees; }
     public ObservableList<User> getUsers()                  { return users; }
     public ObjectProperty<User> loggedInUserProperty()      { return loggedInUser; }
     public BooleanProperty loadingProperty()                { return loading; }
     public BooleanProperty loginFailedProperty()            { return loginFailed; }
+
+    // UserProfileManager
+    public List<UserProfile> getEmployeesForProfile(int profileId) throws Exception {
+        return userProfileManager.getEmployeesForProfile(profileId);
+    }
+
+    public void assignEmployees(int userId, int profileId) throws Exception {
+        userProfileManager.assignEmployees(userId, profileId);
+    }
+
+    public void removeEmployees(int userId, int profileId) throws Exception {
+        userProfileManager.removeEmployees(userId, profileId);
+    }
+
+    public List<Profile> getProfilesForEmployee(int userId) throws Exception {
+        return userProfileManager.getProfilesForEmployee(userId);
+    }
 }

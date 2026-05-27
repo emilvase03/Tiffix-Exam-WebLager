@@ -32,6 +32,10 @@ public class ProfileRuleModel {
         return allProfiles;
     };
 
+    public List<Profile> getAllProfiles() throws Exception {
+        return profileManager.getAllProfiles();
+    }
+
     public Profile createProfile(Profile newProfile) throws Exception {
         return profileManager.createProfile(newProfile);
     };

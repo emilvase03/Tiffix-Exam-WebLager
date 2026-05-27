@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.BLL;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BE.UserProfile;
@@ -8,6 +9,7 @@ import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.DAL.DAO.UserProfileDAO;
 import dk.easv.tiffixexamweblager.DAL.IUserProfileDataAccess;
 
+// Java imports
 import java.util.List;
 
 public class UserProfileManager {
