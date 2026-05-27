@@ -37,6 +37,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Popup;
+import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 
 import javax.imageio.ImageIO;
 
@@ -102,6 +105,10 @@ public class EmployeeDashboardController {
 
     private static final String TREE_DRAG_OVER = "tree-doc-drag-over";
 
+
+    private Popup    treeThumbPopup;
+    private ImageView treeThumbPopupView;
+
     private final ShortcutRegistry shortcutRegistry = new ShortcutRegistry();
 
 
@@ -129,11 +136,11 @@ public class EmployeeDashboardController {
         treeView.setCellFactory(tv -> createTreeCell());
         treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         treeView.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
-            if (sel == null) return;
+            if (sel == null) { hideTreeThumbPopup(); return; }
             Object val = sel.getValue();
-            if      (val instanceof Box)           onBoxSelected();
-            else if (val instanceof Document  d)   onDocumentSelected(d);
-            else if (val instanceof ScannedFile f) onTreeFileSelected(f);
+            if      (val instanceof Box)           { hideTreeThumbPopup(); onBoxSelected(); }
+            else if (val instanceof Document  d)   { hideTreeThumbPopup(); onDocumentSelected(d); }
+            else if (val instanceof ScannedFile f) { onTreeFileSelected(f); showTreeThumbPopup(f); }
         });
 
         root.sceneProperty().addListener((obs, oldScene, newScene) -> {
@@ -288,7 +295,7 @@ public class EmployeeDashboardController {
                     getStyleClass().add("tree-file-cell");
                     String name = f.getFileName();
                     setText(name != null && !name.isBlank() ? name : "File " + f.getScanOrder());
-                    setGraphic(fileThumbnail(f));
+                    setGraphic(makeIcon("/img/File.png", 20));
                 }
             }
         };
@@ -304,20 +311,58 @@ public class EmployeeDashboardController {
         return iv;
     }
 
-    private Node fileThumbnail(ScannedFile f) {
+    private void initTreeThumbPopup() {
+        treeThumbPopupView = new ImageView();
+        treeThumbPopupView.setFitWidth(TREE_THUMB_W * 3.2);
+        treeThumbPopupView.setFitHeight(TREE_THUMB_H * 3.2);
+        treeThumbPopupView.setPreserveRatio(true);
+        treeThumbPopupView.setSmooth(true);
+
+        VBox box = new VBox(treeThumbPopupView);
+        box.setAlignment(Pos.CENTER);
+        box.setStyle(
+                "-fx-background-color: white;"
+                        + "-fx-padding: 6;"
+                        + "-fx-border-color: #c8c8c8;"
+                        + "-fx-border-width: 1;"
+                        + "-fx-border-radius: 6;"
+                        + "-fx-background-radius: 6;"
+                        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.22), 14, 0, 3, 4);"
+        );
+
+        treeThumbPopup = new Popup();
+        treeThumbPopup.setAutoHide(false);
+        treeThumbPopup.setHideOnEscape(true);
+        treeThumbPopup.getContent().add(box);
+    }
+
+    private void showTreeThumbPopup(ScannedFile f) {
+        if (treeThumbPopup == null) initTreeThumbPopup();
+
         BufferedImage bi = getOrLoadProcessedImage(f);
-        if (bi == null) {
-            FontIcon fi = new FontIcon("bi-file-earmark");
-            fi.getStyleClass().add("tree-icon");
-            return fi;
-        }
-        var fxImg = SwingFXUtils.toFXImage(
-                ImageTransformations.applyAll(bi, f.getUserRotation(), f.getUserBrightness()), null);
-        var iv = new ImageView(fxImg);
-        iv.setFitWidth(TREE_THUMB_W); iv.setFitHeight(TREE_THUMB_H);
-        iv.setPreserveRatio(true); iv.setSmooth(true);
-        iv.getStyleClass().add("tree-thumb");
-        return iv;
+        if (bi == null) { hideTreeThumbPopup(); return; }
+
+        treeThumbPopupView.setImage(SwingFXUtils.toFXImage(
+                ImageTransformations.applyAll(bi, f.getUserRotation(), f.getUserBrightness()), null));
+
+        Bounds treeBounds = treeView.localToScreen(treeView.getBoundsInLocal());
+        if (treeBounds == null || treeView.getScene() == null) { hideTreeThumbPopup(); return; }
+
+        int    selIdx    = treeView.getSelectionModel().getSelectedIndex();
+        double cellH     = 30.0;
+        double rowCentreY = treeBounds.getMinY() + (selIdx + 0.5) * cellH;
+
+        double popupW    = TREE_THUMB_W * 3.2 + 12;   // image + padding
+        double popupH    = TREE_THUMB_H * 3.2 + 12;
+
+        double popupX = treeBounds.getMaxX() - 24;
+        double popupY = rowCentreY - popupH / 2.0;
+
+        treeThumbPopup.show(treeView.getScene().getWindow(), popupX, popupY);
+    }
+
+    private void hideTreeThumbPopup() {
+        if (treeThumbPopup != null) treeThumbPopup.hide();
     }
 
 
@@ -453,8 +498,11 @@ public class EmployeeDashboardController {
 
     // ── Scanning ──────────────────────────────────────────────────────────────
 
-    @FXML private void onBtnFetch()  { runFetch(); }
-    @FXML private void onBtnRescan() { runFetch(); }
+    @FXML private void onBtnFetch()  {
+        runFetch(); }
+
+    @FXML private void onBtnRescan() {
+        runFetch(); }
 
     private void runFetch() {
         final int modelSizeBefore = fileImportModel.getScanResults().size();
@@ -508,8 +556,6 @@ public class EmployeeDashboardController {
                     return;
                 }
 
-                // Rescan / replace: only for the very first incoming file, only when
-                // the user had a file selected in the currently viewed document.
                 if (firstNewIndex == -1
                         && selectedFileIndex >= 0
                         && selectedFileIndex < currentFiles.size()) {
@@ -960,6 +1006,7 @@ public class EmployeeDashboardController {
     }
 
     private void hideOverlay() {
+
         shortcutCardOverlay.setVisible(false);
     }
 }
