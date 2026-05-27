@@ -33,9 +33,6 @@ public class DocumentTileController {
     @FXML private VBox      root;
     @FXML private VBox      tileContent;
     @FXML private FlowPane  inlineFilesPane;
-    @FXML private StackPane thumbArea;
-    @FXML private ImageView imgThumbnail;
-    @FXML private ImageView docIcon;
     @FXML private Label     lblDocumentTitle;
     @FXML private Label     lblFileCount;
 
