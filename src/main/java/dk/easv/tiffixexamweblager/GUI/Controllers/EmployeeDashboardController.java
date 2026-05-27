@@ -158,6 +158,12 @@ public class EmployeeDashboardController {
                 .register(new KeyCodeCombination(KeyCode.R,     KeyCombination.CONTROL_DOWN), this::onBtnRotate)
                 .register(new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_ANY),    this::onBtnNext)
                 .register(new KeyCodeCombination(KeyCode.LEFT,  KeyCombination.SHIFT_ANY),    this::onBtnPreviousPage)
+                .register(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN), () -> {
+                    if (shortcutCardOverlay.isVisible())
+                        hideOverlay();
+                    else
+                        showOverlay();
+                })
                 .attach(scene);
 
         treeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -945,12 +951,20 @@ public class EmployeeDashboardController {
 
     @FXML
     private void onMouseEnter(MouseEvent event) {
-        shortcutOverlayController.preloadWindow(false);
-        shortcutCardOverlay.setVisible(true);
+        showOverlay();
     }
 
     @FXML
     private void onMouseExit(MouseEvent event) {
+        hideOverlay();
+    }
+
+    private void showOverlay() {
+        shortcutOverlayController.preloadWindow(false);
+        shortcutCardOverlay.setVisible(true);
+    }
+
+    private void hideOverlay() {
         shortcutCardOverlay.setVisible(false);
     }
 }

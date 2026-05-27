@@ -68,6 +68,12 @@ public class AdminDashboardController {
                 .register(new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN), sideBarController::onMetadata)
                 .register(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN), sideBarController::onLogs)
                 .register(new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.SHIFT_ANY), sideBarController::logout)
+                .register(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN), () -> {
+                    if (shortcutCardOverlay.isVisible())
+                        hideOverlay();
+                    else
+                        showOverlay();
+                })
                 .attach(scene);
     }
 
@@ -188,12 +194,20 @@ public class AdminDashboardController {
 
     @FXML
     private void onMouseEnter(MouseEvent event) {
-        shortcutOverlayController.preloadWindow(true);
-        shortcutCardOverlay.setVisible(true);
+        showOverlay();
     }
 
     @FXML
     private void onMouseExit(MouseEvent event) {
+        hideOverlay();
+    }
+
+    private void showOverlay() {
+        shortcutOverlayController.preloadWindow(false);
+        shortcutCardOverlay.setVisible(true);
+    }
+
+    private void hideOverlay() {
         shortcutCardOverlay.setVisible(false);
     }
 }
