@@ -47,7 +47,7 @@
                         <TableColumn fx:id="colCreatedAt" prefWidth="140.0" text="Created At" />
                         <TableColumn fx:id="colDocuments" prefWidth="90.0" text="Documents" />
                         <TableColumn fx:id="colPages" prefWidth="70.0" text="Files" />
-                  <TableColumn fx:id="colActive" prefWidth="70.0" text="Active" />
+                  <TableColumn fx:id="colActive" prefWidth="70.0" text="Status" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
