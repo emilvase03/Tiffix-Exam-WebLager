@@ -52,7 +52,7 @@ public class ShortcutCardController {
         grid.setPadding(new Insets(8));
 
         ColumnConstraints keyCol = new ColumnConstraints();
-        keyCol.setHalignment(HPos.RIGHT);   // right-align keys so = lines up cleanly
+        keyCol.setHalignment(HPos.RIGHT);
 
         ColumnConstraints sepCol = new ColumnConstraints();
         sepCol.setHalignment(HPos.CENTER);

@@ -103,13 +103,13 @@ public class BoxesTabController implements Initializable {
             final Button btnDeactivate = new Button();
             final HBox container = new HBox();
             {
-                btnActive.setGraphic(new FontIcon("bi-check-square"));
+                btnActive.setGraphic(new FontIcon("bi-unlock"));
                 btnActive.getStyleClass().addAll("icon-button");
                 btnActive.setOnAction(e -> {
                     handleToggle(true);
                 });
 
-                btnDeactivate.setGraphic(new FontIcon("bi-dash-square"));
+                btnDeactivate.setGraphic(new FontIcon("bi-lock"));
                 btnDeactivate.getStyleClass().addAll("icon-button", "danger");
                 btnDeactivate.setOnAction(e -> {
                     handleToggle(false);
