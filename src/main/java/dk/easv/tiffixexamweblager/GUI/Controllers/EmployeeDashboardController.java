@@ -50,7 +50,6 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class EmployeeDashboardController {
-
     @FXML private StackPane        root;
     @FXML private ModalPane        modalPane;
     @FXML private Label            lblBoxID;
@@ -74,8 +73,6 @@ public class EmployeeDashboardController {
     private BoxDocumentModel   boxDocumentModel;
     private FileImportModel    fileImportModel;
     private ProfileRuleModel   profileRuleModel;
-    private DocumentManager    documentManager;
-    private ScannedFileManager scannedFileManager;
 
     private Document    activeDocument = null;
     private Document    viewedDocument = null;
@@ -115,8 +112,6 @@ public class EmployeeDashboardController {
             boxDocumentModel   = new BoxDocumentModel();
             fileImportModel    = new FileImportModel();
             profileRuleModel   = new ProfileRuleModel();
-            documentManager    = new DocumentManager();
-            scannedFileManager = new ScannedFileManager();
             scanTempDir        = Files.createTempDirectory("tiffix-scans-");
         } catch (Exception e) {
             AlertHelper.showError("Documents unavailable", "The documents could not be loaded now.");
@@ -590,10 +585,10 @@ public class EmployeeDashboardController {
                     if (files.isEmpty()) continue;
                     String lbl = documentLabels.getOrDefault(doc, "Document_" + doc.getSortOrder());
                     if (doc.isUnsaved()) {
-                        Document c = documentManager.createDocument(doc.getBoxId(), doc.getSortOrder());
+                        Document c = boxDocumentModel.createDocument(doc.getBoxId(), doc.getSortOrder());
                         doc.setId(c.getId());
                     }
-                    scannedFileManager.saveFilesForDocument(doc.getId(), files);
+                    boxDocumentModel.saveFilesForDocument(doc.getId(), files);
                     if (multiPage) {
                         int w = svc.exportMultiPage(files, outputDir.resolve(sanitizeLabel(lbl) + ".tiff"), rules);
                         sb.append(lbl).append(": ").append(w).append(" page(s)\n");

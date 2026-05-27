@@ -98,7 +98,7 @@ public class ChooseScanSettingsController {
             return;
         }
 
-        profiles = userModel.getUserProfileManager().getProfilesForEmployee(currentUser.getId());
+        profiles = userModel.getProfilesForEmployee(currentUser.getId());
 
         profileList.getChildren().clear();
 
