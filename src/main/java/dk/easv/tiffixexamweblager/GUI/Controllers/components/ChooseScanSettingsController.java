@@ -1,4 +1,4 @@
-package dk.easv.tiffixexamweblager.GUI.Controllers;
+package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
@@ -181,7 +181,7 @@ public class ChooseScanSettingsController {
             try {
                 selectedBox = boxDocumentModel.createBox(newBox);
             } catch (Exception e) {
-                AlertHelper.showError("Error", "Failed to create " + newBox.getTitle());
+                AlertHelper.showError("Error", "Failed to create " + newBox.getTitle() + " "+e.getMessage());
                 return;
             }
         } else {
