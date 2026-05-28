@@ -6,6 +6,7 @@ import dk.easv.tiffixexamweblager.BLL.Utils.BarcodeDetector;
 import dk.easv.tiffixexamweblager.BLL.Utils.ImageTransformations;
 import dk.easv.tiffixexamweblager.BLL.Utils.TiffExportService;
 import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
+import dk.easv.tiffixexamweblager.GUI.Controllers.components.ChooseScanSettingsController;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ScannedFileTileController;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.ShortcutCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
@@ -680,7 +681,7 @@ public class EmployeeDashboardController {
 
     private void showChooseProfileModal() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ChooseScanSettingsView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/ChooseScanSettingsView.fxml"));
             Parent content = loader.load();
             ChooseScanSettingsController ctrl = loader.getController();
             ctrl.init(modalPane, this::onSessionStarted);

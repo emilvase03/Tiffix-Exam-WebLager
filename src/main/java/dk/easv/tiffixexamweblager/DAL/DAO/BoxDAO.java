@@ -67,8 +67,8 @@ public class BoxDAO implements IBoxDataAccess {
     public Box create(Box box) throws Exception {
         String sql = """
                 INSERT INTO Box (Number, Title, CreatedAt, CreatedByUserId,
-                                 DocumentsAmount, PagesAmount, ProfileId, CustomerId)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                ProfileId, CustomerId)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection conn = dbConnector.getConnection();
@@ -78,10 +78,8 @@ public class BoxDAO implements IBoxDataAccess {
             stmt.setString(2, box.getTitle());
             stmt.setObject(3, box.getCreatedAt());
             stmt.setInt(4, box.getCreatedByUserId());
-            stmt.setInt(5, box.getDocumentsAmount());
-            stmt.setInt(6, box.getFilesAmount());
-            stmt.setObject(7, box.getProfileId(), Types.INTEGER);
-            stmt.setInt(8, box.getCustomerId());
+            stmt.setObject(5, box.getProfileId(), Types.INTEGER);
+            stmt.setInt(6, box.getCustomerId());
             stmt.executeUpdate();
 
             try (ResultSet keys = stmt.getGeneratedKeys()) {

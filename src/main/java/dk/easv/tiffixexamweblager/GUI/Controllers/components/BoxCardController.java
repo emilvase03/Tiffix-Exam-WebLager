@@ -87,8 +87,10 @@ public class BoxCardController {
 
         Customer customer = customerCombobox.getSelectionModel().getSelectedItem();
 
-        if (customer == null)
+        if (customer == null) {
+            AlertHelper.showError("Validation", "Customer are required.");
             return;
+        }
 
         Box newBox = new Box(0, number, title, LocalDateTime.now(),
                 loggedInUserId, 0, 0, customer.getId());
@@ -97,7 +99,7 @@ public class BoxCardController {
         try {
             boxDocumentModel.createBox(newBox);
         } catch (Exception e) {
-            AlertHelper.showError("Error", "Failed to create box.");
+            AlertHelper.showError("Error", "Failed to create box. " + e.getMessage());
             return;
         }
 
