@@ -2,8 +2,6 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 //Project imports
 import dk.easv.tiffixexamweblager.BE.*;
-import dk.easv.tiffixexamweblager.BLL.DocumentManager;
-import dk.easv.tiffixexamweblager.BLL.ScannedFileManager;
 import dk.easv.tiffixexamweblager.BLL.Utils.BarcodeDetector;
 import dk.easv.tiffixexamweblager.BLL.Utils.ImageTransformations;
 import dk.easv.tiffixexamweblager.BLL.Utils.TiffExportService;
@@ -19,9 +17,6 @@ import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
 //Atlanta imports
 import atlantafx.base.controls.ModalPane;
-
-// Ikonli imports
-import org.kordamp.ikonli.javafx.FontIcon;
 
 //JavaFX imports
 import javafx.scene.Scene;
@@ -66,8 +61,6 @@ public class EmployeeDashboardController {
     @FXML private TilePane         filesTilePane;
     @FXML private BorderPane       topOverview;
     @FXML private ImageView        previewImageView;
-    @FXML private Button           btnFetch;
-    @FXML private Button           btnRescan;
     @FXML private ScrollPane       previewScrollPane;
     @FXML private BorderPane       dashboardContent;
     @FXML private VBox             shortcutCardOverlay;
@@ -81,18 +74,18 @@ public class EmployeeDashboardController {
     private Document    viewedDocument = null;
     private ScannedFile activeFile     = null;
 
-    private final List<ScannedFile>                                       currentFiles        = new ArrayList<>();
-    private final LinkedHashMap<Document, List<ScannedFile>>              sessionData         = new LinkedHashMap<>();
+    private final List<ScannedFile>    currentFiles        = new ArrayList<>();
+    private final LinkedHashMap<Document, List<ScannedFile>>   sessionData = new LinkedHashMap<>();
     private int nextDocSortOrder   = 1;
     private int nextCreationNumber = 1;
     private int previewIndex       = 0;
     private int selectedFileIndex  = -1;
 
-    private final List<Rule>                                              activeRules         = new ArrayList<>();
+    private final List<Rule>    activeRules  = new ArrayList<>();
     private final IdentityHashMap<ScannedFile, ScannedFileTileController> fileTileControllers = new IdentityHashMap<>();
-    private final IdentityHashMap<Document, String>                       documentLabels      = new IdentityHashMap<>();
+    private final IdentityHashMap<Document, String>   documentLabels      = new IdentityHashMap<>();
 
-    private TreeItem<Object>                                      boxTreeItem       = null;
+    private TreeItem<Object>     boxTreeItem       = null;
     private final IdentityHashMap<Document,    TreeItem<Object>>  documentTreeItems = new IdentityHashMap<>();
     private final IdentityHashMap<ScannedFile, TreeItem<Object>>  fileTreeItems     = new IdentityHashMap<>();
 
@@ -199,7 +192,7 @@ public class EmployeeDashboardController {
 
     private void assignAllBoxDocumentNames() {
         List<Document> sorted = new ArrayList<>(sessionData.keySet());
-        sorted.removeIf(Objects::isNull);   // defensive null guard
+        sorted.removeIf(Objects::isNull);
         sorted.sort(Comparator.comparingInt(Document::getSortOrder));
         int counter = 1;
         for (Document doc : sorted) {
@@ -266,26 +259,41 @@ public class EmployeeDashboardController {
                     });
                     setOnDragDone(e -> { setOpacity(1.0); setDraggedDocument(null); });
                     setOnDragOver(e -> {
-                        if (e.getDragboard().hasString()
-                                && e.getDragboard().getString().equals("DOC")
-                                && getDraggedDocument() != d)
-                            e.acceptTransferModes(TransferMode.MOVE);
+                        if (e.getDragboard().hasString()) {
+                            String s = e.getDragboard().getString();
+                            if ((s.equals("DOC") && getDraggedDocument() != d)
+                                    || s.equals("TREE_FILE") || s.equals("FILE"))
+                                e.acceptTransferModes(TransferMode.MOVE);
+                        }
                         e.consume();
                     });
                     setOnDragEntered(e -> {
-                        if (e.getDragboard().hasString()
-                                && e.getDragboard().getString().equals("DOC")
-                                && getDraggedDocument() != d)
-                            getStyleClass().add(TREE_DRAG_OVER);
+                        if (e.getDragboard().hasString()) {
+                            String s = e.getDragboard().getString();
+                            if ((s.equals("DOC") && getDraggedDocument() != d)
+                                    || s.equals("TREE_FILE") || s.equals("FILE"))
+                                getStyleClass().add(TREE_DRAG_OVER);
+                        }
                         e.consume();
                     });
                     setOnDragExited(e -> { getStyleClass().remove(TREE_DRAG_OVER); e.consume(); });
                     setOnDragDropped(e -> {
                         getStyleClass().remove(TREE_DRAG_OVER);
                         boolean ok = false;
-                        if (e.getDragboard().hasString() && e.getDragboard().getString().equals("DOC")) {
-                            Document src = getDraggedDocument();
-                            if (src != null && src != d) { moveDocument(src, d); ok = true; }
+                        if (e.getDragboard().hasString()) {
+                            String s = e.getDragboard().getString();
+                            if (s.equals("DOC")) {
+                                Document src = getDraggedDocument();
+                                if (src != null && src != d) { moveDocument(src, d); ok = true; }
+                            } else if (s.equals("TREE_FILE") || s.equals("FILE")) {
+                                ScannedFile df = getDraggedFile();
+                                if (df != null) {
+                                    Document src = findDocumentForFile(df);
+                                    if (src != null && src != d) {
+                                        moveFileBetweenDocuments(df, src, d); ok = true;
+                                    }
+                                }
+                            }
                         }
                         e.setDropCompleted(ok);
                         e.consume();
@@ -296,6 +304,18 @@ public class EmployeeDashboardController {
                     String name = f.getFileName();
                     setText(name != null && !name.isBlank() ? name : "File " + f.getScanOrder());
                     setGraphic(makeIcon("/img/File.png", 20));
+
+                    // Drag this file to any document row in the tree
+                    setOnDragDetected(e -> {
+                        Dragboard db = startDragAndDrop(TransferMode.MOVE);
+                        ClipboardContent cc = new ClipboardContent();
+                        cc.putString("TREE_FILE");
+                        db.setContent(cc);
+                        setDraggedFile(f);
+                        setOpacity(0.5);
+                        e.consume();
+                    });
+                    setOnDragDone(e -> { setOpacity(1.0); e.consume(); });
                 }
             }
         };
@@ -320,15 +340,7 @@ public class EmployeeDashboardController {
 
         VBox box = new VBox(treeThumbPopupView);
         box.setAlignment(Pos.CENTER);
-        box.setStyle(
-                "-fx-background-color: white;"
-                        + "-fx-padding: 6;"
-                        + "-fx-border-color: #c8c8c8;"
-                        + "-fx-border-width: 1;"
-                        + "-fx-border-radius: 6;"
-                        + "-fx-background-radius: 6;"
-                        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.22), 14, 0, 3, 4);"
-        );
+        box.getStyleClass().add("tree-thumb-popup");
 
         treeThumbPopup = new Popup();
         treeThumbPopup.setAutoHide(false);
@@ -543,7 +555,6 @@ public class EmployeeDashboardController {
             for (ScannedFile f : newFiles) {
 
                 if (BarcodeDetector.hasBarcode(new File(f.getFilePath()))) {
-                    // Barcode → create a new document; this file and all following go there.
                     createNewDocument();
                     targetDoc = activeDocument;
                     currentFiles.clear();
@@ -808,17 +819,12 @@ public class EmployeeDashboardController {
         draggedFile = null;
     }
 
-    public void moveFileToDocument(ScannedFile file, Document target) {
-        if (file == null || target == null) return;
+    public void moveFileBetweenDocuments(ScannedFile file, Document source, Document target) {
+        if (file == null || source == null || target == null || source == target) return;
 
-        if (viewedDocument == null) return;
-        if (target == viewedDocument) return;  // already in target — nothing to do
-
-        Document source = viewedDocument;
         List<ScannedFile> sourceFiles = sessionData.get(source);
         if (sourceFiles != null) sourceFiles.remove(file);
-        currentFiles.remove(file);
-        updateFileSortOrders(currentFiles);
+        updateFileSortOrders(sessionData.getOrDefault(source, Collections.emptyList()));
 
         List<ScannedFile> targetFiles = sessionData.computeIfAbsent(target, d -> new ArrayList<>());
         targetFiles.add(file);
@@ -827,10 +833,28 @@ public class EmployeeDashboardController {
         removeFileFromTree(file);
         addFileToTree(target, file);
         assignAllBoxFileNames();
-        onDocumentSelected(source);
+
+        if (viewedDocument == source) {
+            currentFiles.remove(file);
+            updateFileSortOrders(currentFiles);
+            onDocumentSelected(source);
+        }
+
         updateTotalFilesInBoxLabel();
         treeView.refresh();
         draggedFile = null;
+    }
+
+    public void moveFileToDocument(ScannedFile file, Document target) {
+        if (file == null || target == null || viewedDocument == null) return;
+        if (target == viewedDocument) return;
+        moveFileBetweenDocuments(file, viewedDocument, target);
+    }
+
+    private Document findDocumentForFile(ScannedFile file) {
+        for (Map.Entry<Document, List<ScannedFile>> e : sessionData.entrySet())
+            if (e.getKey() != null && e.getValue().contains(file)) return e.getKey();
+        return null;
     }
 
     public void moveDocument(Document dragged, Document target) {

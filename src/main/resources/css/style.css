@@ -917,3 +917,12 @@
     -fx-background-color: derive(-wl-row-select, -10%);
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 10, 0.15, 0, 3);
 }
+.tree-thumb-popup {
+    -fx-background-color: white;
+    -fx-padding: 6;
+    -fx-border-color: #c8c8c8;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.22), 14, 0, 3, 4);
+}
