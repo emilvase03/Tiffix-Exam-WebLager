@@ -821,12 +821,11 @@
     -fx-font-weight: 500;
 }
 
-/* File leaf — lighter, muted colour to reduce visual noise */
+/* File leaf — compact row, same height as document rows */
 .nav-tree .tree-cell.tree-file-cell {
     -fx-font-size: 11px;
     -fx-text-fill: -wl-text-muted;
-    /* Taller row to accommodate the thumbnail graphic */
-    -fx-pref-height: 52px;
+    -fx-padding:   3 10 3 6;
 }
 .nav-tree .tree-cell.tree-file-cell:selected {
     /* Keep selected text readable even on muted file cells */
