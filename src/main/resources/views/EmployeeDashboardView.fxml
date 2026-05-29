@@ -81,10 +81,10 @@
         </top>
 
         <center>
-            <SplitPane fx:id="splitPane" dividerPositions="0.18" BorderPane.alignment="CENTER">
+            <SplitPane fx:id="splitPane" dividerPositions="0.22" BorderPane.alignment="CENTER">
                 <items>
 
-                    <VBox fx:id="documentsPanel" minWidth="200.0" prefWidth="210.0" maxWidth="230.0" styleClass="documents-panel" VBox.vgrow="ALWAYS">
+                    <VBox fx:id="documentsPanel" minWidth="280.0" prefWidth="300.0" maxWidth="340.0" styleClass="documents-panel" VBox.vgrow="ALWAYS">
 
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
                             <Label fx:id="lblTotalDocText"
@@ -192,3 +192,4 @@
     <ModalPane fx:id="modalPane" prefHeight="412.0" prefWidth="515.0"/>
 
 </StackPane>
+
