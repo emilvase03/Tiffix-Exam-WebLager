@@ -9,10 +9,6 @@ import dk.easv.tiffixexamweblager.BLL.Utils.ZipExtractor;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Orchestrates fetching a ZIP from the external API and extracting its TIFFs.
- */
-
 public class FileImportManager {
     private final FileApiClient apiClient = new FileApiClient();
 
@@ -25,7 +21,6 @@ public class FileImportManager {
                 extractor.extractTiffs(zipResult.fileBytes());
 
         List<ScanResult> results = new ArrayList<>();
-
 
         for (ZipExtractor.ExtractedFile file : extracted) {
             results.add(new ScanResult(
