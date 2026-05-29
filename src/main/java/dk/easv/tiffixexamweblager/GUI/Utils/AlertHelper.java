@@ -7,14 +7,12 @@ import java.util.Optional;
 
 public class AlertHelper {
 
-    // Private constructor to prevent instantiation
+    // private constructor to prevent instantiation
     private AlertHelper() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
-    /**
-     * Shows a generic alert dialog
-     */
+    // shows a generic alert
     public static void showAlert(String title, String message, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -23,30 +21,22 @@ public class AlertHelper {
         alert.showAndWait();
     }
 
-    /**
-     * Shows an error alert
-     */
+    // shows an error alert
     public static void showError(String title, String message) {
         showAlert(title, message, Alert.AlertType.ERROR);
     }
 
-    /**
-     * Shows an information alert
-     */
+    // shows an information alert
     public static void showInformation(String title, String message) {
         showAlert(title, message, Alert.AlertType.INFORMATION);
     }
 
-    /**
-     * Shows a warning alert
-     */
+    // shows a warning alert
     public static void showWarning(String title, String message) {
         showAlert(title, message, Alert.AlertType.WARNING);
     }
 
-    /**
-     * Shows a confirmation dialog and returns true if user clicks OK
-     */
+    // shows a confirmation dialog and returns true if user clicks ok
     public static boolean showConfirmation(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
@@ -58,9 +48,7 @@ public class AlertHelper {
         return result.isPresent() && result.get() == ButtonType.OK;
     }
 
-    /**
-     * Shows a confirmation dialog with custom button text
-     */
+    // shows a confirmation dialog with custom button text
     public static boolean showConfirmation(String title, String message, String okText, String cancelText) {
         ButtonType okButton = new ButtonType(okText);
         ButtonType cancelButton = new ButtonType(cancelText);
@@ -75,16 +63,14 @@ public class AlertHelper {
         return result.isPresent() && result.get() == okButton;
     }
 
-    /**
-     * Shows an exception alert with expandable stack trace
-     */
+    // shows an exception alert with exandable stack trace
     public static void showException(String title, String message, Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(message);
         alert.setContentText(ex.getMessage());
 
-        // Create expandable Exception details
+        // create expandable exception details
         java.io.StringWriter sw = new java.io.StringWriter();
         java.io.PrintWriter pw = new java.io.PrintWriter(sw);
         ex.printStackTrace(pw);
