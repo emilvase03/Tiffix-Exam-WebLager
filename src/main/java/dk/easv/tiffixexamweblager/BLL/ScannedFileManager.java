@@ -16,7 +16,6 @@ public class ScannedFileManager {
         dataAccess = new ScannedFileDAO();
     }
 
-
     public List<ScannedFile> getFilesForDocument(int documentId) throws Exception {
         return dataAccess.getFilesForDocument(documentId);
     }

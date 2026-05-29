@@ -81,8 +81,6 @@ public class UserManager {
         return result;
     }
 
-    // helpers
-
     /** post-login logger */
     private void log(LogAction action, String message) {
         try {
