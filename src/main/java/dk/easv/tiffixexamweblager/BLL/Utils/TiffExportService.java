@@ -20,10 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 public class TiffExportService {
-
-    // ── Single-page export ────────────────────────────────────────────────────
 
     // Writes each page as a separate TIFF
     public void exportSinglePage(List<ScannedFile> files,
@@ -45,14 +42,12 @@ public class TiffExportService {
         }
     }
 
-    // ── Multi-page export ─────────────────────────────────────────────────────
-
     // Combines all pages into a single multi-page TIFF
     public int exportMultiPage(List<ScannedFile> files,
                                Path outputFile,
                                List<Rule> rules) throws Exception {
 
-        // Resolve and transform every page first; skip unreadable ones
+        // Resolve and transform every page first skip unreadable ones
         List<BufferedImage> pages = new ArrayList<>();
         for (ScannedFile sf : files) {
             BufferedImage img = resolveFullyTransformed(sf, rules);
@@ -117,8 +112,6 @@ public class TiffExportService {
 
         return ImageTransformations.applyAll(base, sf.getUserRotation(), sf.getUserBrightness());
     }
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private String sanitize(String label) {
         return label.replaceAll("[\\s/\\\\:*?\"<>|]", "_");
