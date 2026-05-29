@@ -31,12 +31,7 @@ public class FileApiClient {
                 .build();
     }
 
-    /**
-     * Fetches one ZIP from the scanner API.
-     *
-     * @return ScanResult whose fileBytes are raw ZIP bytes
-     * @throws Exception on network failure or non-200 response
-     */
+    // Fetches one ZIP from the scanner API.
     public ScanResult fetchScanZip() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ENDPOINT))
