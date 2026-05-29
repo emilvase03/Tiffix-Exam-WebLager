@@ -4,6 +4,7 @@ package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -48,7 +49,12 @@ public class SearchBarController {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void hookTable(TableView rawTable) {
         FilteredList filtered = new FilteredList<>(rawTable.getItems(), p -> true);
-        rawTable.setItems(filtered);
+
+        // wrap a sortedlist around it to enable atlantafx table sorting
+        SortedList sorted = new SortedList<>(filtered);
+        sorted.comparatorProperty().bind(rawTable.comparatorProperty());
+
+        rawTable.setItems(sorted);
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             String lower = newVal == null ? "" : newVal.toLowerCase().trim();
