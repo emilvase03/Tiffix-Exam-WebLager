@@ -81,7 +81,7 @@
         </top>
 
         <center>
-            <SplitPane fx:id="splitPane" dividerPositions="0.22" BorderPane.alignment="CENTER">
+            <SplitPane fx:id="splitPane" dividerPositions="0.15" BorderPane.alignment="CENTER">
                 <items>
 
                     <VBox fx:id="documentsPanel" minWidth="280.0" prefWidth="300.0" maxWidth="340.0" styleClass="documents-panel" VBox.vgrow="ALWAYS">

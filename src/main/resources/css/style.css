@@ -790,6 +790,12 @@
     -fx-background-radius: 6px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.11), 7, 0.05, 0, 2);
 }
+/* Empty padding rows at the bottom of the tree — no hover highlight */
+.nav-tree .tree-cell:empty:hover {
+    -fx-background-color: transparent;
+    -fx-effect: none;
+    -fx-cursor: default;
+}
 
 /* ── Selected: accent tint + stronger lift + bolder text ───────────────── */
 .nav-tree .tree-cell:selected {
@@ -862,6 +868,11 @@
 .nord-dark .nav-tree .tree-cell:hover {
     -fx-background-color: -wl-row-bg-hover;            /* #2B3B4C */
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.30), 7, 0.05, 0, 2);
+}
+.nord-dark .nav-tree .tree-cell:empty:hover {
+    -fx-background-color: transparent;
+    -fx-effect: none;
+    -fx-cursor: default;
 }
 .nord-dark .nav-tree .tree-cell:selected {
     -fx-background-color: -wl-row-select;              /* #1a3a5c */
