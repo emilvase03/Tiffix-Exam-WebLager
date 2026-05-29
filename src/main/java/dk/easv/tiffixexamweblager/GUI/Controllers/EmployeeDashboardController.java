@@ -68,6 +68,7 @@ public class EmployeeDashboardController {
     @FXML private VBox             shortcutCardOverlay;
     @FXML private ShortcutCardController shortcutOverlayController;
 
+
     private BoxDocumentModel   boxDocumentModel;
     private FileImportModel    fileImportModel;
     private ProfileRuleModel   profileRuleModel;
