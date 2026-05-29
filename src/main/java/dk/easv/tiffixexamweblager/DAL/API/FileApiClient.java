@@ -11,8 +11,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 
 /**
- * Calls GET /getRandomFile on the Tiffix API.
- * The server always returns a ZIP archive containing one or more TIFFs.
+ * Calls GET /getRandomFile on the WebLager API.
  * This class returns the raw ZIP bytes wrapped in a ScanResult;
  * ZipExtractor in FileImportManager unwraps them.
  */
