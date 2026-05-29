@@ -147,6 +147,8 @@ public class EmployeeDashboardController {
                 rightPanelFocused = false;
                 clearRightPanelHighlight();
             }
+            suppressContentLoad = false;
+            javafx.application.Platform.runLater(() -> suppressContentLoad = true);
         });
 
         treeView.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
@@ -227,6 +229,7 @@ public class EmployeeDashboardController {
                         && rightPanelHighlightIndex < currentFiles.size())
                         ? rightPanelHighlightIndex : 0;
                 rightPanelFocused = true;
+                hideTreeThumbPopup();
                 treeView.getStyleClass().remove(TREE_ACTIVE);
                 setRightPanelHighlight(startIdx);
                 event.consume();
@@ -479,7 +482,7 @@ public class EmployeeDashboardController {
         double popupW    = TREE_THUMB_W * 3.2 + 12;
         double popupH    = TREE_THUMB_H * 3.2 + 12;
 
-        double popupX = treeBounds.getMaxX() - 24;
+        double popupX = treeBounds.getMaxX() - popupW;
         double popupY = rowCentreY - popupH / 2.0;
 
         treeThumbPopup.show(treeView.getScene().getWindow(), popupX, popupY);
