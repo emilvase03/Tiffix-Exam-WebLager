@@ -203,7 +203,7 @@ public class AdminDashboardController {
     }
 
     private void showOverlay() {
-        shortcutOverlayController.preloadWindow(false);
+        shortcutOverlayController.preloadWindow(true);
         shortcutCardOverlay.setVisible(true);
     }
 
