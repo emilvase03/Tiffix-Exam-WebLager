@@ -20,7 +20,7 @@
         prefWidth="960"
         prefHeight="640">
 
-    <!-- ══ LEFT — Brand panel ══ -->
+    <!-- left info panel ══ -->
     <VBox
             styleClass="brand-panel"
             prefWidth="340"
@@ -31,9 +31,7 @@
             <Insets top="48" right="48" bottom="48" left="48"/>
         </padding>
 
-        <!-- <Region VBox.vgrow="ALWAYS"/> -->
-
-        <!-- Company logo -->
+        <!-- weblager logo -->
         <ImageView
                 fx:id="logoImage"
                 fitWidth="240"
@@ -47,7 +45,7 @@
 
         <Region VBox.vgrow="ALWAYS"/>
 
-        <!-- App name -->
+        <!-- app name -->
         <Label text="Tiffix" styleClass="app-name"/>
 
         <Label text="Scanning, reimagined."
@@ -61,13 +59,13 @@
     </VBox>
 
 
-    <!-- ══ RIGHT — Form panel ══ -->
+    <!--right form panel ══ -->
     <VBox
             styleClass="form-panel"
             alignment="CENTER"
             HBox.hgrow="ALWAYS">
 
-        <!-- Top-right theme toggle -->
+        <!-- theme toggle -->
         <HBox alignment="CENTER_RIGHT">
             <padding>
                 <Insets top="12" right="12"/>
@@ -79,13 +77,11 @@
 
         <VBox spacing="20" maxWidth="300">
 
-            <!-- Heading -->
             <VBox spacing="5">
                 <Label text="Sign in to Tiffix" styleClass="form-heading"/>
                 <Label text="Enter your credentials to continue" styleClass="text-muted"/>
             </VBox>
 
-            <!-- Username -->
             <VBox spacing="5">
                 <Label text="Username"/>
                 <TextField
@@ -100,7 +96,6 @@
                         managed="false"/>
             </VBox>
 
-            <!-- Password -->
             <VBox spacing="5">
                 <Label text="Password"/>
                 <PasswordField
@@ -115,7 +110,7 @@
                         managed="false"/>
             </VBox>
 
-            <!-- General error — shown by controller on failed login -->
+            <!-- general error -->
             <Label
                     fx:id="lblGeneralError"
                     text=""
@@ -125,7 +120,6 @@
                     visible="false"
                     managed="false"/>
 
-            <!-- Sign in button -->
             <Button
                     fx:id="btnLogin"
                     text="Sign in"
@@ -134,7 +128,6 @@
                     defaultButton="true"
                     onAction="#onLogin"/>
 
-            <!-- Footer note -->
             <Label
                     text="Need access or forgot your password? Contact your system administrator."
                     styleClass="footer-note"
