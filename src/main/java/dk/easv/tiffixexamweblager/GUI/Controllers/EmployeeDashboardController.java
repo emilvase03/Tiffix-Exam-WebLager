@@ -60,12 +60,14 @@ public class EmployeeDashboardController {
     @FXML private Label            lblTotalFilesInBox;
     @FXML private TreeView<Object> treeView;
     @FXML private TilePane         filesTilePane;
+    @FXML private SplitPane        splitPane;
     @FXML private BorderPane       topOverview;
     @FXML private ImageView        previewImageView;
     @FXML private ScrollPane       previewScrollPane;
     @FXML private BorderPane       dashboardContent;
     @FXML private VBox             shortcutCardOverlay;
     @FXML private ShortcutCardController shortcutOverlayController;
+
 
     private BoxDocumentModel   boxDocumentModel;
     private FileImportModel    fileImportModel;
@@ -175,6 +177,14 @@ public class EmployeeDashboardController {
         root.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (oldScene != null) shortcutRegistry.detach();
             if (newScene != null) registerShortcuts(newScene);
+        });
+        splitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
+            if (treeThumbPopup != null && treeThumbPopup.isShowing()) {
+                TreeItem<Object> sel = treeView.getSelectionModel().getSelectedItem();
+                if (sel != null && sel.getValue() instanceof ScannedFile f) {
+                    showTreeThumbPopup(f);
+                }
+            }
         });
     }
 
@@ -923,7 +933,7 @@ public class EmployeeDashboardController {
         filesTilePane.getChildren().clear(); fileTileControllers.clear();
         for (ScannedFile f : currentFiles) filesTilePane.getChildren().add(createFileTile(f));
         updateDocumentFileCountLabels();
-        applyRightPanelHighlight();  // restore CSS class after tiles are rebuilt
+        applyRightPanelHighlight();
     }
 
     private void refreshFileTile(ScannedFile file) {
@@ -1045,7 +1055,7 @@ public class EmployeeDashboardController {
         }
         else {
             Document neighbour = moveUp ? getPreviousDocument(doc) : getNextDocument(doc);
-            if (neighbour == null) return;  // already at absolute boundary
+            if (neighbour == null) return;
 
             files.remove(idx);
             updateFileSortOrders(files);
