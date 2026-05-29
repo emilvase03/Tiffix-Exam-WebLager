@@ -1,22 +1,23 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Document;
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
 import dk.easv.tiffixexamweblager.GUI.Controllers.EmployeeDashboardController;
 
+// Ikonli imports
+import org.kordamp.ikonli.javafx.FontIcon;
+
+// Java imports
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
-
 import java.util.List;
 import java.util.function.Consumer;
 

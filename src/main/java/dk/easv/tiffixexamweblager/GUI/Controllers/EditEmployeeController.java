@@ -1,17 +1,20 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-import atlantafx.base.controls.ModalPane;
-import atlantafx.base.theme.Styles;
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Role;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// AtlantaFX imports
+import atlantafx.base.controls.ModalPane;
+import atlantafx.base.theme.Styles;
+
+// Java imports
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 public class EditEmployeeController {
     @FXML

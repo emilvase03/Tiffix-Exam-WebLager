@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
+// Java imports
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
@@ -9,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-
 import java.util.Optional;
 
 public class SearchBarController {

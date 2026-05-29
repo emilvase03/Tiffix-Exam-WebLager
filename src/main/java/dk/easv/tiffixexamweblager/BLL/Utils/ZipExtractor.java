@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.BLL.Utils;
 
+// Java imports
 import java.io.*;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -33,19 +34,8 @@ public class ZipExtractor {
     }
 
 
-   /**
-     * Extracts all TIFF files from a ZIP archive provided as a byte array.
-     *
-     * <p>The method iterates through all entries in the ZIP file and
-     * extracts only files with the extensions {@code .tif} or {@code .tiff}.
-     * Other file types are ignored.</p>
-     *
-     * @param zipBytes the raw ZIP file data received from the API
-     * @return a list of extracted TIFF files
-     * @throws IOException if the ZIP input cannot be read
-    */
-
-public List<ExtractedFile> extractTiffs(byte[] zipBytes) throws IOException {
+   // Extracts all TIFF files from a ZIP archive provided as a byte array.
+    public List<ExtractedFile> extractTiffs(byte[] zipBytes) throws IOException {
         List<ExtractedFile> files = new ArrayList<>();
 
         try (ZipInputStream zis =

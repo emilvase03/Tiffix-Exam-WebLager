@@ -19,7 +19,9 @@ import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 //Atlanta imports
 import atlantafx.base.controls.ModalPane;
 
-//JavaFX imports
+// Java imports
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.input.*;
 import javafx.concurrent.Task;
@@ -36,13 +38,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Popup;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.util.Duration;
-
 import javax.imageio.ImageIO;
-
-//Java imports
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -104,7 +101,7 @@ public class EmployeeDashboardController {
     private ScannedFile selectedRightPanelFile = null;
     private boolean     suppressContentLoad = true;
     private ScannedFile movingFile          = null;
-    private Timeline    expandTimer         = null;
+    private Timeline expandTimer         = null;
     private int         rightPanelHighlightIndex  = -1;
     private boolean     rightPanelFocused         = false;
     private boolean     previewOpenedViaEnter     = false;

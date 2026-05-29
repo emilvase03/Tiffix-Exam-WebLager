@@ -1,10 +1,5 @@
 package dk.easv.tiffixexamweblager.BE;
 
-/**
- * Transfer object representing a single TIFF pulled out of the API's ZIP response.
- * This is NOT a persisted entity — it is a staging object that lives only until
- * whoever owns the File BE/DAO layer saves it to the database/disk.
- */
 public class ExtractedFile {
 
     private final String fileName;

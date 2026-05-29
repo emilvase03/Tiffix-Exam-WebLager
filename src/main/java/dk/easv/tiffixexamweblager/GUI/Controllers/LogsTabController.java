@@ -1,13 +1,15 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.LogEntry;
 import dk.easv.tiffixexamweblager.GUI.Models.LogModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// Java imports
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-
 import java.time.format.DateTimeFormatter;
 
 public class LogsTabController {

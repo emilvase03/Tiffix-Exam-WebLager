@@ -1,10 +1,12 @@
 package dk.easv.tiffixexamweblager.GUI.Models;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.ScanResult;
 import dk.easv.tiffixexamweblager.BLL.FileImportManager;
+
+// Java imports
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import java.util.List;
 
 public class FileImportModel {

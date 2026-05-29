@@ -1,9 +1,17 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// AtlantaFX imports
 import atlantafx.base.controls.ModalPane;
+
+// Ikonli imports
+import org.kordamp.ikonli.javafx.FontIcon;
+
+// Java imports
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -13,8 +21,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
-
 import java.io.IOException;
 
 public class EmployeesTabController {
