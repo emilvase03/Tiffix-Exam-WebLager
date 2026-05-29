@@ -1,7 +1,9 @@
 package dk.easv.tiffixexamweblager.BLL.Utils;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Rule;
 
+// Java imports
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;

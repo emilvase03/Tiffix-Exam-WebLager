@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.BE;
 
+// Java imports
 import java.awt.image.BufferedImage;
 
 public class ScannedFile {

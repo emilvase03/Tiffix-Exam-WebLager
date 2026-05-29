@@ -1,8 +1,11 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
 import dk.easv.tiffixexamweblager.BLL.Utils.ImageTransformations;
 import dk.easv.tiffixexamweblager.GUI.Controllers.EmployeeDashboardController;
+
+// Java imports
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
@@ -14,7 +17,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

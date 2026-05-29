@@ -1,14 +1,16 @@
 package dk.easv.tiffixexamweblager.BLL.Utils;
 
+// AtlantaFX imports
 import atlantafx.base.theme.NordDark;
 import atlantafx.base.theme.NordLight;
+
+// Java imports
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Scene;
 import javafx.stage.Window;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;

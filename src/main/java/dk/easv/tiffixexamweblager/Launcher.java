@@ -4,10 +4,6 @@ package dk.easv.tiffixexamweblager;
 import dk.easv.tiffixexamweblager.BLL.Utils.ThemeManager;
 import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 
-// AtlantaFX imports
-import atlantafx.base.theme.NordDark;
-import atlantafx.base.theme.NordLight;
-
 // Java imports
 import javafx.application.Application;
 import javafx.stage.Stage;

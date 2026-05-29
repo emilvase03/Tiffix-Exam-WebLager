@@ -5,6 +5,7 @@ import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BE.Profile;
 import dk.easv.tiffixexamweblager.BE.User;
 
+// Java imports
 import java.util.Collections;
 import java.util.List;
 

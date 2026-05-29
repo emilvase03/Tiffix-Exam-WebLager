@@ -6,6 +6,7 @@ import dk.easv.tiffixexamweblager.BE.Rule;
 import dk.easv.tiffixexamweblager.DAL.DAO.ProfileRuleDAO;
 import dk.easv.tiffixexamweblager.DAL.IProfileRuleDataAccess;
 
+// Java imports
 import java.util.List;
 
 public class ProfileRuleManager {

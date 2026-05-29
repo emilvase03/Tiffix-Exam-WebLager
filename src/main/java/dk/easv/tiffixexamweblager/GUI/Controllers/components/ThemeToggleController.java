@@ -1,13 +1,18 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers.components;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BLL.Utils.ThemeManager;
+
+// Ikonli imports
+import org.kordamp.ikonli.bootstrapicons.BootstrapIcons;
+import org.kordamp.ikonli.javafx.FontIcon;
+
+// Java imports
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.util.Duration;
-import org.kordamp.ikonli.bootstrapicons.BootstrapIcons;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 public class ThemeToggleController {
 

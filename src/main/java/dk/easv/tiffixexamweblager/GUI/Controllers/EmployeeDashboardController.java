@@ -19,7 +19,7 @@ import dk.easv.tiffixexamweblager.GUI.Utils.ViewHandler;
 //Atlanta imports
 import atlantafx.base.controls.ModalPane;
 
-//JavaFX imports
+// Java imports
 import javafx.scene.Scene;
 import javafx.scene.input.*;
 import javafx.concurrent.Task;
@@ -36,13 +36,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Popup;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.util.Duration;
-
 import javax.imageio.ImageIO;
-
-//Java imports
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;

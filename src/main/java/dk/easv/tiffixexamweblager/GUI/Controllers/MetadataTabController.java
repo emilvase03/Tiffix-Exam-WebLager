@@ -2,15 +2,11 @@ package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 // Project imports
 import dk.easv.tiffixexamweblager.BE.Box;
-import dk.easv.tiffixexamweblager.BE.Profile;
-import dk.easv.tiffixexamweblager.GUI.Controllers.components.BoxCardController;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.MetadataCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.BoxDocumentModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
 
 // Ikonli imports
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 // Java imports
@@ -21,6 +17,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 

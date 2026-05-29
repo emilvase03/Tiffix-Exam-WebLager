@@ -1,11 +1,16 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
-import atlantafx.base.controls.ModalPane;
-import atlantafx.base.theme.Styles;
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Role;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.GUI.Models.UserModel;
 import dk.easv.tiffixexamweblager.GUI.Utils.AlertHelper;
+
+// AtlantaFX imports
+import atlantafx.base.controls.ModalPane;
+import atlantafx.base.theme.Styles;
+
+// Java imports
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;

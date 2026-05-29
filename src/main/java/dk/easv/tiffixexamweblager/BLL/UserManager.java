@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.BLL;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BE.Role;
 import dk.easv.tiffixexamweblager.BLL.Utils.Encrypter;
@@ -8,6 +9,7 @@ import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.DAL.DAO.UserDAO;
 import dk.easv.tiffixexamweblager.DAL.IUserDataAccess;
 
+// Java imports
 import java.util.List;
 
 public class UserManager {
