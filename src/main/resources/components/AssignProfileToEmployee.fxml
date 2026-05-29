@@ -15,7 +15,7 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.AssignProfileToEmployeeController"
       styleClass="overlay"
-      stylesheets="@../css/profilesTab.css"
+      stylesheets="@../css/style.css"
       spacing="0"
       prefWidth="420"
       maxHeight="-Infinity" maxWidth="-Infinity"

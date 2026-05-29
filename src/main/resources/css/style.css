@@ -720,20 +720,21 @@
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LOGIN  (merged from login.css)
+   LOGIN
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.brand-panel   { -fx-background-color: -color-bg-subtle; -fx-border-color: -color-border-default; -fx-border-width: 0 1 0 0; }
-.app-name      { -fx-font-size: 34px; -fx-font-weight: 900; -fx-text-fill: -wl-text-main; }
-.brand-tagline { -fx-font-size: 14px; -fx-text-fill: -color-fg-muted; -fx-wrap-text: true; -fx-line-spacing: 4; -fx-padding: -15 0 0 0; }
-.brand-version { -fx-font-size: 11px; -fx-text-fill: -color-fg-subtle; }
-.form-panel    { -fx-background-color: -color-bg-default; }
-.form-heading  { -fx-font-size: 22px; -fx-font-weight: 700; -fx-text-fill: -color-fg-default; }
-.footer-note   { -fx-font-size: 11px; -fx-text-fill: -color-fg-subtle; }
+.login .brand-panel   { -fx-background-color: -color-bg-subtle; -fx-border-color: -color-border-default; -fx-border-width: 0 1 0 0; }
+.login .app-name      { -fx-font-size: 34px; -fx-font-weight: 900; -fx-text-fill: linear-gradient(to right, -color-fg-default, -color-accent-fg); }
+.login .brand-tagline { -fx-font-size: 14px; -fx-text-fill: -color-fg-muted; -fx-wrap-text: true; -fx-line-spacing: 4; -fx-padding: -15 0 0 0; }
+.login .brand-version { -fx-font-size: 11px; -fx-text-fill: -color-fg-subtle; }
+.login .form-panel    { -fx-background-color: -color-bg-default; }
+.login .form-heading  { -fx-font-size: 22px; -fx-font-weight: 700; -fx-text-fill: -color-fg-default; }
+.login .footer-note   { -fx-font-size: 11px; -fx-text-fill: -color-fg-subtle; }
 
+.loginError { -fx-font-size: 11px; -fx-text-fill: #EF4444 !important; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   PROFILES TAB  (merged from profilesTab.css)
+   PROFILES TAB
    ═══════════════════════════════════════════════════════════════════════════ */
 
 #rulesList .list-cell { -fx-padding: 2px; -fx-font-size: 12px; }

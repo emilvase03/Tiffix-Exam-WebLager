@@ -15,7 +15,8 @@
         xmlns="http://javafx.com/javafx"
         xmlns:fx="http://javafx.com/fxml"
         fx:controller="dk.easv.tiffixexamweblager.GUI.Controllers.LoginController"
-        stylesheets="@../css/login.css"
+        stylesheets="@../css/style.css"
+        styleClass="login"
         prefWidth="960"
         prefHeight="640">
 
@@ -94,7 +95,7 @@
                 <Label
                         fx:id="lblUserError"
                         text=""
-                        styleClass="danger,text-small"
+                        styleClass="loginError"
                         visible="false"
                         managed="false"/>
             </VBox>
@@ -109,7 +110,7 @@
                 <Label
                         fx:id="lblPasswordError"
                         text=""
-                        styleClass="danger,text-small"
+                        styleClass="loginError"
                         visible="false"
                         managed="false"/>
             </VBox>
@@ -118,7 +119,7 @@
             <Label
                     fx:id="lblGeneralError"
                     text=""
-                    styleClass="danger,text-small"
+                    styleClass="loginError"
                     wrapText="true"
                     maxWidth="Infinity"
                     visible="false"
