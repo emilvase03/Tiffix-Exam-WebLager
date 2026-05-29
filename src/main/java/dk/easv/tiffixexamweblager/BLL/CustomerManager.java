@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.BLL;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.BE.User;
 import dk.easv.tiffixexamweblager.BLL.Utils.LogAction;
@@ -7,6 +8,7 @@ import dk.easv.tiffixexamweblager.BLL.Utils.UserSession;
 import dk.easv.tiffixexamweblager.DAL.DAO.CustomerDAO;
 import dk.easv.tiffixexamweblager.DAL.ICustomerDataAccess;
 
+// Java imports
 import java.util.List;
 
 public class CustomerManager {

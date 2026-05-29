@@ -1,7 +1,6 @@
 package dk.easv.tiffixexamweblager.GUI.Controllers;
 
 // Project imports
-import dk.easv.tiffixexamweblager.BE.Box;
 import dk.easv.tiffixexamweblager.BE.Customer;
 import dk.easv.tiffixexamweblager.GUI.Controllers.components.CustomerCardController;
 import dk.easv.tiffixexamweblager.GUI.Models.CustomerProfileModel;
@@ -14,7 +13,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import javafx.fxml.Initializable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;

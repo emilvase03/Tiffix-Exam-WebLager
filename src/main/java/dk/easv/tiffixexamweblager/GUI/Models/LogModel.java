@@ -1,7 +1,10 @@
 package dk.easv.tiffixexamweblager.GUI.Models;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.LogEntry;
 import dk.easv.tiffixexamweblager.BLL.LogManager;
+
+// Java imports
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

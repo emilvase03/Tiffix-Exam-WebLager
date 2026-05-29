@@ -8,9 +8,7 @@ import dk.easv.tiffixexamweblager.BLL.CustomerProfileManager;
 
 // Java imports
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
-import java.util.List;
+import javafx.collections.ObservableList;;
 
 public class CustomerProfileModel {
     private CustomerProfileManager customerProfileManager;

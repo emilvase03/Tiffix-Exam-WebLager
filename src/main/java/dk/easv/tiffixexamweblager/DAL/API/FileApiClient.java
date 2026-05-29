@@ -1,7 +1,9 @@
 package dk.easv.tiffixexamweblager.DAL.API;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.ScanResult;
 
+// Java imports
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

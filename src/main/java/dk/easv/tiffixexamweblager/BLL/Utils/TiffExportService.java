@@ -20,27 +20,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Exports ScannedFile collections to disk as TIFF files with ALL active
- * transformations baked in.
- *
- * <p><b>Single-page</b> — one {@code .tiff} per page, named
- * {@code {docLabel}_page_{sortOrder}.tiff}.
- *
- * <p><b>Multi-page</b> — all pages of a document in one {@code .tiff}, using
- * {@code prepareWriteSequence} / {@code writeToSequence} / {@code endWriteSequence}
- * with an explicit {@link ImageWriteParam} (passing {@code null} causes some
- * JDK TIFF writers to commit only the first page).
- * Returns the number of pages written so the caller can verify completeness.
- */
+
 public class TiffExportService {
 
     // ── Single-page export ────────────────────────────────────────────────────
 
-    /**
-     *   Writes each page as a separate TIFF in {@code outputDir}.
-     *   File names: {@code {docLabel}_page_{sortOrder}.tiff}
-     */
+    // Writes each page as a separate TIFF
     public void exportSinglePage(List<ScannedFile> files,
                                  Path outputDir,
                                  String docLabel,
@@ -62,16 +47,7 @@ public class TiffExportService {
 
     // ── Multi-page export ─────────────────────────────────────────────────────
 
-    /**
-     * Combines all pages into a single multi-page TIFF at {@code outputFile}.
-     * Pages appear in {@code files} order (by sort order).
-     *
-     * @param files      pages to export
-     * @param outputFile destination file path (created or overwritten)
-     * @param rules      active profile rules — applied to any page whose
-     *                   {@code processedImage} is null (lazy load path)
-     * @return number of pages written
-     */
+    // Combines all pages into a single multi-page TIFF
     public int exportMultiPage(List<ScannedFile> files,
                                Path outputFile,
                                List<Rule> rules) throws Exception {
@@ -111,23 +87,6 @@ public class TiffExportService {
         return pages.size();
     }
 
-
-    /**
-     * Returns the fully-transformed image for {@code sf}, applying:
-     * <ol>
-     *   <li>Profile rules (ROTATE + BRIGHTNESS from the selected profile)
-     *   <li>User rotation accumulated during the session
-     *   <li>User brightness accumulated during the session
-     * </ol>
-     *
-     * <p>Step 1 is already done if {@code sf.getProcessedImage()} is non-null —
-     * that happens at fetch time via {@code ImageTransformations.applyRules()}.
-     * If {@code processedImage} is null (e.g. a DB-loaded file that was never
-     * previewed), this method decodes the raw bytes and applies the rules now
-     * so the exported result is identical to what the user would have seen in preview.
-     *
-     * @return transformed image, or {@code null} if the page cannot be decoded
-     */
     private BufferedImage resolveFullyTransformed(ScannedFile sf, List<Rule> rules) {
         BufferedImage base = sf.getProcessedImage();
 

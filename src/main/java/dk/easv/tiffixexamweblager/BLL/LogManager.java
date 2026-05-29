@@ -1,10 +1,12 @@
 package dk.easv.tiffixexamweblager.BLL;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.LogEntry;
 import dk.easv.tiffixexamweblager.BLL.Utils.LogAction;
 import dk.easv.tiffixexamweblager.DAL.DAO.LogDAO;
 import dk.easv.tiffixexamweblager.DAL.ILogDataAccess;
 
+// Java imports
 import java.util.List;
 
 public class LogManager {

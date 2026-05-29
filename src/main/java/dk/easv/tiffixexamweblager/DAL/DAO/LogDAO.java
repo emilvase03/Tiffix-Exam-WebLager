@@ -1,9 +1,11 @@
 package dk.easv.tiffixexamweblager.DAL.DAO;
 
+// project imports
 import dk.easv.tiffixexamweblager.BE.LogEntry;
 import dk.easv.tiffixexamweblager.DAL.ILogDataAccess;
 import dk.easv.tiffixexamweblager.DAL.Utils.DBConnector;
 
+// Java imports
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

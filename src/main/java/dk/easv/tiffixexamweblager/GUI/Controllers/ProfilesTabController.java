@@ -13,7 +13,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 // Java imports
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;

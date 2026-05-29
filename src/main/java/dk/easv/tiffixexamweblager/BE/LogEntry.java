@@ -1,5 +1,6 @@
 package dk.easv.tiffixexamweblager.BE;
 
+// Java imports
 import java.time.LocalDateTime;
 
 public class LogEntry {

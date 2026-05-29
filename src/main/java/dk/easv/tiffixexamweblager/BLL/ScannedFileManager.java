@@ -1,9 +1,11 @@
 package dk.easv.tiffixexamweblager.BLL;
 
+// Project imports
 import dk.easv.tiffixexamweblager.BE.ScannedFile;
 import dk.easv.tiffixexamweblager.DAL.DAO.ScannedFileDAO;
 import dk.easv.tiffixexamweblager.DAL.IScannedFileDataAccess;
 
+// Java imports
 import java.util.List;
 
 public class ScannedFileManager {
