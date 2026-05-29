@@ -927,3 +927,28 @@
     -fx-background-radius: 6;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.22), 14, 0, 3, 4);
 }
+.file-being-moved {
+    -fx-opacity: 0.45;
+    -fx-border-color: #18a999;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   KEYBOARD NAVIGATION — tree active + right-panel tile highlight
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/*
+ * .tree-active is added to the TreeView when keyboard navigation is in the
+ * left panel.  It adds an accent border to the selected cell so the user
+ * always knows which panel is "active".
+ * Removed when focus moves to the right panel; restored when it returns.
+ */
+.nav-tree.tree-active .tree-cell:selected {
+    -fx-border-color:  -wl-accent;
+    -fx-border-width:  2px;
+    -fx-border-radius: 6px;
+}
+.nord-dark .nav-tree.tree-active .tree-cell:selected {
+    -fx-border-color: #33A9EE;
+}

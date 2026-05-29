@@ -36,6 +36,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Popup;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 import javax.imageio.ImageIO;
 
@@ -97,7 +100,17 @@ public class EmployeeDashboardController {
     private ScannedFile draggedFile;
     private Document    draggedDocument;
 
+    private ScannedFile selectedRightPanelFile = null;
+    private boolean     suppressContentLoad = true;
+    private ScannedFile movingFile          = null;
+    private Timeline    expandTimer         = null;
+    private int         rightPanelHighlightIndex  = -1;
+    private boolean     rightPanelFocused         = false;
+    private boolean     previewOpenedViaEnter     = false;
+
     private static final String TREE_DRAG_OVER = "tree-doc-drag-over";
+    private static final String TILE_SELECTED  = "selected";
+    private static final String TREE_ACTIVE    = "tree-active";
 
 
     private Popup    treeThumbPopup;
@@ -122,19 +135,44 @@ public class EmployeeDashboardController {
         dashboardContent.prefHeightProperty().bind(root.heightProperty());
 
         if (treeView == null) {
-            AlertHelper.showError("Layout error",
-                    "TreeView missing from FXML. Add <TreeView fx:id=\"treeView\"> to EmployeeDashboardView.fxml.");
+            AlertHelper.showError( "Something went wrong",
+                    "Restart the app and try again.");
             return;
         }
 
         treeView.setCellFactory(tv -> createTreeCell());
         treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        treeView.getStyleClass().add(TREE_ACTIVE);  // tree starts active
+        treeView.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            if (rightPanelFocused) {
+                rightPanelFocused = false;
+                clearRightPanelHighlight();
+            }
+        });
+
         treeView.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
-            if (sel == null) { hideTreeThumbPopup(); return; }
+            if (sel == null) { hideTreeThumbPopup(); cancelExpandTimer(); return; }
             Object val = sel.getValue();
-            if      (val instanceof Box)           { hideTreeThumbPopup(); onBoxSelected(); }
-            else if (val instanceof Document  d)   { hideTreeThumbPopup(); onDocumentSelected(d); }
-            else if (val instanceof ScannedFile f) { onTreeFileSelected(f); showTreeThumbPopup(f); }
+
+            if (val instanceof ScannedFile f) showTreeThumbPopup(f);
+            else                              hideTreeThumbPopup();
+            cancelExpandTimer();
+            if (movingFile != null && val instanceof Document && !sel.isExpanded()) {
+                final TreeItem<Object> docItem = sel;
+                expandTimer = new Timeline(new KeyFrame(Duration.millis(1500), e -> {
+                    docItem.setExpanded(true);
+                    expandTimer = null;
+                    if (movingFile != null) reSelectFileInTree(movingFile);
+                }));
+                expandTimer.play();
+            }
+
+            if (val instanceof ScannedFile f2 && f2 != movingFile) movingFile = null;
+
+            if (suppressContentLoad) return;
+            if      (val instanceof Box)            onBoxSelected();
+            else if (val instanceof Document  d)    onDocumentSelected(d);
+            else if (val instanceof ScannedFile f3) onTreeFileSelected(f3);
         });
 
         root.sceneProperty().addListener((obs, oldScene, newScene) -> {
@@ -154,6 +192,7 @@ public class EmployeeDashboardController {
                 .register(new KeyCodeCombination(KeyCode.R,     KeyCombination.CONTROL_DOWN), this::onBtnRotate)
                 .register(new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_ANY),    this::onBtnNext)
                 .register(new KeyCodeCombination(KeyCode.LEFT,  KeyCombination.SHIFT_ANY),    this::onBtnPreviousPage)
+                .register(new KeyCodeCombination(KeyCode.LEFT,  KeyCombination.CONTROL_DOWN), this::onMoveRightPanelFileToMiddleDocument)
                 .register(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN), () -> {
                     if (shortcutCardOverlay.isVisible())
                         hideOverlay();
@@ -161,13 +200,81 @@ public class EmployeeDashboardController {
                         showOverlay();
                 })
                 .attach(scene);
+        scene.windowProperty().addListener((obs, oldW, newW) -> {
+            if (newW != null)
+                newW.focusedProperty().addListener((o, wasFocused, isFocused) -> {
+                    if (!isFocused) hideTreeThumbPopup();
+                });
+        });
+        if (scene.getWindow() != null)
+            scene.getWindow().focusedProperty().addListener((o, wasFocused, isFocused) -> {
+                if (!isFocused) hideTreeThumbPopup();
+            });
 
-        treeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                TreeItem<Object> sel = treeView.getSelectionModel().getSelectedItem();
-                if (sel != null && !sel.isLeaf()) sel.setExpanded(!sel.isExpanded());
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            boolean plainRight = event.getCode() == KeyCode.RIGHT
+                    && !event.isControlDown() && !event.isShiftDown() && !event.isAltDown();
+
+            if (!rightPanelFocused && plainRight && !currentFiles.isEmpty()) {
+                int startIdx = (rightPanelHighlightIndex >= 0
+                        && rightPanelHighlightIndex < currentFiles.size())
+                        ? rightPanelHighlightIndex : 0;
+                rightPanelFocused = true;
+                treeView.getStyleClass().remove(TREE_ACTIVE);
+                setRightPanelHighlight(startIdx);
                 event.consume();
                 return;
+            }
+            if (rightPanelFocused) {
+                handleRightPanelKey(event);
+                return;
+            }
+            if (!event.isControlDown() && !event.isShiftDown()
+                    && (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN)) {
+                Node owner = scene.getFocusOwner();
+                if (!(owner instanceof TextInputControl)) {
+                    int cur  = treeView.getSelectionModel().getSelectedIndex();
+                    int next = event.getCode() == KeyCode.UP ? cur - 1 : cur + 1;
+                    if (next >= 0 && next < treeView.getExpandedItemCount()) {
+                        treeView.getSelectionModel().select(next);
+                        treeView.scrollTo(next);
+                    }
+                    event.consume();
+                    return;
+                }
+            }
+        });
+
+        treeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (rightPanelFocused) return;
+            if (event.getCode() == KeyCode.ENTER) {
+                cancelExpandTimer();
+                movingFile = null;
+                TreeItem<Object> sel = treeView.getSelectionModel().getSelectedItem();
+                if (sel != null) {
+                    Object val = sel.getValue();
+                    if (!sel.isLeaf() && !(val instanceof Box)) sel.setExpanded(!sel.isExpanded());
+                    if      (val instanceof Box)            onBoxSelected();
+                    else if (val instanceof Document  d)    onDocumentSelected(d);
+                    else if (val instanceof ScannedFile f)  onTreeFileSelected(f);
+                }
+                event.consume(); return;
+            }
+            if (event.isControlDown()
+                    && (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN)) {
+                cancelExpandTimer();
+                ScannedFile sf = null;
+                TreeItem<Object> sel = treeView.getSelectionModel().getSelectedItem();
+                if (sel != null && sel.getValue() instanceof ScannedFile f) {
+                    sf = f;
+                } else if (movingFile != null) {
+                    sf = movingFile;
+                }
+                if (sf != null) {
+                    movingFile = sf;
+                    moveFileOneStepInTree(sf, event.getCode() == KeyCode.UP);
+                    event.consume(); return;
+                }
             }
             if (event.getCode() != KeyCode.TAB) return;
             int cur  = treeView.getSelectionModel().getSelectedIndex();
@@ -183,7 +290,6 @@ public class EmployeeDashboardController {
     private void assignAllBoxFileNames() {
         int counter = 1;
         List<Map.Entry<Document, List<ScannedFile>>> sorted = new ArrayList<>(sessionData.entrySet());
-        // Defensive: skip any entry whose key is null (should never happen, but guards the crash)
         sorted.removeIf(en -> en.getKey() == null);
         sorted.sort(Comparator.comparingInt(en -> en.getKey().getSortOrder()));
         for (Map.Entry<Document, List<ScannedFile>> entry : sorted)
@@ -305,8 +411,6 @@ public class EmployeeDashboardController {
                     String name = f.getFileName();
                     setText(name != null && !name.isBlank() ? name : "File " + f.getScanOrder());
                     setGraphic(makeIcon("/img/File.png", 20));
-
-                    // Drag this file to any document row in the tree
                     setOnDragDetected(e -> {
                         Dragboard db = startDragAndDrop(TransferMode.MOVE);
                         ClipboardContent cc = new ClipboardContent();
@@ -365,7 +469,7 @@ public class EmployeeDashboardController {
         double cellH     = 30.0;
         double rowCentreY = treeBounds.getMinY() + (selIdx + 0.5) * cellH;
 
-        double popupW    = TREE_THUMB_W * 3.2 + 12;   // image + padding
+        double popupW    = TREE_THUMB_W * 3.2 + 12;
         double popupH    = TREE_THUMB_H * 3.2 + 12;
 
         double popupX = treeBounds.getMaxX() - 24;
@@ -383,6 +487,9 @@ public class EmployeeDashboardController {
         documentTreeItems.clear(); fileTreeItems.clear();
         boxTreeItem = new TreeItem<>(box);
         boxTreeItem.setExpanded(true);
+        boxTreeItem.expandedProperty().addListener((obs, wasOpen, isOpen) -> {
+            if (!isOpen) boxTreeItem.setExpanded(true);
+        });
         treeView.setRoot(boxTreeItem);
         treeView.setShowRoot(true);
     }
@@ -438,12 +545,14 @@ public class EmployeeDashboardController {
 
     private void onBoxSelected() {
 
-        activeDocument = null;
-        viewedDocument = null;
-        activeFile     = null;
-        selectedFileIndex = -1;
+        activeDocument           = null;
+        viewedDocument           = null;
+        activeFile               = null;
+        selectedFileIndex        = -1;
+        rightPanelHighlightIndex = -1;
+        previewOpenedViaEnter    = false;
+        rightPanelFocused        = false;
 
-        // Prune any null keys that may have slipped in, then show all files.
         pruneNullKeys();
 
         currentFiles.clear(); fileTileControllers.clear(); filesTilePane.getChildren().clear();
@@ -455,16 +564,20 @@ public class EmployeeDashboardController {
                     filesTilePane.getChildren().add(createFileTile(f));
                 }));
         lblDocumentNr.setText("All documents");
-        lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
+        lblTotalFilesText.setVisible(false);  lblTotalFilesText.setManaged(false);
+        lblTotalFilesInDoc.setVisible(false); lblTotalFilesInDoc.setManaged(false);
         topOverview.setVisible(false);
     }
 
     private void onDocumentSelected(Document doc) {
         if (doc == null) return;
-        activeDocument    = doc;
-        viewedDocument    = doc;
-        selectedFileIndex = -1;
-        activeFile        = null;
+        activeDocument           = doc;
+        viewedDocument           = doc;
+        selectedFileIndex        = -1;
+        rightPanelHighlightIndex = -1;
+        previewOpenedViaEnter    = false;
+        rightPanelFocused        = false;
+        activeFile               = null;
         lblDocumentNr.setText(documentLabels.getOrDefault(doc, String.valueOf(doc.getSortOrder())));
 
         if (!doc.isUnsaved()) {
@@ -503,7 +616,10 @@ public class EmployeeDashboardController {
         for (ScannedFile f : currentFiles) filesTilePane.getChildren().add(createFileTile(f));
 
         int idx = currentFiles.indexOf(file);
-        selectedFileIndex = Math.max(idx, 0);
+        selectedFileIndex        = Math.max(idx, 0);
+        rightPanelHighlightIndex = selectedFileIndex;
+        previewOpenedViaEnter    = true;
+        applyRightPanelHighlight();
         lblDocumentNr.setText(documentLabels.getOrDefault(parentDoc, "Document " + parentDoc.getSortOrder()));
         updateDocumentFileCountLabels();
         openPreviewAt(selectedFileIndex);
@@ -710,7 +826,9 @@ public class EmployeeDashboardController {
             sessionData.clear(); currentFiles.clear(); fileTileControllers.clear();
             documentLabels.clear(); fileImportModel.clear();
             filesTilePane.getChildren().clear();
-            lblTotalFilesInDoc.setText("0"); topOverview.setVisible(false);
+            lblTotalFilesText.setVisible(false);  lblTotalFilesText.setManaged(false);
+            lblTotalFilesInDoc.setVisible(false); lblTotalFilesInDoc.setManaged(false);
+            topOverview.setVisible(false);
 
             buildTree(box);
             populateTreeFromDocuments(documents);
@@ -735,7 +853,19 @@ public class EmployeeDashboardController {
             setTotalsVisible(true);
             updateTotalFilesInBoxLabel();
             treeView.refresh();
+            suppressContentLoad = false;
             treeView.getSelectionModel().select(boxTreeItem);
+            suppressContentLoad = true;
+            Document lastDoc = getNewestDocument();
+            if (lastDoc != null) {
+                TreeItem<Object> lastDocItem = documentTreeItems.get(lastDoc);
+                if (lastDocItem != null) {
+                    treeView.getSelectionModel().select(lastDocItem);
+                    int row = treeView.getRow(lastDocItem);
+                    if (row >= 0) treeView.scrollTo(row);
+                }
+            }
+            javafx.application.Platform.runLater(treeView::requestFocus);
 
         } catch (Exception e) {
             AlertHelper.showError("Load error", "Could not load documents for the selected box.");
@@ -779,7 +909,11 @@ public class EmployeeDashboardController {
             tile.setOnMouseClicked(e -> {
                 int idx = currentFiles.indexOf(file);
                 selectedFileIndex = idx;
+                selectedRightPanelFile = file;
                 openPreviewAt(idx);
+            });
+            tile.focusedProperty().addListener((obs, wasF, isF) -> {
+                if (isF) selectedRightPanelFile = file;
             });
             return tile;
         } catch (Exception e) {
@@ -792,6 +926,7 @@ public class EmployeeDashboardController {
         filesTilePane.getChildren().clear(); fileTileControllers.clear();
         for (ScannedFile f : currentFiles) filesTilePane.getChildren().add(createFileTile(f));
         updateDocumentFileCountLabels();
+        applyRightPanelHighlight();  // restore CSS class after tiles are rebuilt
     }
 
     private void refreshFileTile(ScannedFile file) {
@@ -888,6 +1023,292 @@ public class EmployeeDashboardController {
         draggedDocument = null;
     }
 
+    // ── Keyboard file movement ────────────────────────────────────────────────
+
+    private void moveFileOneStepInTree(ScannedFile file, boolean moveUp) {
+        Document doc = findDocumentForFile(file);
+        if (doc == null) return;
+
+        List<ScannedFile> files = sessionData.get(doc);
+        int idx = files.indexOf(file);
+        if (idx == -1) return;
+
+        int newIdx = moveUp ? idx - 1 : idx + 1;
+        TreeItem<Object> curDocItem = documentTreeItems.get(doc);
+        boolean curDocExpanded = curDocItem != null && curDocItem.isExpanded();
+
+        if (curDocExpanded && newIdx >= 0 && newIdx < files.size()) {
+            Collections.swap(files, idx, newIdx);
+            updateFileSortOrders(files);
+            assignAllBoxFileNames();
+            refreshTreeFileNodes(doc);
+            if (viewedDocument == doc) {
+                currentFiles.clear(); currentFiles.addAll(files); refreshFilePanel();
+            }
+        }
+        else {
+            Document neighbour = moveUp ? getPreviousDocument(doc) : getNextDocument(doc);
+            if (neighbour == null) return;  // already at absolute boundary
+
+            files.remove(idx);
+            updateFileSortOrders(files);
+
+            List<ScannedFile> nFiles = sessionData.computeIfAbsent(neighbour, d -> new ArrayList<>());
+            TreeItem<Object>  nItem  = documentTreeItems.get(neighbour);
+            boolean nExpanded        = nItem != null && nItem.isExpanded();
+
+            if (moveUp) {
+                nFiles.add(file);
+            } else {
+                if (nExpanded) nFiles.add(0, file);
+                else           nFiles.add(file);
+            }
+            updateFileSortOrders(nFiles);
+            assignAllBoxFileNames();
+            refreshTreeFileNodes(doc);
+            refreshTreeFileNodes(neighbour);
+
+            if      (viewedDocument == doc)       { currentFiles.clear(); currentFiles.addAll(files);  refreshFilePanel(); }
+            else if (viewedDocument == neighbour) { currentFiles.clear(); currentFiles.addAll(nFiles); refreshFilePanel(); }
+            updateTotalFilesInBoxLabel();
+        }
+
+        reSelectFileInTree(file);
+    }
+
+    private void cancelExpandTimer() {
+        if (expandTimer != null) { expandTimer.stop(); expandTimer = null; }
+    }
+
+    private void reSelectFileInTree(ScannedFile file) {
+        TreeItem<Object> fi = fileTreeItems.get(file);
+        if (fi == null) return;
+        TreeItem<Object> parent = fi.getParent();
+        if (parent != null && !parent.isExpanded()) {
+            treeView.getSelectionModel().select(parent);
+            int pRow = treeView.getRow(parent);
+            if (pRow >= 0) treeView.scrollTo(pRow);
+        } else {
+
+            treeView.getSelectionModel().select(fi);
+            int row = treeView.getRow(fi);
+            if (row >= 0) treeView.scrollTo(row);
+        }
+    }
+
+    private List<Document> getSortedDocuments() {
+        List<Document> list = new ArrayList<>(sessionData.keySet());
+        list.removeIf(Objects::isNull);
+        list.sort(Comparator.comparingInt(Document::getSortOrder));
+        return list;
+    }
+
+    private Document getPreviousDocument(Document doc) {
+        List<Document> s = getSortedDocuments(); int i = s.indexOf(doc);
+        return i > 0 ? s.get(i - 1) : null;
+    }
+
+    private Document getNextDocument(Document doc) {
+        List<Document> s = getSortedDocuments(); int i = s.indexOf(doc);
+        return (i >= 0 && i < s.size() - 1) ? s.get(i + 1) : null;
+    }
+
+    private void onMoveRightPanelFileToMiddleDocument() {
+        if (rightPanelFocused) return;  // Ctrl+Left handled by right-panel key filter
+        if (selectedRightPanelFile == null) return;
+        Document source = findDocumentForFile(selectedRightPanelFile);
+        if (source == null) return;
+
+        Document target = findMiddleVisibleDocument();
+        if (target == null || target == source) return;
+
+        moveFileBetweenDocuments(selectedRightPanelFile, source, target);
+        selectedRightPanelFile = null;
+    }
+
+    private Document findMiddleVisibleDocument() {
+        int totalVisible  = treeView.getExpandedItemCount();
+        if (totalVisible == 0) return null;
+        Bounds vpBounds   = treeView.localToScene(treeView.getBoundsInLocal());
+        double cellH      = 30.0;
+        double treeH      = treeView.getBoundsInLocal().getHeight();
+        double scrollFrac = 0.0;
+        var skin = treeView.getSkin();
+        if (skin != null) {
+            for (var child : ((javafx.scene.layout.Region) skin).getChildrenUnmodifiable()) {
+                if (child instanceof javafx.scene.control.ScrollBar sb
+                        && sb.getOrientation() == javafx.geometry.Orientation.VERTICAL) {
+                    scrollFrac = sb.getValue(); // 0.0 = top, 1.0 = bottom
+                    break;
+                }
+            }
+        }
+        int maxScroll    = Math.max(0, totalVisible - (int)(treeH / cellH));
+        int firstVisible = (int) Math.round(scrollFrac * maxScroll);
+        int visibleRows  = Math.max(1, (int)(treeH / cellH));
+        int middleRow    = firstVisible + visibleRows / 2;
+        middleRow        = Math.min(middleRow, totalVisible - 1);
+
+        Document best     = null;
+        int      bestDist = Integer.MAX_VALUE;
+        for (Map.Entry<Document, TreeItem<Object>> entry : documentTreeItems.entrySet()) {
+            Document doc  = entry.getKey();
+            int      row  = treeView.getRow(entry.getValue());
+            if (row < 0) continue;   // not visible (collapsed parent)
+            int dist = Math.abs(row - middleRow);
+            if (dist < bestDist) { bestDist = dist; best = doc; }
+        }
+        return best;
+    }
+
+    //Right-panel keyboard navigation
+
+    private void applyRightPanelHighlight() {
+        var children = filesTilePane.getChildren();
+        for (int i = 0; i < children.size(); i++) {
+            Node n = children.get(i);
+            if (i == rightPanelHighlightIndex) {
+                if (!n.getStyleClass().contains(TILE_SELECTED)) n.getStyleClass().add(TILE_SELECTED);
+            } else {
+                n.getStyleClass().remove(TILE_SELECTED);
+            }
+        }
+    }
+    private void clearRightPanelHighlight() {
+        rightPanelHighlightIndex = -1;
+        filesTilePane.getChildren().forEach(n -> n.getStyleClass().remove(TILE_SELECTED));
+        if (!treeView.getStyleClass().contains(TREE_ACTIVE))
+            treeView.getStyleClass().add(TREE_ACTIVE);
+        treeView.requestFocus();
+    }
+
+    private void setRightPanelHighlight(int index) {
+        if (currentFiles.isEmpty()) { rightPanelHighlightIndex = -1; return; }
+        rightPanelHighlightIndex = Math.max(0, Math.min(index, currentFiles.size() - 1));
+        applyRightPanelHighlight();
+        selectedRightPanelFile = currentFiles.get(rightPanelHighlightIndex);
+    }
+
+    private int getTilesPerRow() {
+        var children = filesTilePane.getChildren();
+        if (children.size() <= 1) return Math.max(1, children.size());
+
+        if (children.get(0).getBoundsInParent().getWidth() > 1.0) {
+
+            int    count = 1;
+            double prevX = children.get(0).getBoundsInParent().getMinX();
+            for (int i = 1; i < children.size(); i++) {
+                double x = children.get(i).getBoundsInParent().getMinX();
+                if (x <= prevX) break;
+                prevX = x;
+                count++;
+            }
+            return count;
+        }
+
+        double tileW    = filesTilePane.getTileWidth();
+        double hgap     = filesTilePane.getHgap();
+        javafx.geometry.Insets ins = filesTilePane.getInsets();
+        double contentW = filesTilePane.getWidth() - ins.getLeft() - ins.getRight();
+        if (tileW <= 0 || contentW <= 0) return 1;
+        return Math.max(1, (int) ((contentW + hgap) / (tileW + hgap)));
+    }
+
+    private void handleRightPanelKey(KeyEvent event) {
+        if (currentFiles.isEmpty()) return;
+        int total = currentFiles.size();
+        int cur   = rightPanelHighlightIndex < 0 ? 0 : rightPanelHighlightIndex;
+
+        if (event.getCode() == KeyCode.ESCAPE) {
+            if (previewOpenedViaEnter && topOverview.isVisible()) {
+                topOverview.setVisible(false);
+                previewOpenedViaEnter = false;
+            } else {
+                rightPanelFocused = false;
+                clearRightPanelHighlight();
+            }
+            event.consume(); return;
+        }
+
+        if (event.getCode() == KeyCode.ENTER && !event.isControlDown()) {
+            if (rightPanelHighlightIndex >= 0 && rightPanelHighlightIndex < total) {
+                previewOpenedViaEnter = true;
+                openPreviewAt(rightPanelHighlightIndex);
+            }
+            event.consume(); return;
+        }
+
+        if (event.isControlDown()) {
+            int target;
+            switch (event.getCode()) {
+                case LEFT  -> target = cur - 1;
+                case RIGHT -> target = cur + 1;
+                case UP    -> target = cur - getTilesPerRow();
+                case DOWN  -> target = cur + getTilesPerRow();
+                default    -> { return; }
+            }
+            target = Math.max(0, Math.min(target, total - 1));
+            if (target != cur) reorderRightPanelFile(cur, target);
+            event.consume();
+
+        } else {
+            if (previewOpenedViaEnter && topOverview.isVisible()
+                    && (event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.RIGHT)) {
+                int newIdx = event.getCode() == KeyCode.LEFT ? cur - 1 : cur + 1;
+                if (newIdx >= 0 && newIdx < total) {
+                    setRightPanelHighlight(newIdx);
+                    openPreviewAt(newIdx);
+                }
+
+                event.consume(); return;
+            }
+
+            int newIdx;
+            switch (event.getCode()) {
+                case LEFT -> {
+                    if (cur == 0) {
+                        rightPanelFocused = false;
+                        clearRightPanelHighlight();
+                        event.consume(); return;
+                    }
+                    newIdx = cur - 1;
+                }
+                case RIGHT -> {
+                    newIdx = cur + 1;
+                    if (newIdx >= total) { event.consume(); return; }
+                }
+                case UP -> {
+                    int candidate = cur - getTilesPerRow();
+                    if (candidate < 0) { event.consume(); return; }
+                    newIdx = candidate;
+                }
+                case DOWN -> {
+                    int candidate = cur + getTilesPerRow();
+                    if (candidate >= total) { event.consume(); return; }
+                    newIdx = candidate;
+                }
+                default -> { return; }
+            }
+            if (newIdx >= 0 && newIdx < total) {
+                setRightPanelHighlight(newIdx);
+                event.consume();
+            }
+        }
+    }
+
+    private void reorderRightPanelFile(int fromIdx, int toIdx) {
+        if (fromIdx == toIdx || viewedDocument == null) return;
+        if (fromIdx < 0 || toIdx < 0 || fromIdx >= currentFiles.size() || toIdx >= currentFiles.size()) return;
+        ScannedFile file = currentFiles.remove(fromIdx);
+        currentFiles.add(toIdx, file);
+        sessionData.put(viewedDocument, new ArrayList<>(currentFiles));
+        updateFileSortOrders(currentFiles);
+        assignAllBoxFileNames();
+        rightPanelHighlightIndex = toIdx;
+        refreshFilePanel();
+        refreshTreeFileNodes(viewedDocument);
+    }
+
     // ── Preview ───────────────────────────────────────────────────────────────
 
     private void openPreviewAt(int index) {
@@ -928,10 +1349,20 @@ public class EmployeeDashboardController {
     }
 
     @FXML private void onBtnPreviousPage() {
-        if (!currentFiles.isEmpty() && previewIndex > 0) openPreviewAt(previewIndex - 1);
+        if (!topOverview.isVisible()) return;
+        if (!currentFiles.isEmpty() && previewIndex > 0) {
+            int newIdx = previewIndex - 1;
+            setRightPanelHighlight(newIdx);
+            openPreviewAt(newIdx);
+        }
     }
     @FXML private void onBtnNext() {
-        if (!currentFiles.isEmpty() && previewIndex < currentFiles.size() - 1) openPreviewAt(previewIndex + 1);
+        if (!topOverview.isVisible()) return;
+        if (!currentFiles.isEmpty() && previewIndex < currentFiles.size() - 1) {
+            int newIdx = previewIndex + 1;
+            setRightPanelHighlight(newIdx);
+            openPreviewAt(newIdx);
+        }
     }
     @FXML private void onBtnRotate() {
         if (currentFiles.isEmpty()) return;
@@ -939,7 +1370,10 @@ public class EmployeeDashboardController {
         cur.setUserRotation((cur.getUserRotation() + 90) % 360);
         loadPreviewImage(cur); refreshFileTile(cur);
     }
-    @FXML private void onBtnCloseOverview() { topOverview.setVisible(false); }
+    @FXML private void onBtnCloseOverview() {
+        topOverview.setVisible(false);
+        previewOpenedViaEnter = false;
+    }
 
     @FXML public void onLogout() {
         UserSession.getInstance().clear();
@@ -968,6 +1402,8 @@ public class EmployeeDashboardController {
 
     private void updateDocumentFileCountLabels() {
         lblTotalFilesInDoc.setText(String.valueOf(currentFiles.size()));
+        lblTotalFilesText.setVisible(true);  lblTotalFilesText.setManaged(true);
+        lblTotalFilesInDoc.setVisible(true); lblTotalFilesInDoc.setManaged(true);
     }
 
     private void updateTotalFilesInBoxLabel() {

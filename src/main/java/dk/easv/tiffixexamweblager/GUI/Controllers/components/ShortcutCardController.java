@@ -30,11 +30,11 @@ public class ShortcutCardController {
             {"ESC",              "Close file preview"},
             {"Backspace",        "Rescan file in preview"},
             {"ctrl + r",         "Rotate file in preview"},
-            {"→  Arrow key",     "Show next file in preview"},
-            {"←  Arrow key",     "Show previous file in preview"},
-            {"Tab",              "Next document in tree"},
-            {"Tab + Shift",      "Previous document in tree"},
-            {"Enter",            "Open document in tree"},
+            {"Enter",            "Expand/ collapse / show selected item"},
+            {"↑ / ↓",            "Navigate in left panel"},
+            {"Ctrl + ↑ / ↓",     "Reorder file in left panel"},
+            {"← / → / ↑ / ↓",    "Navigate in right panel"},
+            {"Ctrl + ← / → / ↑ / ↓",  "Reorder file in  right panel"},
             {"ctrl + l",         "Log out"},
     };
 
