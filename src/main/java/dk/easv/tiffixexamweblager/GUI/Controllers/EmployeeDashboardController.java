@@ -178,8 +178,6 @@ public class EmployeeDashboardController {
             if (oldScene != null) shortcutRegistry.detach();
             if (newScene != null) registerShortcuts(newScene);
         });
-
-        // Reposition thumbnail popup whenever the split divider moves
         splitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
             if (treeThumbPopup != null && treeThumbPopup.isShowing()) {
                 TreeItem<Object> sel = treeView.getSelectionModel().getSelectedItem();
